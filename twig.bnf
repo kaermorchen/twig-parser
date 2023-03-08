@@ -1,0 +1,19 @@
+%lex
+%%
+
+\s+               /* skip whitespace */
+
+\d+               return "Number"
+\w+               return "IDENTIFIER"
+
+/lex
+
+%{
+
+%}
+
+%%
+
+Program
+  : /* empty */   { $$ = { type: "Program", body: [] } }
+  ;

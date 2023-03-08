@@ -4,12 +4,13 @@
   "description": "",
   "main": "",
   "scripts": {
-    "syntax-cli": "syntax-cli"
+    "syntax": "syntax-cli",
+    "build-parser": "syntax-cli -g twig.bnf -m lalr1 -o out/parser.js",
+    "test": "vitest"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "",
   "devDependencies": {
-    "syntax-cli": "^0.1.27",
     "@release-it-plugins/lerna-changelog": "^5.0.0",
     "@types/node": "^18.11.15",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
@@ -17,6 +18,8 @@
     "esbuild": "^0.17.8",
     "eslint": "^8.29.0",
     "release-it": "^15.6.0",
-    "typescript": "^4.9.4"
+    "syntax-cli": "^0.1.27",
+    "typescript": "^4.9.4",
+    "vitest": "^0.29.2"
   }
 }
