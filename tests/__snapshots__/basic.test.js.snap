@@ -1,0 +1,37 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Identifier 1`] = `
+{
+  "body": [
+    {
+      "type": "Identifier",
+      "value": "foo",
+    },
+  ],
+  "type": "Block",
+}
+`;
+
+exports[`Numbers 1`] = `
+{
+  "body": [
+    {
+      "type": "NumericLiteral",
+      "value": 42,
+    },
+  ],
+  "type": "Block",
+}
+`;
+
+exports[`Strings 1`] = `
+{
+  "body": [
+    {
+      "type": "StringLiteral",
+      "value": "Hello",
+    },
+  ],
+  "type": "Block",
+}
+`;
