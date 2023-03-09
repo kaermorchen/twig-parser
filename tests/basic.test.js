@@ -1,7 +1,9 @@
 import { test, expect } from 'vitest';
 import result from '../src/parser';
 
-console.log(result.parse('asd werwr <div><div> {{ text }}'));
+console.log(result.parse('aaa {{ bbbb }} ccc'));
+
+// console.log(result.parse('aaa {{ bbbb }} ccc'));
 // console.log(result.parser.parse('4 + 23'));
 
 test('Base', () => {
