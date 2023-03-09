@@ -5,7 +5,7 @@
   "main": "",
   "scripts": {
     "syntax": "syntax-cli",
-    "build-parser": "syntax-cli -g twig.jison -m lalr1 -o out/parser.js",
+    "build-parser": "jison src/twig.jison -m es -o src/parser.js",
     "test": "vitest"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",

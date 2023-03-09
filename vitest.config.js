@@ -5,7 +5,8 @@ export default defineConfig({
     watch: true,
     forceRerunTriggers: configDefaults.forceRerunTriggers.concat(
       'twig.jison',
-      './tests/**'
+      './tests/**',
+      './src/**'
     ),
     deps: {
       inline: [

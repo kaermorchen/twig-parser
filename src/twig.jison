@@ -1,30 +1,46 @@
+/* lexical grammar */
+%lex
 
+VAR_START_TYPE        \{\{[~]?
+VAR_END_TYPE          [~]?\}\}
 
 %%
 
-/* Module
+\s+                   /* skip whitespace */
+.+                     return 'TEXT'
+
+/lex
+
+/* operator associations and precedence */
+
+/* %left '+' '-' */
+
+
+/* %start expressions */
+
+%% /* language grammar */
+
+Module
   :
-  | ElementList { return ast.Module($1) }
+  | Elements
   ;
 
-ElementList
+Elements
   : Element
-  | ElementList Element
+  | Elements Element
   ;
-
 
 Element
-  : Text
+  : Block
   | Text
+  ;
+
+Block
+  : VAR_START_TYPE Text VAR_END_TYPE { return {type: 'Block'} }
   ;
 
 Text
   :
   | TEXT
-  ;
-*/
-
-A
-  : A x
-  |
+  | Text TEXT
   ;

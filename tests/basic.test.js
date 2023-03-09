@@ -1,6 +1,9 @@
 import { test, expect } from 'vitest';
-import Parser from '../src/parser';
-console.log(Parser.parse({}));
+import result from '../src/parser';
+
+console.log(result.parse('asd werwr <div><div> {{ text }}'));
+// console.log(result.parser.parse('4 + 23'));
+
 test('Base', () => {
   // expect(Parser.parse(`a`)).toMatchSnapshot();
 });
