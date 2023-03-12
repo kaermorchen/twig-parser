@@ -1,18 +1,29 @@
 %lex
 
-Text [^<{]+
+TRIM_CHAR [~-]
+ANY_CHAR [\s\S]
 
-%x Block
+VAR_START_TYPE \{\{{TRIM_CHAR}?\s*
+VAR_END_TYPE \s*{TRIM_CHAR}?\}\}
+
+BLOCK_START_TYPE \{\%{TRIM_CHAR}?
+BLOCK_END_TYPE {TRIM_CHAR}?\%\}
+
+COMMENT_START_TYPE \{\#{TRIM_CHAR}?
+COMMENT_END_TYPE {TRIM_CHAR}?\#\}
+
+TEXT [^{]+
+
+%x VariableBlock
 %options flex
 %%
 
-{Text}                              return "TEXT";
+{VAR_START_TYPE}                    this.pushState("VariableBlock"); return "VAR_START_TYPE";
+<VariableBlock>{VAR_END_TYPE}       this.popState(); return "VAR_END_TYPE";
+<VariableBlock>\s+  /* skip whitespaces */
+<VariableBlock>.*?(?={VAR_END_TYPE})  return "Comment";
 
-"{#"                                this.begin("Block"); return "{#";
-<Block>"#}"                         this.popState(); return "#}";
-<Block>\s+                          /* skip whitespaces */
-<Block>((?!\#\})(.|$|\r\n|\r|\n))*  return "Comment";
-
+{TEXT}                              return "TEXT";
 <<EOF>>                            return "EOF";
 
 %%
@@ -26,8 +37,7 @@ Program
   ;
 
 ElementList
-  : -> []
-  | Element -> [$1]
+  : Element -> [$1]
   | ElementList Element -> $1.concat($2)
   ;
 
@@ -41,9 +51,9 @@ Text
   ;
 
 Block
-  : CommentBlock
+  : VariableBlock
   ;
 
-CommentBlock
-  : '{#' Comment '#}' -> {type: 'CommentBlock', value: $2}
+VariableBlock
+  : VAR_START_TYPE Comment VAR_END_TYPE -> {type: 'VariableBlock', value: $2}
   ;
