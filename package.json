@@ -4,8 +4,9 @@
   "description": "",
   "main": "",
   "scripts": {
-    "syntax": "syntax-cli",
-    "build-parser": "syntax-cli -g twig.bnf -m lalr1 -o out/parser.js",
+    "esbuild-base": "esbuild ./src/tokenizer.ts --bundle --outfile=out/tokenizer.js --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "test": "vitest"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
