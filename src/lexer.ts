@@ -24,12 +24,12 @@ export default class Lexer {
   public static STATE_INTERPOLATION = 4;
   public static REGEX_NAME = /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/y;
   public static REGEX_NUMBER = /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/y;
-  // public static REGEX_STRING =
-  //   /"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'/sy;
-  // public static REGEX_DQ_STRING_DELIM = /"/y;
-  // public static REGEX_DQ_STRING_PART =
-  //   /[^#"\\\\]*(?:(?:\\\\.|#(?!\\{))[^#"\\\\]*)*/sy;
-  // public static PUNCTUATION = '()[]{}?:.,|';
+  public static REGEX_STRING =
+    /"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'/sy;
+  public static REGEX_DQ_STRING_DELIM = /"/y;
+  public static REGEX_DQ_STRING_PART =
+    /[^#"\\\\]*(?:(?:\\\\.|#(?!\\{))[^#"\\\\]*)*/sy;
+  public static PUNCTUATION = '()[]{}?:.,|';
 
   private regexes = {
     lex_tokens_start: /(\{\{|\{\%|\{\#)(-|~)?/gs,
@@ -69,9 +69,9 @@ export default class Lexer {
       // dispatch to the lexing functions depending
       // on the current state
       switch (this.state) {
-        // case Lexer.STATE_DATA:
-        //   this.lexData();
-        //   break;
+        case Lexer.STATE_DATA:
+          this.lexData();
+          break;
         // case Lexer.STATE_BLOCK:
         //   this.lexBlock();
         //   break;
@@ -100,6 +100,86 @@ export default class Lexer {
     // return new TokenStream(this.tokens, this.code);
   }
 
+  private lexData(): void {
+    // if no matches are left we return the rest of the template as simple text token
+    if (this.position === this.positions[0].length - 1) {
+      this.pushToken(Token.TEXT_TYPE, this.code.substring(this.cursor));
+      this.cursor = this.end;
+      return;
+    }
+
+    // Find the first token after the current cursor
+    let position = this.positions[0][++this.position];
+    while (position[1] < this.cursor) {
+      if (this.position === this.positions[0].length - 1) {
+        return;
+      }
+      position = this.positions[0][++this.position];
+    }
+
+    // push the template text first
+    let textContent;
+    let text = (textContent = this.code.substring(
+      this.cursor,
+      position[1] - this.cursor
+    ));
+
+    // trim?
+    if (this.positions?.[2]?.[this.position]?.[0]) {
+      if (
+        this.options.whitespace_trim === this.positions[2][this.position][0]
+      ) {
+        // whitespace_trim detected ({%-, {{- or {#-)
+        text = text.trimStart();
+      } else if (
+        this.options.whitespace_line_trim ===
+        this.positions[2][this.position][0]
+      ) {
+        // whitespace_line_trim detected ({%~, {{~ or {#~)
+        // don't trim \r and \n
+        text = text.replace(/ \t\0\v/g, '');
+      }
+    }
+
+    this.pushToken(Token.TEXT_TYPE, text);
+    this.moveCursor(textContent + position[0]);
+
+    let match: RegExpMatchArray | null;
+
+    switch (this.positions[1][this.position][0]) {
+      case this.options['tag_comment'][0]:
+        this.lexComment();
+        break;
+      case this.options['tag_block'][0]:
+        if (
+          (match = this.code
+            .substring(this.cursor)
+            .match(this.regexes.lex_block_raw))
+        ) {
+          this.moveCursor(match[0]);
+          this.lexRawData();
+          // {% line \d+ %}
+        } else if (
+          (match = this.code
+            .substring(this.cursor)
+            .match(this.regexes.lex_block_line))
+        ) {
+          this.moveCursor(match[0]);
+          this.lineno = parseInt(match[1]);
+        } else {
+          this.pushToken(Token.BLOCK_START_TYPE);
+          this.pushState(Lexer.STATE_BLOCK);
+          this.currentVarBlockLine = this.lineno;
+        }
+        break;
+      case this.options['tag_variable'][0]:
+        this.pushToken(Token.VAR_START_TYPE);
+        this.pushState(Lexer.STATE_VAR);
+        this.currentVarBlockLine = this.lineno;
+        break;
+    }
+  }
+
   private pushToken(type_: number, value = ''): void {
     // do not push empty text tokens
     if (Token.TEXT_TYPE === type_ && '' === value) {
@@ -107,6 +187,31 @@ export default class Lexer {
     }
 
     this.tokens.push(new Token(type_, value, this.lineno));
+  }
+
+  private lexComment(): void {
+    // // let match: RegExpMatchArray | null;
+    // const matches = this.code.substring(this.cursor).matchAll(this.regexes.lex_comment);
+    // for (const match of matches) {
+    //   this.positions.push([[match[0], match.index]]);
+    // }
+    // if (
+    //   !(match = this.code
+    //     .substring(this.cursor)
+    //     .match(this.regexes.lex_comment)
+    //   !preg_match(
+    //     this.regexes['lex_comment'],
+    //     this.code,
+    //     match,
+    //     PREG_OFFSET_CAPTURE,
+    //     this.cursor
+    //   )
+    // ) {
+    //   throw new Error('Unclosed comment.', this.lineno, this.source);
+    // }
+    // this.moveCursor(
+    //   this.code.substring(this.cursor, match[0][1] - this.cursor) + match[0][0]
+    // );
   }
 
   private lexInterpolation(): void {
@@ -184,63 +289,55 @@ export default class Lexer {
 
       this.pushToken(Token.NUMBER_TYPE, String(number_));
       this.moveCursor(match[0]);
+    } else if (Lexer.PUNCTUATION.includes(this.code[this.cursor])) {
+      // punctuation
+      // opening bracket
+      if ('([{'.includes(this.code[this.cursor])) {
+        this.brackets.push([this.code[this.cursor], this.lineno]);
+      }
+      // closing bracket
+      else if (')]}'.includes(this.code[this.cursor])) {
+        if (this.brackets.length === 0) {
+          throw new Error(
+            `Unexpected ${this.code[this.cursor]} ${this.lineno} ${this.code}`
+          );
+        }
+
+        const [expect, lineno] = this.brackets.pop();
+
+        if (
+          this.code[this.cursor] !==
+          expect.replace('(', ')').replace('[', ']').replace('{', '}')
+        ) {
+          throw new Error(`Unclosed ${expect} ${lineno} ${this.code}`);
+        }
+      }
+      this.pushToken(Token.PUNCTUATION_TYPE, this.code[this.cursor]);
+      ++this.cursor;
+    } else if (
+      (match = this.code.substring(this.cursor).match(Lexer.REGEX_STRING))
+    ) {
+      // strings
+      this.pushToken(Token.STRING_TYPE, match[0].substring(1, -1));
+      this.moveCursor(match[0]);
+    } else if (
+      // opening double quoted string
+      (match = this.code
+        .substring(this.cursor)
+        .match(Lexer.REGEX_DQ_STRING_DELIM))
+    ) {
+      this.brackets.push(['"', this.lineno]);
+      this.pushState(Lexer.STATE_STRING);
+      this.moveCursor(match[0]);
     }
-    // punctuation
-    // else if (false !== strpos(Lexer.PUNCTUATION, this.code[this.cursor])) {
-    //   // opening bracket
-    //   if (false !== strpos('([{', this.code[this.cursor])) {
-    //     this.brackets.push([this.code[this.cursor], this.lineno]);
-    //   }
-    //   // closing bracket
-    //   else if (false !== strpos(')]}', this.code[this.cursor])) {
-    //     if (empty(this.brackets)) {
-    //       throw new Error(
-    //         sprintf('Unexpected "%s".', this.code[this.cursor]),
-    //         this.lineno,
-    //         this.source
-    //       );
-    //     }
-    //     const [expect, lineno] = array_pop(this.brackets);
-    //     if (this.code[this.cursor] != strtr(expect, '([{', ')]}')) {
-    //       throw new Error(
-    //         sprintf('Unclosed "%s".', expect),
-    //         lineno,
-    //         this.source
-    //       );
-    //     }
-    //   }
-    //   this.pushToken(
-    //     // Token::PUNCTUATION_TYPE
-    //     9,
-    //     this.code[this.cursor]
-    //   );
-    //   ++this.cursor;
-    // }
-    // // strings
-    // else if (preg_match(Lexer.REGEX_STRING, this.code, match, 0, this.cursor)) {
-    //   this.pushToken(
-    //     // Token::STRING_TYPE
-    //     7,
-    //     stripcslashes(substr(match[0], 1, -1))
-    //   );
-    //   this.moveCursor(match[0]);
-    // }
-    // // opening double quoted string
-    // else if (
-    //   preg_match(Lexer.REGEX_DQ_STRING_DELIM, this.code, match, 0, this.cursor)
-    // ) {
-    //   this.brackets.push(['"', this.lineno]);
-    //   this.pushState(Lexer.STATE_STRING);
-    //   this.moveCursor(match[0]);
-    // }
-    // // unlexable
-    // else {
-    //   throw new Error(
-    //     sprintf('Unexpected character "%s".', this.code[this.cursor]),
-    //     this.lineno,
-    //     this.source
-    //   );
-    // }
+    // unlexable
+    else {
+      throw new Error(
+        `Unexpected character ${this.code[this.cursor]} ${this.lineno} ${
+          this.code
+        }`
+      );
+    }
   }
 
   private moveCursor(text: string): void {
@@ -248,12 +345,19 @@ export default class Lexer {
     this.lineno += text.match(/\n/g)?.length ?? 0;
   }
 
+  private pushState(state: number): void {
+    this.states.push(this.state);
+    this.state = state;
+  }
+
   private popState(): void {
-    if (this.states.length === 0) {
+    const state = this.states.pop();
+
+    if (state !== undefined) {
+      this.state = state;
+    } else {
       throw new Error('Cannot pop state without a previous state.');
     }
-
-    this.state = this.states.pop();
   }
 
   // private getOperatorRegex(): string {
