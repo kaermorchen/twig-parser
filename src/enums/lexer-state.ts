@@ -1,9 +1,0 @@
-enum LexerState {
-  STATE_DATA = 'STATE_DATA',
-  STATE_BLOCK = 'STATE_BLOCK',
-  STATE_VAR = 'STATE_VAR',
-  STATE_STRING = 'STATE_STRING',
-  STATE_INTERPOLATION = 'STATE_INTERPOLATION',
-}
-
-export default LexerState;
