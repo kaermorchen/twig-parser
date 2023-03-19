@@ -1,17 +1,31 @@
 import { createToken, Lexer } from 'chevrotain';
 
-const WhiteSpace = createToken({
-  name: 'WhiteSpace',
-  pattern: /\s+/,
-  group: Lexer.SKIPPED,
+const Text = createToken({
+  name: 'Text',
+  pattern: /[^{]+/,
+  line_breaks: true,
+});
+
+// Comment
+const TagCommentOpen = createToken({
+  name: 'TagCommentOpen',
+  pattern: /\{\#/,
+  push_mode: 'COMMENT',
+});
+
+const TagCommentClose = createToken({
+  name: 'TagCommentClose',
+  pattern: /\#\}/,
+  pop_mode: true,
 });
 
 const Comment = createToken({
   name: 'Comment',
-  pattern: /\{\#.*?\#\}/,
+  pattern: /(\s|\S)+(?=\#\})/,
   line_breaks: true,
 });
 
+// Variable
 const TagVariableOpen = createToken({
   name: 'TagVariableOpen',
   pattern: /\{\{/,
@@ -24,18 +38,82 @@ const TagVariableClose = createToken({
   pop_mode: true,
 });
 
-let TwigTokens = [WhiteSpace, Comment, TagVariableOpen, TagVariableClose];
+// Block
+const TagBlockOpen = createToken({
+  name: 'TagBlockOpen',
+  pattern: /\{\%/,
+  push_mode: 'BLOCK',
+});
+
+const TagBlockClose = createToken({
+  name: 'TagBlockClose',
+  pattern: /\%\}/,
+  pop_mode: true,
+});
+
+// Expression
+const WhiteSpace = createToken({
+  name: 'WhiteSpace',
+  pattern: /\s+/,
+  group: Lexer.SKIPPED,
+});
+
+const ArrowFunction = createToken({
+  name: 'ArrowFunction',
+  pattern: /\=\>/,
+});
+
+const Operator = createToken({
+  name: 'Operator',
+  pattern: /not|\-|\+|or|and|b-or|b-xor|b-and|\=\=|\!\=|\<\=\>|\<|\>|\>\=|\<\=|not in|in|matches|starts with|ends with|\.\.|\+|\-|\~|\*|\/|\/\/|\%|is|is not|\*\*|\?\?/,
+});
+
+const Name = createToken({
+  name: 'Name',
+  pattern: /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/y,
+});
+
+const Number = createToken({
+  name: 'Number',
+  pattern: /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/y,
+});
+
+const String = createToken({
+  name: 'String',
+  pattern: /"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'/ys,
+});
+
+const Punctuation = createToken({
+  name: 'Punctuation',
+  pattern: //,
+});
+
+// Lexer
+const Expressions = [
+  WhiteSpace,
+  ArrowFunction,
+  Operator,
+  Name,
+  Number,
+  String,
+]
 
 let TwigLexer = new Lexer({
   defaultMode: 'TEMPLATE',
   modes: {
-    TEMPLATE: [Comment, TagVariableOpen],
-    VARIABLE: [TagVariableClose],
+    TEMPLATE: [Text, TagCommentOpen, TagVariableOpen, TagBlockOpen],
+    COMMENT: [WhiteSpace, TagCommentClose],
+    VARIABLE: Expressions.concat(TagVariableClose),
+    BLOCK: Expressions.concat(TagBlockClose),
   },
 });
 
-let inputText = '{{}}';
-console.log(TwigLexer.tokenize(inputText));
+const inputText = `
+  Hello {{ '45' }}
+`;
+const tokens = TwigLexer.tokenize(inputText);
+
+console.debug(tokens.tokens);
 
 // import type { VFile } from 'vfile';
 // import Grammar from './grammar.js';
