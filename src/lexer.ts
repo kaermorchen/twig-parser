@@ -1,102 +1,141 @@
-import type { VFile } from 'vfile';
-import Grammar from './grammar.js';
-import Reader from './reader.js';
-import { Token, TokenType } from './token.js';
+import { createToken, Lexer } from 'chevrotain';
 
-export enum LexerState {
-  STATE_DATA = 'STATE_DATA',
-  STATE_BLOCK = 'STATE_BLOCK',
-  STATE_VAR = 'STATE_VAR',
-  STATE_STRING = 'STATE_STRING',
-  STATE_INTERPOLATION = 'STATE_INTERPOLATION',
-}
+const WhiteSpace = createToken({
+  name: 'WhiteSpace',
+  pattern: /\s+/,
+  group: Lexer.SKIPPED,
+});
 
-export class Lexer {
-  public readonly file: VFile;
-  protected readonly grammar: Grammar;
-  protected position: number;
-  protected readonly reader: Reader;
-  protected readonly sequence: Token[];
-  protected state: LexerState;
+const Comment = createToken({
+  name: 'Comment',
+  pattern: /\{\#.*?\#\}/,
+  line_breaks: true,
+});
 
-  constructor(document: string, file: VFile) {
-    file.value = document.replace(/\r\n/gm, '\n');
+const TagVariableOpen = createToken({
+  name: 'TagVariableOpen',
+  pattern: /\{\{/,
+  push_mode: 'VARIABLE',
+});
 
-    this.file = file;
-    this.grammar = new Grammar();
-    this.position = -1;
-    this.reader = new Reader(file.value);
-    this.sequence = [];
-    this.state =
-      this.reader.eof || !this.grammar.COMMENT.test(file.value)
-        ? LexerState.DONE
-        : LexerState.READY;
+const TagVariableClose = createToken({
+  name: 'TagVariableClose',
+  pattern: /\}\}/,
+  pop_mode: true,
+});
 
-    this.tokenize();
-  }
+let TwigTokens = [WhiteSpace, Comment, TagVariableOpen, TagVariableClose];
 
-  public get done(): boolean {
-    return this.offset >= this.tokens.length - 1;
-  }
+let TwigLexer = new Lexer({
+  defaultMode: 'TEMPLATE',
+  modes: {
+    TEMPLATE: [Comment, TagVariableOpen],
+    VARIABLE: [TagVariableClose],
+  },
+});
 
-  public get offset(): number {
-    return this.position;
-  }
+let inputText = '{{}}';
+console.log(TwigLexer.tokenize(inputText));
 
-  public get tokens(): Token[] {
-    return this.sequence;
-  }
+// import type { VFile } from 'vfile';
+// import Grammar from './grammar.js';
+// import Reader from './reader.js';
+// import { Token, TokenType } from './token.js';
 
-  protected addToken(
-    kind: keyof typeof TokenKind,
-    k: number,
-    value: Nullable<string> = null
-  ): { sequenced: boolean; token: Token } {}
+// export enum LexerState {
+//   STATE_DATA = 'STATE_DATA',
+//   STATE_BLOCK = 'STATE_BLOCK',
+//   STATE_VAR = 'STATE_VAR',
+//   STATE_STRING = 'STATE_STRING',
+//   STATE_INTERPOLATION = 'STATE_INTERPOLATION',
+// }
 
-  public peek(k: number = 1): Nullable<Token> {
-    return this.sequence[this.offset + k] ?? null;
-  }
+// export class Lexer {
+//   public readonly file: VFile;
+//   protected readonly grammar: Grammar;
+//   protected position: number;
+//   protected readonly reader: Reader;
+//   protected readonly sequence: Token[];
+//   protected state: LexerState;
 
-  public peekUntil(condition: Predicate<Token>, k: number = 1): Token[] {
-    const peeked: Token[] = [];
+//   constructor(document: string, file: VFile) {
+//     file.value = document.replace(/\r\n/gm, '\n');
 
-    for (let j = k; j <= this.tokens.length; j++) {
-      const token: Token = this.peek(j)!;
+//     this.file = file;
+//     this.grammar = new Grammar();
+//     this.position = -1;
+//     this.reader = new Reader(file.value);
+//     this.sequence = [];
+//     this.state =
+//       this.reader.eof || !this.grammar.COMMENT.test(file.value)
+//         ? LexerState.DONE
+//         : LexerState.READY;
 
-      peeked.push(token);
+//     this.tokenize();
+//   }
 
-      if (condition(token, this.offset + j, this.tokens)) break;
-    }
+//   public get done(): boolean {
+//     return this.offset >= this.tokens.length - 1;
+//   }
 
-    return peeked;
-  }
+//   public get offset(): number {
+//     return this.position;
+//   }
 
-  public read(k: number = 1): Nullable<Token> {
-    return this.sequence[(this.position += k)] ?? null;
-  }
+//   public get tokens(): Token[] {
+//     return this.sequence;
+//   }
 
-  protected tokenize(): void {
-    for (const match of this.reader.peekUntil().matchAll(regex)) {
-      const { groups = {}, index = 0, input = '' } = match;
-      let { context: ctx = '' } = groups;
+//   protected addToken(
+//     kind: keyof typeof TokenKind,
+//     k: number,
+//     value: Nullable<string> = null
+//   ): { sequenced: boolean; token: Token } {}
 
-      // two empty lines => no comment context
-      if (ctx !== '\n\n') {
-        // trim context
-        ctx = ctx.trim();
+//   public peek(k: number = 1): Nullable<Token> {
+//     return this.sequence[this.offset + k] ?? null;
+//   }
 
-        /**
-         * Index of comment context in source file.
-         *
-         * @const {number} offset
-         */
-        const offset: number = input.indexOf(ctx, index) + 1;
+//   public peekUntil(condition: Predicate<Token>, k: number = 1): Token[] {
+//     const peeked: Token[] = [];
 
-        // add context start and end tokens
-        this.addToken('CONTEXT_START', offset, ctx);
-        const { column, line } = this.tokens[this.tokens.length - 1]!.point;
-        this.addToken('CONTEXT_END', offset + ctx.length, `${line}:${column}`);
-      }
-    }
-  }
-}
+//     for (let j = k; j <= this.tokens.length; j++) {
+//       const token: Token = this.peek(j)!;
+
+//       peeked.push(token);
+
+//       if (condition(token, this.offset + j, this.tokens)) break;
+//     }
+
+//     return peeked;
+//   }
+
+//   public read(k: number = 1): Nullable<Token> {
+//     return this.sequence[(this.position += k)] ?? null;
+//   }
+
+//   protected tokenize(): void {
+//     for (const match of this.reader.peekUntil().matchAll(regex)) {
+//       const { groups = {}, index = 0, input = '' } = match;
+//       let { context: ctx = '' } = groups;
+
+//       // two empty lines => no comment context
+//       if (ctx !== '\n\n') {
+//         // trim context
+//         ctx = ctx.trim();
+
+//         /**
+//          * Index of comment context in source file.
+//          *
+//          * @const {number} offset
+//          */
+//         const offset: number = input.indexOf(ctx, index) + 1;
+
+//         // add context start and end tokens
+//         this.addToken('CONTEXT_START', offset, ctx);
+//         const { column, line } = this.tokens[this.tokens.length - 1]!.point;
+//         this.addToken('CONTEXT_END', offset + ctx.length, `${line}:${column}`);
+//       }
+//     }
+//   }
+// }

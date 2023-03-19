@@ -17,6 +17,7 @@
     "@types/node": "^18.11.15",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
+    "chevrotain": "^10.5.0",
     "esbuild": "^0.17.8",
     "eslint": "^8.29.0",
     "release-it": "^15.6.0",
