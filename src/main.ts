@@ -141,7 +141,6 @@ class TwigParser extends CstParser {
 
     $.RULE('template', () => {
       $.SUBRULE($.elements);
-      $.CONSUME(EOF);
     });
 
     $.RULE('elements', () => {
@@ -151,17 +150,24 @@ class TwigParser extends CstParser {
     });
 
     $.RULE('element', () => {
-      $.OR([
+      return $.OR([
         { ALT: () => $.CONSUME(text) },
         { ALT: () => $.SUBRULE($.variable) },
+        { ALT: () => $.SUBRULE($.block) },
       ]);
     });
 
     $.RULE('variable', () => {
       $.CONSUME(varStart);
-      $.CONSUME(name);
+      $.SUBRULE($.expression);
       $.CONSUME(varEnd);
     });
+
+    $.RULE('block', () => {
+      $.CONSUME(name);
+    });
+
+    $.RULE('expression', () => {});
 
     this.performSelfAnalysis();
   }

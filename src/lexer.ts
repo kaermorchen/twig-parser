@@ -188,7 +188,7 @@ export class Lexer {
       }
     }
 
-    this.pushToken(Token.EOF_TYPE);
+    // this.pushToken(Token.EOF_TYPE);
 
     if (this.brackets.length) {
       const [expect, lineno] = this.brackets.pop();
@@ -572,7 +572,7 @@ function preg_match(
 ): boolean {
   const str = subject.substring(offset);
 
-  // cleat matches if not empty
+  // clear matches
   matches.length = 0;
 
   for (const match of str.matchAll(re)) {
