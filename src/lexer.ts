@@ -1,4 +1,4 @@
-import { Token } from './Token';
+import { Token } from './token.js';
 
 const PREG_OFFSET_CAPTURE = 256;
 

@@ -1,86 +1,180 @@
-import { createToken, CstParser, Lexer } from 'chevrotain';
+import { createToken, CstParser, Lexer as ChevLexer } from 'chevrotain';
+import { Lexer } from './lexer.js';
+import { Token } from './token.js';
 
-const WhiteSpace = createToken({
-  name: 'WhiteSpace',
+const lexer = new Lexer();
+
+const whiteSpace = createToken({
+  name: 'whiteSpace',
   pattern: /\s+/,
-  group: Lexer.SKIPPED,
+  group: ChevLexer.SKIPPED,
 });
 
-const TagCommentOpen = createToken({
-  name: 'TagCommentOpen',
-  pattern: /\{\#/,
+const EOF = createToken({
+  name: 'EOF',
 });
 
-const TagCommentClose = createToken({
-  name: 'TagCommentClose',
-  pattern: /\#\}/,
+const text = createToken({
+  name: 'text',
 });
 
-const Text = createToken({
-  name: 'Text',
-  pattern: /(?:(?!\{[{%#][~-]?|[~-]?[{%#]\})[\s\S])+/,
-  line_breaks: true,
+const blockStart = createToken({
+  name: 'BlockStart',
 });
 
-// const Text = createToken({
-//   name: 'Text',
-//   pattern: (text: string, offset: number) => {
-//     const lex_tokens_start = /[\s\S]+?(?=\{[{%#])/y;
+const varStart = createToken({
+  name: 'VarStart',
+});
 
-//     lex_tokens_start.lastIndex = offset;
+const blockEnd = createToken({
+  name: 'BlockEnd',
+});
 
-//     const execResult = lex_tokens_start.exec(text);
+const varEnd = createToken({
+  name: 'VarEnd',
+});
 
-//     if (execResult !== null) {
-//       return execResult;
-//     } else {
-//       return [text.substring(offset)];
-//     }
-//   },
-//   line_breaks: true,
-// });
+const name = createToken({
+  name: 'Name',
+});
+
+const number = createToken({
+  name: 'number',
+});
+
+const string = createToken({
+  name: 'string',
+});
+
+const operator = createToken({
+  name: 'operator',
+});
+
+const punctuation = createToken({
+  name: 'punctuation',
+});
+
+const interpolationStart = createToken({
+  name: 'interpolationStart',
+});
+
+const interpolationEnd = createToken({
+  name: 'interpolationStart',
+});
+
+const arrow = createToken({
+  name: 'arrow',
+});
 
 // Lexer
 let allTokens = [
-  TagCommentOpen,
-  TagCommentClose,
-
-  WhiteSpace,
-  Text,
+  whiteSpace,
+  EOF,
+  text,
+  blockStart,
+  varStart,
+  blockEnd,
+  varEnd,
+  name,
+  number,
+  string,
+  operator,
+  punctuation,
+  interpolationStart,
+  interpolationEnd,
+  arrow,
 ];
 
-const TwigLexer = new Lexer(allTokens);
+// const tmpl = `Text {# Comment #} {{user.name}} {% set v = 54 %} end text`;
+const tmpl = `Text {{ user }}`;
+const tokens = [];
 
-// class TwigParser extends CstParser {
-//   constructor() {
-//     super(allTokens);
+for (const token of lexer.tokenize(tmpl)) {
+  const tokenTypeIdx = getTokenType(token.getType())?.tokenTypeIdx;
 
-//     const $ = this;
+  tokens.push({
+    tokenTypeIdx,
+    payload: token.value,
+    image: String(token.value),
+    startLine: token.lineno,
+  });
+}
 
-//     // $.RULE('template', () => {
-//     //   $.OR([{ ALT: () => $.CONSUME(Text) }]);
-//     // });
+function getTokenType(tokenId: number) {
+  switch (tokenId) {
+    case Token.EOF_TYPE:
+      return EOF;
+    case Token.TEXT_TYPE:
+      return text;
+    case Token.BLOCK_START_TYPE:
+      return blockStart;
+    case Token.VAR_START_TYPE:
+      return varStart;
+    case Token.BLOCK_END_TYPE:
+      return blockEnd;
+    case Token.VAR_END_TYPE:
+      return varEnd;
+    case Token.NAME_TYPE:
+      return name;
+    case Token.NUMBER_TYPE:
+      return number;
+    case Token.STRING_TYPE:
+      return string;
+    case Token.OPERATOR_TYPE:
+      return operator;
+    case Token.PUNCTUATION_TYPE:
+      return punctuation;
+    case Token.INTERPOLATION_START_TYPE:
+      return interpolationStart;
+    case Token.INTERPOLATION_END_TYPE:
+      return interpolationEnd;
+    case Token.ARROW_TYPE:
+      return arrow;
+  }
+}
 
-//     $.RULE('comment', () => {
-//       $.CONSUME(TagCommentOpen);
-//       $.CONSUME(Text);
-//       $.CONSUME(TagCommentClose);
-//     });
+class TwigParser extends CstParser {
+  constructor() {
+    super(allTokens);
 
-//     this.performSelfAnalysis();
-//   }
-// }
+    const $ = this;
 
-// const parser = new TwigParser();
+    $.RULE('template', () => {
+      $.SUBRULE($.elements);
+      $.CONSUME(EOF);
+    });
 
-const text = `{# Comment #}`;
+    $.RULE('elements', () => {
+      $.AT_LEAST_ONE(() => {
+        $.SUBRULE($.element);
+      });
+    });
 
-console.log(TwigLexer.tokenize(text).tokens);
+    $.RULE('element', () => {
+      $.OR([
+        { ALT: () => $.CONSUME(text) },
+        { ALT: () => $.SUBRULE($.variable) },
+      ]);
+    });
 
-// parser.input = TwigLexer.tokenize(text).tokens;
-// parser.comment();
+    $.RULE('variable', () => {
+      $.CONSUME(varStart);
+      $.CONSUME(name);
+      $.CONSUME(varEnd);
+    });
 
-// if (parser.errors.length > 0) {
-//   console.log(parser.errors);
+    this.performSelfAnalysis();
+  }
+}
 
-// }
+const parser = new TwigParser();
+
+parser.input = tokens;
+const ast = parser.template();
+
+if (parser.errors.length > 0) {
+  console.log(parser.errors);
+} else {
+  console.debug(ast);
+  console.log('Done');
+}
