@@ -1,9 +1,10 @@
-import { Token } from './token.js';
+import { IToken, TokenType } from 'chevrotain';
+import * as tokens from './tokens.js';
 
 const PREG_OFFSET_CAPTURE = 256;
 
 export class Lexer {
-  private tokens: Token[] = [];
+  private tokens: IToken[] = [];
   private code: string;
   private cursor: number = 0;
   private lineno: number = 1;
@@ -188,8 +189,6 @@ export class Lexer {
       }
     }
 
-    // this.pushToken(Token.EOF_TYPE);
-
     if (this.brackets.length) {
       const [expect, lineno] = this.brackets.pop();
 
@@ -202,7 +201,7 @@ export class Lexer {
   private lexData(): void {
     // if no matches are left we return the rest of the template as simple text token
     if (this.position === this.positions[0].length - 1) {
-      this.pushToken(Token.TEXT_TYPE, this.code.substring(this.cursor));
+      this.pushToken(tokens.text, this.code.substring(this.cursor));
       this.cursor = this.end;
       return;
     }
@@ -237,7 +236,7 @@ export class Lexer {
       }
     }
 
-    this.pushToken(Token.TEXT_TYPE, text);
+    this.pushToken(tokens.text, text);
     this.moveCursor(textContent + position[0]);
 
     switch (this.positions[1][this.position][0]) {
@@ -272,14 +271,14 @@ export class Lexer {
           this.moveCursor(match[0]);
           this.lineno = parseInt(match[1]);
         } else {
-          this.pushToken(Token.BLOCK_START_TYPE);
+          this.pushToken(tokens.blockStart);
           this.pushState(Lexer.STATE_BLOCK);
           this.currentVarBlockLine = this.lineno;
         }
         break;
       }
       case this.options['tag_variable'][0]:
-        this.pushToken(Token.VAR_START_TYPE);
+        this.pushToken(tokens.varStart);
         this.pushState(Lexer.STATE_VAR);
         this.currentVarBlockLine = this.lineno;
         break;
@@ -293,7 +292,7 @@ export class Lexer {
       this.brackets.length === 0 &&
       preg_match(this.regexes.lex_block, this.code, match, 0, this.cursor)
     ) {
-      this.pushToken(Token.BLOCK_END_TYPE);
+      this.pushToken(tokens.blockEnd);
       this.moveCursor(match[0]);
       this.popState();
     } else {
@@ -308,7 +307,7 @@ export class Lexer {
       this.brackets.length === 0 &&
       preg_match(this.regexes.lex_var, this.code, match, 0, this.cursor)
     ) {
-      this.pushToken(Token.VAR_END_TYPE);
+      this.pushToken(tokens.varEnd);
       this.moveCursor(match[0]);
       this.popState();
     } else {
@@ -332,7 +331,7 @@ export class Lexer {
 
     // arrow function
     if ('=' === this.code[this.cursor] && '>' === this.code[this.cursor + 1]) {
-      this.pushToken(Token.ARROW_TYPE, '=>');
+      this.pushToken(tokens.arrow, '=>');
       this.moveCursor('=>');
     }
 
@@ -340,13 +339,13 @@ export class Lexer {
     else if (
       preg_match(this.regexes['operator'], this.code, match, 0, this.cursor)
     ) {
-      this.pushToken(Token.OPERATOR_TYPE, match[0].replace(/\s+/g, ' '));
+      this.pushToken(tokens.operator, match[0].replace(/\s+/g, ' '));
       this.moveCursor(match[0]);
     }
 
     // names
     else if (preg_match(Lexer.REGEX_NAME, this.code, match, 0, this.cursor)) {
-      this.pushToken(Token.NAME_TYPE, match[0]);
+      this.pushToken(tokens.name, match[0]);
       this.moveCursor(match[0]);
     }
 
@@ -359,7 +358,7 @@ export class Lexer {
         number_ = parseInt(match[0]);
         // integers lower than the maximum
       }
-      this.pushToken(Token.NUMBER_TYPE, number_);
+      this.pushToken(tokens.number, number_);
       this.moveCursor(match[0]);
     }
 
@@ -384,12 +383,12 @@ export class Lexer {
           throw new Error(`Unclosed ${expect}`);
         }
       }
-      this.pushToken(Token.PUNCTUATION_TYPE, this.code[this.cursor]);
+      this.pushToken(tokens.punctuation, this.code[this.cursor]);
       ++this.cursor;
     }
     // strings
     else if (preg_match(Lexer.REGEX_STRING, this.code, match, 0, this.cursor)) {
-      this.pushToken(Token.STRING_TYPE, match[0].slice(1, -1));
+      this.pushToken(tokens.string, match[0].slice(1, -1));
       this.moveCursor(match[0]);
     }
     // opening double quoted string
@@ -433,7 +432,7 @@ export class Lexer {
         text = text.replace(/[ \t\0\v]+$/, '');
       }
     }
-    this.pushToken(Token.TEXT_TYPE, text);
+    this.pushToken(tokens.text, text);
   }
 
   private lexComment(): void {
@@ -468,7 +467,7 @@ export class Lexer {
       )
     ) {
       this.brackets.push([this.options['interpolation'][0], this.lineno]);
-      this.pushToken(Token.INTERPOLATION_START_TYPE);
+      this.pushToken(tokens.interpolationStart);
       this.moveCursor(match[0]);
       this.pushState(Lexer.STATE_INTERPOLATION);
     } else if (
@@ -481,7 +480,7 @@ export class Lexer {
       ) &&
       match[0].length > 0
     ) {
-      this.pushToken(Token.STRING_TYPE, match[0]);
+      this.pushToken(tokens.string, match[0]);
       this.moveCursor(match[0]);
     } else if (
       preg_match(Lexer.REGEX_DQ_STRING_DELIM, this.code, match, 0, this.cursor)
@@ -513,7 +512,7 @@ export class Lexer {
       )
     ) {
       this.brackets.pop();
-      this.pushToken(Token.INTERPOLATION_END_TYPE);
+      this.pushToken(tokens.interpolationEnd);
       this.moveCursor(match[0]);
       this.popState();
     } else {
@@ -521,13 +520,20 @@ export class Lexer {
     }
   }
 
-  private pushToken(type_, value = ''): void {
+  private pushToken(tokenType: TokenType, value = ''): void {
     // do not push empty text tokens
-    if (Token.TEXT_TYPE === type_ && '' === value) {
+    if (tokenType.name === 'text' && '' === value) {
       return;
     }
 
-    this.tokens.push(new Token(type_, value, this.lineno));
+    this.tokens.push({
+      image: String(value),
+      startOffset: 0,
+      startLine: this.lineno,
+      tokenType,
+      tokenTypeIdx: tokenType.tokenTypeIdx!,
+      payload: value,
+    });
   }
 
   private moveCursor(text: string): void {

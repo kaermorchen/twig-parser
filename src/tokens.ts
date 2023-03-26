@@ -6,32 +6,28 @@ export const whiteSpace = createToken({
   group: ChevLexer.SKIPPED,
 });
 
-export const EOF = createToken({
-  name: 'EOF',
-});
-
 export const text = createToken({
   name: 'text',
 });
 
 export const blockStart = createToken({
-  name: 'BlockStart',
+  name: 'blockStart',
 });
 
 export const varStart = createToken({
-  name: 'VarStart',
+  name: 'varStart',
 });
 
 export const blockEnd = createToken({
-  name: 'BlockEnd',
+  name: 'blockEnd',
 });
 
 export const varEnd = createToken({
-  name: 'VarEnd',
+  name: 'varEnd',
 });
 
 export const name = createToken({
-  name: 'Name',
+  name: 'name',
 });
 
 export const number = createToken({
