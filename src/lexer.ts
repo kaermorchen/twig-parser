@@ -141,7 +141,7 @@ export class Lexer {
     ),
   };
 
-  public tokenize(code: string): Token[] {
+  public tokenize(code: string): { tokens: IToken[] } {
     this.code = code.replace(/(\r\n|\r)/g, '\n');
     this.cursor = 0;
     this.lineno = 1;
@@ -195,7 +195,7 @@ export class Lexer {
       throw new Error(`Unclosed ${expect}`);
     }
 
-    return this.tokens;
+    return { tokens: this.tokens };
   }
 
   private lexData(): void {

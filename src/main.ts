@@ -5,7 +5,7 @@ const lexer = new Lexer();
 
 // const tmpl = `Text {# Comment #} {{user.name}} {% set v = 54 %} end text`;
 const tmpl = `Text {{ user }}`;
-const tokens = lexer.tokenize(tmpl);
+const { tokens } = lexer.tokenize(tmpl);
 
 const parser = new TwigParser();
 
