@@ -1,28 +1,44 @@
-import type { Node, Position } from 'unist';
-import { u } from 'unist-builder';
-import { source } from 'unist-util-source';
-import type { VFile } from 'vfile';
-import TokenKind from './enums/token-kind.js';
-import Lexer from './lexer.js';
+import { CstParser } from 'chevrotain';
+import * as tokens from './tokens.js';
 
-class Parser {
-  protected readonly lexer: Lexer;
+export default class TwigParser extends CstParser {
+  constructor() {
+    super(tokens);
 
-  constructor(document: string, file: VFile) {
-    this.lexer = new Lexer(document, file);
-  }
+    const $ = this;
 
-  public override parse(): Node {
+    $.RULE('template', () => {
+      $.SUBRULE($.elements);
+    });
 
-  }
+    $.RULE('elements', () => {
+      $.AT_LEAST_ONE(() => {
+        $.SUBRULE($.element);
+      });
+    });
 
-  protected parseComment(token: Token, k: number) {
+    $.RULE('element', () => {
+      return $.OR([
+        { ALT: () => $.CONSUME(tokens.text) },
+        { ALT: () => $.SUBRULE($.variable) },
+        { ALT: () => $.SUBRULE($.block) },
+      ]);
+    });
 
-  }
+    $.RULE('variable', () => {
+      $.CONSUME(tokens.varStart);
+      $.SUBRULE($.expression);
+      $.CONSUME(tokens.varEnd);
+    });
 
-  protected source(value: Node | Position): Nullable<string> {
-    return source(value, this.lexer.file);
+    $.RULE('block', () => {
+      $.CONSUME(tokens.name);
+    });
+
+    $.RULE('expression', () => {
+      return $.OR([{ ALT: () => $.CONSUME(tokens.name) }]);
+    });
+
+    this.performSelfAnalysis();
   }
 }
-
-export default Parser;
