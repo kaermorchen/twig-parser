@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Numbers 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "text": [
+                  {
+                    "image": "Text",
+                    "payload": "Text",
+                    "startLine": 1,
+                    "startOffset": 0,
+                    "tokenType": {
+                      "CATEGORIES": [],
+                      "categoryMatches": [],
+                      "categoryMatchesMap": {},
+                      "isParent": false,
+                      "name": "text",
+                      "tokenTypeIdx": 4,
+                    },
+                    "tokenTypeIdx": 4,
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Text 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "text": [
+                  {
+                    "image": "Text",
+                    "payload": "Text",
+                    "startLine": 1,
+                    "startOffset": 0,
+                    "tokenType": {
+                      "CATEGORIES": [],
+                      "categoryMatches": [],
+                      "categoryMatchesMap": {},
+                      "isParent": false,
+                      "name": "text",
+                      "tokenTypeIdx": 4,
+                    },
+                    "tokenTypeIdx": 4,
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;

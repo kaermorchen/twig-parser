@@ -8,8 +8,8 @@ const tmpl = `Text {{ user }}`;
 const { tokens } = lexer.tokenize(tmpl);
 
 const parser = new TwigParser();
-
 parser.input = tokens;
+
 const ast = parser.template();
 
 if (parser.errors.length > 0) {
