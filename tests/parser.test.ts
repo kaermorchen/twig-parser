@@ -1,17 +1,7 @@
 import { test, expect } from 'vitest';
-import { Lexer } from "../src/lexer.js";
-import TwigParser from "../src/parser.js";
+import { tpl2asr } from './helpers.js';
 
-const lexer = new Lexer();
-const parser = new TwigParser();
-
-export default function tpl2asr(tpl) {
-  const { tokens } = lexer.tokenize(tpl);
-  parser.input = tokens;
-
-  return parser.template();
-}
-
-test('Text', () => {
-  expect(tpl2asr(`Text`)).toMatchSnapshot();
+test('Template', () => {
+  expect(tpl2asr(''), 'Empty template').toMatchSnapshot();
+  expect(tpl2asr('Hello world'), 'Only text').toMatchSnapshot();
 });
