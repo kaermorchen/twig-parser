@@ -1,7 +1,7 @@
-import { Lexer } from "../src/lexer.js";
+import { TwigLexer } from "../src/lexer.js";
 import TwigParser from "../src/parser.js";
 
-const lexer = new Lexer();
+const lexer = new TwigLexer();
 const parser = new TwigParser();
 
 export function tpl2asr(tpl: string) {
