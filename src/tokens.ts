@@ -51,7 +51,7 @@ export const interpolationStart = createToken({
 });
 
 export const interpolationEnd = createToken({
-  name: 'interpolationStart',
+  name: 'interpolationEnd',
 });
 
 export const arrow = createToken({
