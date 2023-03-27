@@ -61,6 +61,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   expression = this.RULE('expression', () => {
     return this.OR([
       { ALT: () => this.SUBRULE(this.number) },
+      { ALT: () => this.SUBRULE(this.string) },
       { ALT: () => this.SUBRULE(this.name) },
     ]);
   });
@@ -73,5 +74,10 @@ export default class TwigParser extends EmbeddedActionsParser {
   number = this.RULE('number', () => ({
     type: 'number',
     value: this.CONSUME(tokens.number).payload,
+  }));
+
+  string = this.RULE('string', () => ({
+    type: 'string',
+    value: this.CONSUME(tokens.string).payload,
   }));
 }

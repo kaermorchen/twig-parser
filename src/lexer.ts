@@ -33,10 +33,10 @@ export class Lexer {
   public static REGEX_NAME = /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/gy;
   public static REGEX_NUMBER = /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/gy;
   public static REGEX_STRING =
-    /"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'/gsy;
-  public static REGEX_DQ_STRING_DELIM = /"/y;
+    /"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/g;
+  public static REGEX_DQ_STRING_DELIM = /"/gy;
   public static REGEX_DQ_STRING_PART =
-    /[^#"\\\\]*(?:(?:\\\\.|#(?!\\{))[^#"\\\\]*)*/sy;
+    /[^#"\\]*(?:(?:\\.|#(?!\{))[^#"\\]*)*/gsy;
   public static PUNCTUATION = '()[]{}?:.,|';
 
   private regexes = {
@@ -133,11 +133,11 @@ export class Lexer {
     ),
     interpolation_start: new RegExp(
       `${this.options['interpolation'][0]}\\s*`,
-      'y'
+      'gy'
     ),
     interpolation_end: new RegExp(
       `\\s*${this.options['interpolation'][1]}`,
-      'y'
+      'gy'
     ),
   };
 

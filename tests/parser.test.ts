@@ -19,3 +19,9 @@ test('Number', () => {
   expect(tpl2asr('{{ 42 }}'), 'Integer').toMatchSnapshot();
   expect(tpl2asr('{{ 42.23 }}'), 'Float').toMatchSnapshot();
 });
+
+test('String', () => {
+  expect(tpl2asr('{{ "Hello world" }}')).toMatchSnapshot();
+  expect(tpl2asr(`{{ 'Hello world' }}`)).toMatchSnapshot();
+  expect(tpl2asr(`{{ 'It\\'s good' }}`)).toMatchSnapshot();
+});

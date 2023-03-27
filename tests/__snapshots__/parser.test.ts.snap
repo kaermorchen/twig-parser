@@ -60,6 +60,51 @@ exports[`Number 3`] = `
 }
 `;
 
+exports[`String 1`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "string",
+        "value": "Hello world",
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
+exports[`String 2`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "string",
+        "value": "Hello world",
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
+exports[`String 3`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "string",
+        "value": "It\\\\'s good",
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
 exports[`Template 1`] = `
 {
   "children": [],
