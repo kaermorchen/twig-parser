@@ -27,10 +27,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   element = this.RULE('element', () => {
     return this.OR([
       {
-        ALT: () => ({
-          type: 'text',
-          value: this.CONSUME(tokens.text).payload,
-        }),
+        ALT: () => this.SUBRULE(this.text),
       },
       {
         ALT: () => this.SUBRULE(this.variable),
@@ -51,6 +48,11 @@ export default class TwigParser extends EmbeddedActionsParser {
       value,
     };
   });
+
+  text = this.RULE('text', () => ({
+    type: 'text',
+    value: this.CONSUME(tokens.text).payload,
+  }));
 
   block = this.RULE('block', () => {
     this.CONSUME(tokens.name);
