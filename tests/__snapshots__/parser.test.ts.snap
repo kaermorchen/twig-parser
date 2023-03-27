@@ -1,5 +1,65 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Name 1`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "name",
+        "value": "user",
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
+exports[`Number 1`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "number",
+        "value": 0,
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
+exports[`Number 2`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "number",
+        "value": 42,
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
+exports[`Number 3`] = `
+{
+  "children": [
+    {
+      "type": "variable",
+      "value": {
+        "type": "number",
+        "value": 42.23,
+      },
+    },
+  ],
+  "type": "template",
+}
+`;
+
 exports[`Template 1`] = `
 {
   "children": [],

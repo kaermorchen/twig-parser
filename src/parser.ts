@@ -59,6 +59,19 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   expression = this.RULE('expression', () => {
-    return this.OR([{ ALT: () => this.CONSUME(tokens.name).image }]);
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.number) },
+      { ALT: () => this.SUBRULE(this.name) },
+    ]);
   });
+
+  name = this.RULE('name', () => ({
+    type: 'name',
+    value: this.CONSUME(tokens.name).payload,
+  }));
+
+  number = this.RULE('number', () => ({
+    type: 'number',
+    value: this.CONSUME(tokens.number).payload,
+  }));
 }

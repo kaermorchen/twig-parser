@@ -31,7 +31,7 @@ export class Lexer {
   public static STATE_STRING = 3;
   public static STATE_INTERPOLATION = 4;
   public static REGEX_NAME = /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/gy;
-  public static REGEX_NUMBER = /[0-9]+(?:\\.[0-9]+)?([Ee][\\+\\-][0-9]+)?/gy;
+  public static REGEX_NUMBER = /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/gy;
   public static REGEX_STRING =
     /"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'/gsy;
   public static REGEX_DQ_STRING_DELIM = /"/y;
