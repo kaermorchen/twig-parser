@@ -21,7 +21,7 @@ export default class TwigParser extends CstParser {
     this.OR([
       { ALT: () => this.SUBRULE(this.comment) },
       { ALT: () => this.SUBRULE(this.text) },
-      // { ALT: () => this.SUBRULE(this.variable) },
+      { ALT: () => this.SUBRULE(this.variable) },
       // { ALT: () => this.SUBRULE(this.block) },
     ]);
   });
@@ -38,31 +38,33 @@ export default class TwigParser extends CstParser {
     this.CONSUME(tokens.RComment);
   });
 
-  // variable = this.RULE('variable', () => {
-  //   this.CONSUME(tokens.varStart);
-  //   this.SUBRULE(this.expression);
-  //   this.CONSUME(tokens.varEnd);
-  // });
+  variable = this.RULE('variable', () => {
+    this.CONSUME(tokens.LVariable);
+    this.OPTION(() => {
+      this.SUBRULE(this.expression);
+    });
+    this.CONSUME(tokens.RVariable);
+  });
 
   // block = this.RULE('block', () => {
   //   this.CONSUME(tokens.name);
   // });
 
-  // expression = this.RULE('expression', () => {
-  //   this.OR([
-  //     { ALT: () => this.SUBRULE(this.number) },
-  //     { ALT: () => this.SUBRULE(this.string) },
-  //     { ALT: () => this.SUBRULE(this.name) },
-  //   ]);
-  // });
+  expression = this.RULE('expression', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.number) },
+      // { ALT: () => this.SUBRULE(this.string) },
+      // { ALT: () => this.SUBRULE(this.name) },
+    ]);
+  });
 
   // name = this.RULE('name', () => {
   //   this.CONSUME(tokens.name);
   // });
 
-  // number = this.RULE('number', () => {
-  //   this.CONSUME(tokens.number);
-  // });
+  number = this.RULE('number', () => {
+    this.CONSUME(tokens.Number);
+  });
 
   // string = this.RULE('string', () => {
   //   this.CONSUME(tokens.string);

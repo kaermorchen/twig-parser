@@ -28,9 +28,9 @@ exports[`Comment 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 4,
+                            "tokenTypeIdx": 5,
                           },
-                          "tokenTypeIdx": 4,
+                          "tokenTypeIdx": 5,
                         },
                       ],
                       "RComment": [
@@ -49,9 +49,9 @@ exports[`Comment 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                     },
@@ -100,9 +100,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Comment",
-                            "tokenTypeIdx": 6,
+                            "tokenTypeIdx": 7,
                           },
-                          "tokenTypeIdx": 6,
+                          "tokenTypeIdx": 7,
                         },
                       ],
                       "LComment": [
@@ -121,9 +121,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 4,
+                            "tokenTypeIdx": 5,
                           },
-                          "tokenTypeIdx": 4,
+                          "tokenTypeIdx": 5,
                         },
                       ],
                       "RComment": [
@@ -142,9 +142,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                     },
@@ -194,9 +194,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Comment",
-                            "tokenTypeIdx": 6,
+                            "tokenTypeIdx": 7,
                           },
-                          "tokenTypeIdx": 6,
+                          "tokenTypeIdx": 7,
                         },
                       ],
                       "LComment": [
@@ -215,9 +215,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 4,
+                            "tokenTypeIdx": 5,
                           },
-                          "tokenTypeIdx": 4,
+                          "tokenTypeIdx": 5,
                         },
                       ],
                       "RComment": [
@@ -236,9 +236,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                     },
@@ -301,13 +301,190 @@ exports[`Template 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Text",
-                            "tokenTypeIdx": 16,
+                            "tokenTypeIdx": 19,
                           },
-                          "tokenTypeIdx": 16,
+                          "tokenTypeIdx": 19,
                         },
                       ],
                     },
                     "name": "text",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Variable 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 8,
+                          },
+                          "tokenTypeIdx": 8,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 5,
+                          "endLine": 1,
+                          "endOffset": 4,
+                          "image": "}}",
+                          "startColumn": 4,
+                          "startLine": 1,
+                          "startOffset": 3,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Variable 2`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 8,
+                          },
+                          "tokenTypeIdx": 8,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 8,
+                          "endLine": 1,
+                          "endOffset": 7,
+                          "image": "}}",
+                          "startColumn": 7,
+                          "startLine": 1,
+                          "startOffset": 6,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "number": [
+                              {
+                                "children": {
+                                  "Number": [
+                                    {
+                                      "endColumn": 5,
+                                      "endLine": 1,
+                                      "endOffset": 4,
+                                      "image": "42",
+                                      "startColumn": 4,
+                                      "startLine": 1,
+                                      "startOffset": 3,
+                                      "tokenType": {
+                                        "CATEGORIES": [],
+                                        "PATTERN": /\\[0-9\\]\\+\\(\\?:\\\\\\.\\[0-9\\]\\+\\)\\?\\(\\[Ee\\]\\[\\\\\\+\\\\-\\]\\[0-9\\]\\+\\)\\?/,
+                                        "categoryMatches": [],
+                                        "categoryMatchesMap": {},
+                                        "isParent": false,
+                                        "name": "Number",
+                                        "tokenTypeIdx": 4,
+                                      },
+                                      "tokenTypeIdx": 4,
+                                    },
+                                  ],
+                                },
+                                "name": "number",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
                   },
                 ],
               },

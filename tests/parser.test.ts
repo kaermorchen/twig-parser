@@ -15,9 +15,10 @@ test('Comment', () => {
   #}`), 'Multiline comment').toMatchSnapshot();
 });
 
-// test('Variable', () => {
-//   expect(tpl2asr('{{ }}'), 'Empty variable').toMatchSnapshot();
-// });
+test('Variable', () => {
+  expect(tpl2asr('{{ }}'), 'Empty variable').toMatchSnapshot();
+  expect(tpl2asr('{{ 42 }}'), 'Value').toMatchSnapshot();
+});
 
 // test('Name', () => {
 //   expect(tpl2asr('{{ user }}')).toMatchSnapshot();
