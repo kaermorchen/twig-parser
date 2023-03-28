@@ -336,9 +336,9 @@ exports[`Name 1`] = `
                                         "categoryMatchesMap": {},
                                         "isParent": false,
                                         "name": "Name",
-                                        "tokenTypeIdx": 25,
+                                        "tokenTypeIdx": 36,
                                       },
-                                      "tokenTypeIdx": 25,
+                                      "tokenTypeIdx": 36,
                                     },
                                   ],
                                 },
@@ -1176,44 +1176,7 @@ exports[`Template 3`] = `
   "children": {
     "elements": [
       {
-        "children": {
-          "element": [
-            {
-              "children": {
-                "text": [
-                  {
-                    "children": {
-                      "Text": [
-                        {
-                          "endColumn": 11,
-                          "endLine": 1,
-                          "endOffset": 10,
-                          "image": "Hello world",
-                          "startColumn": 1,
-                          "startLine": 1,
-                          "startOffset": 0,
-                          "tokenType": {
-                            "CATEGORIES": [],
-                            "LINE_BREAKS": true,
-                            "PATTERN": [Function],
-                            "categoryMatches": [],
-                            "categoryMatchesMap": {},
-                            "isParent": false,
-                            "name": "Text",
-                            "tokenTypeIdx": 26,
-                          },
-                          "tokenTypeIdx": 26,
-                        },
-                      ],
-                    },
-                    "name": "text",
-                  },
-                ],
-              },
-              "name": "element",
-            },
-          ],
-        },
+        "children": {},
         "name": "elements",
       },
     ],
@@ -1437,9 +1400,9 @@ exports[`Verbatim 1`] = `
                                   "categoryMatchesMap": {},
                                   "isParent": false,
                                   "name": "EndVerbatim",
-                                  "tokenTypeIdx": 24,
+                                  "tokenTypeIdx": 35,
                                 },
-                                "tokenTypeIdx": 24,
+                                "tokenTypeIdx": 35,
                               },
                             ],
                             "LBlock": [
@@ -1538,9 +1501,9 @@ exports[`Verbatim 1`] = `
                                   "categoryMatchesMap": {},
                                   "isParent": false,
                                   "name": "Verbatim",
-                                  "tokenTypeIdx": 23,
+                                  "tokenTypeIdx": 34,
                                 },
-                                "tokenTypeIdx": 23,
+                                "tokenTypeIdx": 34,
                               },
                             ],
                             "rawText": [
@@ -1568,9 +1531,9 @@ exports[`Verbatim 1`] = `
                                         "categoryMatchesMap": {},
                                         "isParent": false,
                                         "name": "RawText",
-                                        "tokenTypeIdx": 25,
+                                        "tokenTypeIdx": 37,
                                       },
-                                      "tokenTypeIdx": 25,
+                                      "tokenTypeIdx": 37,
                                     },
                                   ],
                                 },
