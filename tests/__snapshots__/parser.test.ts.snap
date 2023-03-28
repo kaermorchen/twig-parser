@@ -1,5 +1,263 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Comment 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "comment": [
+                  {
+                    "children": {
+                      "LComment": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{#",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{#/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LComment",
+                            "tokenTypeIdx": 4,
+                          },
+                          "tokenTypeIdx": 4,
+                        },
+                      ],
+                      "RComment": [
+                        {
+                          "endColumn": 5,
+                          "endLine": 1,
+                          "endOffset": 4,
+                          "image": "#}",
+                          "startColumn": 4,
+                          "startLine": 1,
+                          "startOffset": 3,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /#\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RComment",
+                            "tokenTypeIdx": 5,
+                          },
+                          "tokenTypeIdx": 5,
+                        },
+                      ],
+                    },
+                    "name": "comment",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Comment 2`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "comment": [
+                  {
+                    "children": {
+                      "Comment": [
+                        {
+                          "endColumn": 20,
+                          "endLine": 1,
+                          "endOffset": 19,
+                          "image": "This is a comment",
+                          "startColumn": 4,
+                          "startLine": 1,
+                          "startOffset": 3,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "LINE_BREAKS": true,
+                            "PATTERN": /\\[\\\\S\\\\s\\]\\*\\?\\(\\?=\\\\s\\*#\\}\\)/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "Comment",
+                            "tokenTypeIdx": 6,
+                          },
+                          "tokenTypeIdx": 6,
+                        },
+                      ],
+                      "LComment": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{#",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{#/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LComment",
+                            "tokenTypeIdx": 4,
+                          },
+                          "tokenTypeIdx": 4,
+                        },
+                      ],
+                      "RComment": [
+                        {
+                          "endColumn": 23,
+                          "endLine": 1,
+                          "endOffset": 22,
+                          "image": "#}",
+                          "startColumn": 22,
+                          "startLine": 1,
+                          "startOffset": 21,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /#\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RComment",
+                            "tokenTypeIdx": 5,
+                          },
+                          "tokenTypeIdx": 5,
+                        },
+                      ],
+                    },
+                    "name": "comment",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Comment 3`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "comment": [
+                  {
+                    "children": {
+                      "Comment": [
+                        {
+                          "endColumn": 15,
+                          "endLine": 3,
+                          "endOffset": 32,
+                          "image": "First line
+    Second line",
+                          "startColumn": 5,
+                          "startLine": 2,
+                          "startOffset": 7,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "LINE_BREAKS": true,
+                            "PATTERN": /\\[\\\\S\\\\s\\]\\*\\?\\(\\?=\\\\s\\*#\\}\\)/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "Comment",
+                            "tokenTypeIdx": 6,
+                          },
+                          "tokenTypeIdx": 6,
+                        },
+                      ],
+                      "LComment": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{#",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{#/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LComment",
+                            "tokenTypeIdx": 4,
+                          },
+                          "tokenTypeIdx": 4,
+                        },
+                      ],
+                      "RComment": [
+                        {
+                          "endColumn": 4,
+                          "endLine": 4,
+                          "endOffset": 37,
+                          "image": "#}",
+                          "startColumn": 3,
+                          "startLine": 4,
+                          "startOffset": 36,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /#\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RComment",
+                            "tokenTypeIdx": 5,
+                          },
+                          "tokenTypeIdx": 5,
+                        },
+                      ],
+                    },
+                    "name": "comment",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
 exports[`Template 1`] = `
 {
   "children": {
@@ -43,9 +301,9 @@ exports[`Template 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Text",
-                            "tokenTypeIdx": 13,
+                            "tokenTypeIdx": 16,
                           },
-                          "tokenTypeIdx": 13,
+                          "tokenTypeIdx": 16,
                         },
                       ],
                     },

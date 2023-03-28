@@ -6,6 +6,15 @@ test('Template', () => {
   expect(tpl2asr('Hello world'), 'Only text').toMatchSnapshot();
 });
 
+test('Comment', () => {
+  expect(tpl2asr('{# #}'), 'Empty comment').toMatchSnapshot();
+  expect(tpl2asr('{# This is a comment #}'), 'Singleline comment').toMatchSnapshot();
+  expect(tpl2asr(`{#
+    First line
+    Second line
+  #}`), 'Multiline comment').toMatchSnapshot();
+});
+
 // test('Variable', () => {
 //   expect(tpl2asr('{{ }}'), 'Empty variable').toMatchSnapshot();
 // });

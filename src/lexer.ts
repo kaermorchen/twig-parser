@@ -13,6 +13,11 @@ function createToken(config: ITokenConfig) {
 }
 
 createToken({ name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED });
+
+createToken({ name: 'LComment', pattern: /{#/ });
+createToken({ name: 'RComment', pattern: /#}/ });
+createToken({ name: 'Comment', pattern: /[\S\s]*?(?=\s*#})/, line_breaks: true, });
+
 createToken({ name: 'True', pattern: /true/ });
 createToken({ name: 'False', pattern: /false/ });
 createToken({ name: 'Null', pattern: /null/ });
