@@ -5,6 +5,20 @@ exports[`Template 1`] = `
   "children": {
     "elements": [
       {
+        "children": {},
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Template 2`] = `
+{
+  "children": {
+    "elements": [
+      {
         "children": {
           "element": [
             {
@@ -12,7 +26,7 @@ exports[`Template 1`] = `
                 "text": [
                   {
                     "children": {
-                      "text": [
+                      "Text": [
                         {
                           "endColumn": 11,
                           "endLine": 1,
@@ -28,7 +42,7 @@ exports[`Template 1`] = `
                             "categoryMatches": [],
                             "categoryMatchesMap": {},
                             "isParent": false,
-                            "name": "text",
+                            "name": "Text",
                             "tokenTypeIdx": 4,
                           },
                           "tokenTypeIdx": 4,

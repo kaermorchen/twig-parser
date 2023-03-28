@@ -17,7 +17,7 @@ function createToken(config: ITokenConfig): TokenType {
 }
 
 export const WhiteSpace = createToken({
-  name: 'whiteSpace',
+  name: 'WhiteSpace',
   pattern: /\s+/,
   group: Lexer.SKIPPED,
 });
