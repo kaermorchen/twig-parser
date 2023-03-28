@@ -20,6 +20,11 @@ test('Variable', () => {
   expect(tpl2asr('{{ 42 }}'), 'Value').toMatchSnapshot();
 });
 
+test('Literals', () => {
+  expect(tpl2asr('{{ 42 }}'), 'Integer').toMatchSnapshot();
+  expect(tpl2asr('{{ 42.23 }}'), 'Float').toMatchSnapshot();
+});
+
 // test('Name', () => {
 //   expect(tpl2asr('{{ user }}')).toMatchSnapshot();
 // });
