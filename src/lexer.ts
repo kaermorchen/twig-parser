@@ -6,23 +6,24 @@ import {
   TokenType,
 } from 'chevrotain';
 
-export const tokenMap: Map<string, TokenType> = new Map();
+const tokenArray: TokenType[] = [];
 
-function createToken(config: ITokenConfig): TokenType {
-  const token = chevrotainCreateToken(config);
-
-  tokenMap.set(config.name, token);
-
-  return token;
+function createToken(config: ITokenConfig) {
+  tokenArray.push(chevrotainCreateToken(config));
 }
 
-export const WhiteSpace = createToken({
-  name: 'WhiteSpace',
-  pattern: /\s+/,
-  group: Lexer.SKIPPED,
-});
+createToken({ name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED });
+createToken({ name: 'True', pattern: /true/ });
+createToken({ name: 'False', pattern: /false/ });
+createToken({ name: 'Null', pattern: /null/ });
+createToken({ name: 'LCurly', pattern: /{/ });
+createToken({ name: 'RCurly', pattern: /}/ });
+createToken({ name: 'LSquare', pattern: /\[/ });
+createToken({ name: 'RSquare', pattern: /]/ });
+createToken({ name: 'Comma', pattern: /,/ });
+createToken({ name: 'Colon', pattern: /:/ });
 
-export const Text = createToken({
+createToken({
   name: 'Text',
   line_breaks: true,
   pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
@@ -87,8 +88,15 @@ export const Text = createToken({
 
 export class TwigLexer extends Lexer {
   constructor() {
-    super([...tokenMap.values()]);
+    super(tokenArray);
   }
 }
 
-export const tokens = Object.fromEntries(tokenMap);
+export const tokens = tokenArray.reduce<Record<string, TokenType>>(
+  (obj, token) => {
+    obj[token.name] = token;
+
+    return obj;
+  },
+  {}
+);
