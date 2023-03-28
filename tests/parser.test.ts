@@ -37,9 +37,9 @@ test('String', () => {
   expect(tpl2asr(`{{ 'It\\'s good' }}`)).toMatchSnapshot();
 });
 
-// test('Name', () => {
-//   expect(tpl2asr('{{ user }}')).toMatchSnapshot();
-// });
+test('Name', () => {
+  expect(tpl2asr('{{ user }}')).toMatchSnapshot();
+});
 
 test('Verbatim', () => {
   expect(tpl2asr(`{% verbatim %}

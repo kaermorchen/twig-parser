@@ -260,6 +260,112 @@ exports[`Comment 3`] = `
 }
 `;
 
+exports[`Name 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 10,
+                          "endLine": 1,
+                          "endOffset": 9,
+                          "image": "}}",
+                          "startColumn": 9,
+                          "startLine": 1,
+                          "startOffset": 8,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "name": [
+                              {
+                                "children": {
+                                  "Name": [
+                                    {
+                                      "endColumn": 7,
+                                      "endLine": 1,
+                                      "endOffset": 6,
+                                      "image": "user",
+                                      "startColumn": 4,
+                                      "startLine": 1,
+                                      "startOffset": 3,
+                                      "tokenType": {
+                                        "CATEGORIES": [],
+                                        "PATTERN": /\\[a-zA-Z_\\\\x7f-\\\\xff\\]\\[a-zA-Z0-9_\\\\x7f-\\\\xff\\]\\*/,
+                                        "categoryMatches": [],
+                                        "categoryMatchesMap": {},
+                                        "isParent": false,
+                                        "name": "Name",
+                                        "tokenTypeIdx": 25,
+                                      },
+                                      "tokenTypeIdx": 25,
+                                    },
+                                  ],
+                                },
+                                "name": "name",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
 exports[`Number 1`] = `
 {
   "children": {

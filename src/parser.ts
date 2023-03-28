@@ -69,13 +69,13 @@ export default class TwigParser extends CstParser {
   expression = this.RULE('expression', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.literal) },
-      // { ALT: () => this.SUBRULE(this.name) },
+      { ALT: () => this.SUBRULE(this.name) },
     ]);
   });
 
-  // name = this.RULE('name', () => {
-  //   this.CONSUME(tokens.name);
-  // });
+  name = this.RULE('name', () => {
+    this.CONSUME(tokens.Name);
+  });
 
   literal = this.RULE('literal', () => {
     this.OR([

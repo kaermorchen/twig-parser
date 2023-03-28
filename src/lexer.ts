@@ -38,6 +38,7 @@ createToken({ name: 'Colon', pattern: /:/ });
 createToken({ name: 'Arrow', pattern: /=>/ });
 createToken({ name: 'Verbatim', pattern: /\bverbatim\b/ });
 createToken({ name: 'EndVerbatim', pattern: /\bendverbatim\b/ });
+createToken({ name: 'Name', pattern: /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/ });
 
 createToken({
   name: 'RawText',
@@ -68,54 +69,6 @@ createToken({
       : [text.substring(startOffset, execResult.index)];
   },
 });
-
-// export const blockStart = createToken({
-//   name: 'blockStart',
-// });
-
-// export const varStart = createToken({
-//   name: 'varStart',
-// });
-
-// export const blockEnd = createToken({
-//   name: 'blockEnd',
-// });
-
-// export const varEnd = createToken({
-//   name: 'varEnd',
-// });
-
-// export const name = createToken({
-//   name: 'name',
-// });
-
-// export const number = createToken({
-//   name: 'number',
-// });
-
-// export const string = createToken({
-//   name: 'string',
-// });
-
-// export const operator = createToken({
-//   name: 'operator',
-// });
-
-// export const punctuation = createToken({
-//   name: 'punctuation',
-// });
-
-// export const interpolationStart = createToken({
-//   name: 'interpolationStart',
-// });
-
-// export const interpolationEnd = createToken({
-//   name: 'interpolationEnd',
-// });
-
-// export const arrow = createToken({
-//   name: 'arrow',
-// });
 
 export class TwigLexer extends Lexer {
   constructor() {
