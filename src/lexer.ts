@@ -14,6 +14,7 @@ function createToken(config: ITokenConfig) {
 
 createToken({ name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED });
 createToken({ name: 'Number', pattern: /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/ });
+createToken({ name: 'String', pattern: /"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/ });
 
 createToken({ name: 'LComment', pattern: /{#/ });
 createToken({ name: 'RComment', pattern: /#}/ });
@@ -31,6 +32,8 @@ createToken({ name: 'LSquare', pattern: /\[/ });
 createToken({ name: 'RSquare', pattern: /]/ });
 createToken({ name: 'Comma', pattern: /,/ });
 createToken({ name: 'Colon', pattern: /:/ });
+
+
 
 
 createToken({

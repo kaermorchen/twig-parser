@@ -28,9 +28,9 @@ exports[`Comment 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                       "RComment": [
@@ -49,9 +49,9 @@ exports[`Comment 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 6,
+                            "tokenTypeIdx": 7,
                           },
-                          "tokenTypeIdx": 6,
+                          "tokenTypeIdx": 7,
                         },
                       ],
                     },
@@ -100,9 +100,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Comment",
-                            "tokenTypeIdx": 7,
+                            "tokenTypeIdx": 8,
                           },
-                          "tokenTypeIdx": 7,
+                          "tokenTypeIdx": 8,
                         },
                       ],
                       "LComment": [
@@ -121,9 +121,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                       "RComment": [
@@ -142,9 +142,9 @@ exports[`Comment 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 6,
+                            "tokenTypeIdx": 7,
                           },
-                          "tokenTypeIdx": 6,
+                          "tokenTypeIdx": 7,
                         },
                       ],
                     },
@@ -194,9 +194,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Comment",
-                            "tokenTypeIdx": 7,
+                            "tokenTypeIdx": 8,
                           },
-                          "tokenTypeIdx": 7,
+                          "tokenTypeIdx": 8,
                         },
                       ],
                       "LComment": [
@@ -215,9 +215,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LComment",
-                            "tokenTypeIdx": 5,
+                            "tokenTypeIdx": 6,
                           },
-                          "tokenTypeIdx": 5,
+                          "tokenTypeIdx": 6,
                         },
                       ],
                       "RComment": [
@@ -236,9 +236,9 @@ exports[`Comment 3`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RComment",
-                            "tokenTypeIdx": 6,
+                            "tokenTypeIdx": 7,
                           },
-                          "tokenTypeIdx": 6,
+                          "tokenTypeIdx": 7,
                         },
                       ],
                     },
@@ -258,7 +258,7 @@ exports[`Comment 3`] = `
 }
 `;
 
-exports[`Literals 1`] = `
+exports[`Number 1`] = `
 {
   "children": {
     "elements": [
@@ -286,9 +286,122 @@ exports[`Literals 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LVariable",
-                            "tokenTypeIdx": 8,
+                            "tokenTypeIdx": 9,
                           },
-                          "tokenTypeIdx": 8,
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 7,
+                          "endLine": 1,
+                          "endOffset": 6,
+                          "image": "}}",
+                          "startColumn": 6,
+                          "startLine": 1,
+                          "startOffset": 5,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "literal": [
+                              {
+                                "children": {
+                                  "numberLiteral": [
+                                    {
+                                      "children": {
+                                        "Number": [
+                                          {
+                                            "endColumn": 4,
+                                            "endLine": 1,
+                                            "endOffset": 3,
+                                            "image": "0",
+                                            "startColumn": 4,
+                                            "startLine": 1,
+                                            "startOffset": 3,
+                                            "tokenType": {
+                                              "CATEGORIES": [],
+                                              "PATTERN": /\\[0-9\\]\\+\\(\\?:\\\\\\.\\[0-9\\]\\+\\)\\?\\(\\[Ee\\]\\[\\\\\\+\\\\-\\]\\[0-9\\]\\+\\)\\?/,
+                                              "categoryMatches": [],
+                                              "categoryMatchesMap": {},
+                                              "isParent": false,
+                                              "name": "Number",
+                                              "tokenTypeIdx": 4,
+                                            },
+                                            "tokenTypeIdx": 4,
+                                          },
+                                        ],
+                                      },
+                                      "name": "numberLiteral",
+                                    },
+                                  ],
+                                },
+                                "name": "literal",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Number 2`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
                         },
                       ],
                       "RVariable": [
@@ -307,9 +420,9 @@ exports[`Literals 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RVariable",
-                            "tokenTypeIdx": 9,
+                            "tokenTypeIdx": 10,
                           },
-                          "tokenTypeIdx": 9,
+                          "tokenTypeIdx": 10,
                         },
                       ],
                       "expression": [
@@ -371,7 +484,7 @@ exports[`Literals 1`] = `
 }
 `;
 
-exports[`Literals 2`] = `
+exports[`Number 3`] = `
 {
   "children": {
     "elements": [
@@ -399,9 +512,9 @@ exports[`Literals 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LVariable",
-                            "tokenTypeIdx": 8,
+                            "tokenTypeIdx": 9,
                           },
-                          "tokenTypeIdx": 8,
+                          "tokenTypeIdx": 9,
                         },
                       ],
                       "RVariable": [
@@ -420,9 +533,9 @@ exports[`Literals 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RVariable",
-                            "tokenTypeIdx": 9,
+                            "tokenTypeIdx": 10,
                           },
-                          "tokenTypeIdx": 9,
+                          "tokenTypeIdx": 10,
                         },
                       ],
                       "expression": [
@@ -457,6 +570,345 @@ exports[`Literals 2`] = `
                                         ],
                                       },
                                       "name": "numberLiteral",
+                                    },
+                                  ],
+                                },
+                                "name": "literal",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`String 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 19,
+                          "endLine": 1,
+                          "endOffset": 18,
+                          "image": "}}",
+                          "startColumn": 18,
+                          "startLine": 1,
+                          "startOffset": 17,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "literal": [
+                              {
+                                "children": {
+                                  "stringLiteral": [
+                                    {
+                                      "children": {
+                                        "String": [
+                                          {
+                                            "endColumn": 16,
+                                            "endLine": 1,
+                                            "endOffset": 15,
+                                            "image": "\\"Hello world\\"",
+                                            "startColumn": 4,
+                                            "startLine": 1,
+                                            "startOffset": 3,
+                                            "tokenType": {
+                                              "CATEGORIES": [],
+                                              "PATTERN": /"\\(\\[\\^#"\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^#"\\\\\\\\\\]\\*\\)\\*\\)"\\|'\\(\\[\\^'\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^'\\\\\\\\\\]\\*\\)\\*\\)'/,
+                                              "categoryMatches": [],
+                                              "categoryMatchesMap": {},
+                                              "isParent": false,
+                                              "name": "String",
+                                              "tokenTypeIdx": 5,
+                                            },
+                                            "tokenTypeIdx": 5,
+                                          },
+                                        ],
+                                      },
+                                      "name": "stringLiteral",
+                                    },
+                                  ],
+                                },
+                                "name": "literal",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`String 2`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 19,
+                          "endLine": 1,
+                          "endOffset": 18,
+                          "image": "}}",
+                          "startColumn": 18,
+                          "startLine": 1,
+                          "startOffset": 17,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "literal": [
+                              {
+                                "children": {
+                                  "stringLiteral": [
+                                    {
+                                      "children": {
+                                        "String": [
+                                          {
+                                            "endColumn": 16,
+                                            "endLine": 1,
+                                            "endOffset": 15,
+                                            "image": "'Hello world'",
+                                            "startColumn": 4,
+                                            "startLine": 1,
+                                            "startOffset": 3,
+                                            "tokenType": {
+                                              "CATEGORIES": [],
+                                              "PATTERN": /"\\(\\[\\^#"\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^#"\\\\\\\\\\]\\*\\)\\*\\)"\\|'\\(\\[\\^'\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^'\\\\\\\\\\]\\*\\)\\*\\)'/,
+                                              "categoryMatches": [],
+                                              "categoryMatchesMap": {},
+                                              "isParent": false,
+                                              "name": "String",
+                                              "tokenTypeIdx": 5,
+                                            },
+                                            "tokenTypeIdx": 5,
+                                          },
+                                        ],
+                                      },
+                                      "name": "stringLiteral",
+                                    },
+                                  ],
+                                },
+                                "name": "literal",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`String 3`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 18,
+                          "endLine": 1,
+                          "endOffset": 17,
+                          "image": "}}",
+                          "startColumn": 17,
+                          "startLine": 1,
+                          "startOffset": 16,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "literal": [
+                              {
+                                "children": {
+                                  "stringLiteral": [
+                                    {
+                                      "children": {
+                                        "String": [
+                                          {
+                                            "endColumn": 15,
+                                            "endLine": 1,
+                                            "endOffset": 14,
+                                            "image": "'It\\\\'s good'",
+                                            "startColumn": 4,
+                                            "startLine": 1,
+                                            "startOffset": 3,
+                                            "tokenType": {
+                                              "CATEGORIES": [],
+                                              "PATTERN": /"\\(\\[\\^#"\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^#"\\\\\\\\\\]\\*\\)\\*\\)"\\|'\\(\\[\\^'\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^'\\\\\\\\\\]\\*\\)\\*\\)'/,
+                                              "categoryMatches": [],
+                                              "categoryMatchesMap": {},
+                                              "isParent": false,
+                                              "name": "String",
+                                              "tokenTypeIdx": 5,
+                                            },
+                                            "tokenTypeIdx": 5,
+                                          },
+                                        ],
+                                      },
+                                      "name": "stringLiteral",
                                     },
                                   ],
                                 },
@@ -527,9 +979,9 @@ exports[`Template 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Text",
-                            "tokenTypeIdx": 19,
+                            "tokenTypeIdx": 20,
                           },
-                          "tokenTypeIdx": 19,
+                          "tokenTypeIdx": 20,
                         },
                       ],
                     },
@@ -577,9 +1029,9 @@ exports[`Variable 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LVariable",
-                            "tokenTypeIdx": 8,
+                            "tokenTypeIdx": 9,
                           },
-                          "tokenTypeIdx": 8,
+                          "tokenTypeIdx": 9,
                         },
                       ],
                       "RVariable": [
@@ -598,9 +1050,9 @@ exports[`Variable 1`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RVariable",
-                            "tokenTypeIdx": 9,
+                            "tokenTypeIdx": 10,
                           },
-                          "tokenTypeIdx": 9,
+                          "tokenTypeIdx": 10,
                         },
                       ],
                     },
@@ -648,9 +1100,9 @@ exports[`Variable 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "LVariable",
-                            "tokenTypeIdx": 8,
+                            "tokenTypeIdx": 9,
                           },
-                          "tokenTypeIdx": 8,
+                          "tokenTypeIdx": 9,
                         },
                       ],
                       "RVariable": [
@@ -669,9 +1121,9 @@ exports[`Variable 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "RVariable",
-                            "tokenTypeIdx": 9,
+                            "tokenTypeIdx": 10,
                           },
-                          "tokenTypeIdx": 9,
+                          "tokenTypeIdx": 10,
                         },
                       ],
                       "expression": [

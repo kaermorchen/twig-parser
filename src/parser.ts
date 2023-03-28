@@ -53,7 +53,6 @@ export default class TwigParser extends CstParser {
   expression = this.RULE('expression', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.literal) },
-      // { ALT: () => this.SUBRULE(this.string) },
       // { ALT: () => this.SUBRULE(this.name) },
     ]);
   });
@@ -65,7 +64,7 @@ export default class TwigParser extends CstParser {
   literal = this.RULE('literal', () => {
     this.OR([
       { ALT: () => this.SUBRULE(this.numberLiteral) },
-      // { ALT: () => this.SUBRULE(this.string) },
+      { ALT: () => this.SUBRULE(this.stringLiteral) },
     ]);
   });
 
@@ -73,7 +72,7 @@ export default class TwigParser extends CstParser {
     this.CONSUME(tokens.Number);
   });
 
-  // string = this.RULE('string', () => {
-  //   this.CONSUME(tokens.string);
-  // });
+  stringLiteral = this.RULE('stringLiteral', () => {
+    this.CONSUME(tokens.String);
+  });
 }
