@@ -23,6 +23,9 @@ createToken({ name: 'Comment', pattern: /[\S\s]*?(?=\s*#})/, line_breaks: true, 
 createToken({ name: 'LVariable', pattern: /{{[-~]?/ });
 createToken({ name: 'RVariable', pattern: /[-~]?}}/ });
 
+createToken({ name: 'LBlock', pattern: /{%[-~]?/ });
+createToken({ name: 'RBlock', pattern: /[-~]?%}/ });
+
 createToken({ name: 'True', pattern: /true/ });
 createToken({ name: 'False', pattern: /false/ });
 createToken({ name: 'Null', pattern: /null/ });
@@ -32,9 +35,24 @@ createToken({ name: 'LSquare', pattern: /\[/ });
 createToken({ name: 'RSquare', pattern: /]/ });
 createToken({ name: 'Comma', pattern: /,/ });
 createToken({ name: 'Colon', pattern: /:/ });
+createToken({ name: 'Arrow', pattern: /=>/ });
+createToken({ name: 'Verbatim', pattern: /\bverbatim\b/ });
+createToken({ name: 'EndVerbatim', pattern: /\bendverbatim\b/ });
 
+createToken({
+  name: 'RawText',
+  line_breaks: true,
+  pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
+    const startBlockPattern = /{%\s*endverbatim/;
+    startBlockPattern.lastIndex = startOffset;
 
+    const execResult = startBlockPattern.exec(text);
 
+    return execResult === null
+      ? null
+      : [text.substring(startOffset, execResult.index)];
+  },
+});
 
 createToken({
   name: 'Text',

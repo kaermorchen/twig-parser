@@ -19,15 +19,19 @@ export default class TwigParser extends CstParser {
 
   element = this.RULE('element', () => {
     this.OR([
-      { ALT: () => this.SUBRULE(this.comment) },
       { ALT: () => this.SUBRULE(this.text) },
+      { ALT: () => this.SUBRULE(this.comment) },
       { ALT: () => this.SUBRULE(this.variable) },
-      // { ALT: () => this.SUBRULE(this.block) },
+      { ALT: () => this.SUBRULE(this.block) },
     ]);
   });
 
   text = this.RULE('text', () => {
     this.CONSUME(tokens.Text);
+  });
+
+  rawText = this.RULE('rawText', () => {
+    this.CONSUME(tokens.RawText);
   });
 
   comment = this.RULE('comment', () => {
@@ -46,9 +50,21 @@ export default class TwigParser extends CstParser {
     this.CONSUME(tokens.RVariable);
   });
 
-  // block = this.RULE('block', () => {
-  //   this.CONSUME(tokens.name);
-  // });
+  block = this.RULE('block', () => {
+    this.OR([
+      { ALT: () => this.SUBRULE(this.verbatim) },
+    ]);
+  });
+
+  verbatim = this.RULE('verbatim', () => {
+    this.CONSUME(tokens.LBlock);
+    this.CONSUME(tokens.Verbatim);
+    this.CONSUME(tokens.RBlock);
+    this.SUBRULE(this.rawText);
+    this.CONSUME1(tokens.LBlock);
+    this.CONSUME1(tokens.EndVerbatim);
+    this.CONSUME1(tokens.RBlock);
+  });
 
   expression = this.RULE('expression', () => {
     this.OR([

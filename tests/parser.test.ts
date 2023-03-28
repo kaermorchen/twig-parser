@@ -3,6 +3,7 @@ import { tpl2asr } from './helpers.js';
 
 test('Template', () => {
   expect(tpl2asr(''), 'Empty template').toMatchSnapshot();
+  expect(tpl2asr(`{{ '{{' }}`)).toMatchSnapshot();
   expect(tpl2asr('Hello world'), 'Only text').toMatchSnapshot();
 });
 
@@ -20,6 +21,10 @@ test('Variable', () => {
   expect(tpl2asr('{{ 42 }}'), 'Value').toMatchSnapshot();
 });
 
+test('Block', () => {
+  expect(tpl2asr('{% %}'), 'Empty variable').toMatchSnapshot();
+});
+
 test('Number', () => {
   expect(tpl2asr('{{ 0 }}'), 'Zero').toMatchSnapshot();
   expect(tpl2asr('{{ 42 }}'), 'Integer').toMatchSnapshot();
@@ -35,3 +40,13 @@ test('String', () => {
 // test('Name', () => {
 //   expect(tpl2asr('{{ user }}')).toMatchSnapshot();
 // });
+
+test('Verbatim', () => {
+  expect(tpl2asr(`{% verbatim %}
+  <ul>
+  {% for item in seq %}
+      <li>{{ item }}</li>
+  {% endfor %}
+  </ul>
+{% endverbatim %}`)).toMatchSnapshot();
+});

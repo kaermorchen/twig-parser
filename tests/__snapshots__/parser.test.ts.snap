@@ -1,5 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Block 1`] = `undefined`;
+
 exports[`Comment 1`] = `
 {
   "children": {
@@ -959,6 +961,119 @@ exports[`Template 2`] = `
           "element": [
             {
               "children": {
+                "variable": [
+                  {
+                    "children": {
+                      "LVariable": [
+                        {
+                          "endColumn": 2,
+                          "endLine": 1,
+                          "endOffset": 1,
+                          "image": "{{",
+                          "startColumn": 1,
+                          "startLine": 1,
+                          "startOffset": 0,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\{\\{\\[-~\\]\\?/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "LVariable",
+                            "tokenTypeIdx": 9,
+                          },
+                          "tokenTypeIdx": 9,
+                        },
+                      ],
+                      "RVariable": [
+                        {
+                          "endColumn": 10,
+                          "endLine": 1,
+                          "endOffset": 9,
+                          "image": "}}",
+                          "startColumn": 9,
+                          "startLine": 1,
+                          "startOffset": 8,
+                          "tokenType": {
+                            "CATEGORIES": [],
+                            "PATTERN": /\\[-~\\]\\?\\}\\}/,
+                            "categoryMatches": [],
+                            "categoryMatchesMap": {},
+                            "isParent": false,
+                            "name": "RVariable",
+                            "tokenTypeIdx": 10,
+                          },
+                          "tokenTypeIdx": 10,
+                        },
+                      ],
+                      "expression": [
+                        {
+                          "children": {
+                            "literal": [
+                              {
+                                "children": {
+                                  "stringLiteral": [
+                                    {
+                                      "children": {
+                                        "String": [
+                                          {
+                                            "endColumn": 7,
+                                            "endLine": 1,
+                                            "endOffset": 6,
+                                            "image": "'{{'",
+                                            "startColumn": 4,
+                                            "startLine": 1,
+                                            "startOffset": 3,
+                                            "tokenType": {
+                                              "CATEGORIES": [],
+                                              "PATTERN": /"\\(\\[\\^#"\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^#"\\\\\\\\\\]\\*\\)\\*\\)"\\|'\\(\\[\\^'\\\\\\\\\\]\\*\\(\\?:\\\\\\\\\\.\\[\\^'\\\\\\\\\\]\\*\\)\\*\\)'/,
+                                              "categoryMatches": [],
+                                              "categoryMatchesMap": {},
+                                              "isParent": false,
+                                              "name": "String",
+                                              "tokenTypeIdx": 5,
+                                            },
+                                            "tokenTypeIdx": 5,
+                                          },
+                                        ],
+                                      },
+                                      "name": "stringLiteral",
+                                    },
+                                  ],
+                                },
+                                "name": "literal",
+                              },
+                            ],
+                          },
+                          "name": "expression",
+                        },
+                      ],
+                    },
+                    "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Template 3`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
                 "text": [
                   {
                     "children": {
@@ -979,9 +1094,9 @@ exports[`Template 2`] = `
                             "categoryMatchesMap": {},
                             "isParent": false,
                             "name": "Text",
-                            "tokenTypeIdx": 20,
+                            "tokenTypeIdx": 26,
                           },
-                          "tokenTypeIdx": 20,
+                          "tokenTypeIdx": 26,
                         },
                       ],
                     },
@@ -1170,6 +1285,198 @@ exports[`Variable 2`] = `
                       ],
                     },
                     "name": "variable",
+                  },
+                ],
+              },
+              "name": "element",
+            },
+          ],
+        },
+        "name": "elements",
+      },
+    ],
+  },
+  "name": "template",
+}
+`;
+
+exports[`Verbatim 1`] = `
+{
+  "children": {
+    "elements": [
+      {
+        "children": {
+          "element": [
+            {
+              "children": {
+                "block": [
+                  {
+                    "children": {
+                      "verbatim": [
+                        {
+                          "children": {
+                            "EndVerbatim": [
+                              {
+                                "endColumn": 14,
+                                "endLine": 7,
+                                "endOffset": 108,
+                                "image": "endverbatim",
+                                "startColumn": 4,
+                                "startLine": 7,
+                                "startOffset": 98,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\\\bendverbatim\\\\b/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "EndVerbatim",
+                                  "tokenTypeIdx": 24,
+                                },
+                                "tokenTypeIdx": 24,
+                              },
+                            ],
+                            "LBlock": [
+                              {
+                                "endColumn": 2,
+                                "endLine": 1,
+                                "endOffset": 1,
+                                "image": "{%",
+                                "startColumn": 1,
+                                "startLine": 1,
+                                "startOffset": 0,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\{%\\[-~\\]\\?/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "LBlock",
+                                  "tokenTypeIdx": 11,
+                                },
+                                "tokenTypeIdx": 11,
+                              },
+                              {
+                                "endColumn": 2,
+                                "endLine": 7,
+                                "endOffset": 96,
+                                "image": "{%",
+                                "startColumn": 1,
+                                "startLine": 7,
+                                "startOffset": 95,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\{%\\[-~\\]\\?/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "LBlock",
+                                  "tokenTypeIdx": 11,
+                                },
+                                "tokenTypeIdx": 11,
+                              },
+                            ],
+                            "RBlock": [
+                              {
+                                "endColumn": 14,
+                                "endLine": 1,
+                                "endOffset": 13,
+                                "image": "%}",
+                                "startColumn": 13,
+                                "startLine": 1,
+                                "startOffset": 12,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\[-~\\]\\?%\\}/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "RBlock",
+                                  "tokenTypeIdx": 12,
+                                },
+                                "tokenTypeIdx": 12,
+                              },
+                              {
+                                "endColumn": 17,
+                                "endLine": 7,
+                                "endOffset": 111,
+                                "image": "%}",
+                                "startColumn": 16,
+                                "startLine": 7,
+                                "startOffset": 110,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\[-~\\]\\?%\\}/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "RBlock",
+                                  "tokenTypeIdx": 12,
+                                },
+                                "tokenTypeIdx": 12,
+                              },
+                            ],
+                            "Verbatim": [
+                              {
+                                "endColumn": 11,
+                                "endLine": 1,
+                                "endOffset": 10,
+                                "image": "verbatim",
+                                "startColumn": 4,
+                                "startLine": 1,
+                                "startOffset": 3,
+                                "tokenType": {
+                                  "CATEGORIES": [],
+                                  "PATTERN": /\\\\bverbatim\\\\b/,
+                                  "categoryMatches": [],
+                                  "categoryMatchesMap": {},
+                                  "isParent": false,
+                                  "name": "Verbatim",
+                                  "tokenTypeIdx": 23,
+                                },
+                                "tokenTypeIdx": 23,
+                              },
+                            ],
+                            "rawText": [
+                              {
+                                "children": {
+                                  "RawText": [
+                                    {
+                                      "endColumn": 1,
+                                      "endLine": 6,
+                                      "endOffset": 94,
+                                      "image": "<ul>
+  {% for item in seq %}
+      <li>{{ item }}</li>
+  {% endfor %}
+  </ul>
+",
+                                      "startColumn": 3,
+                                      "startLine": 2,
+                                      "startOffset": 17,
+                                      "tokenType": {
+                                        "CATEGORIES": [],
+                                        "LINE_BREAKS": true,
+                                        "PATTERN": [Function],
+                                        "categoryMatches": [],
+                                        "categoryMatchesMap": {},
+                                        "isParent": false,
+                                        "name": "RawText",
+                                        "tokenTypeIdx": 25,
+                                      },
+                                      "tokenTypeIdx": 25,
+                                    },
+                                  ],
+                                },
+                                "name": "rawText",
+                              },
+                            ],
+                          },
+                          "name": "verbatim",
+                        },
+                      ],
+                    },
+                    "name": "block",
                   },
                 ],
               },
