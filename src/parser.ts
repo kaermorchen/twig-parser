@@ -92,9 +92,9 @@ export default class TwigParser extends EmbeddedActionsParser {
   expression = this.RULE('expression', () => {
     return this.OR([
       { ALT: () => this.SUBRULE(this.literal) },
-      { ALT: () => this.SUBRULE(this.identifier) },
       { ALT: () => this.SUBRULE(this.arrayExpression) },
       { ALT: () => this.SUBRULE(this.hashExpression) },
+      { ALT: () => this.SUBRULE(this.identifier) },
     ]);
   });
 
@@ -204,9 +204,8 @@ export default class TwigParser extends EmbeddedActionsParser {
       },
       {
         ALT: () => {
-          const identifier = this.SUBRULE(this.identifier);
-          key = Object.assign({}, identifier, { type: 'StringLiteral' });
-          value = identifier;
+          value = this.SUBRULE(this.identifier);
+          key = Object.assign({}, value, { type: 'StringLiteral' });
           shorthand = true;
         },
       },
