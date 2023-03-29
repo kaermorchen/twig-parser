@@ -93,6 +93,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     return this.OR([
       { ALT: () => this.SUBRULE(this.literal) },
       { ALT: () => this.SUBRULE(this.identifier) },
+      { ALT: () => this.SUBRULE(this.arrayExpression) },
     ]);
   });
 
@@ -140,6 +141,24 @@ export default class TwigParser extends EmbeddedActionsParser {
     return {
       type: 'NullLiteral',
       value: this.CONSUME(tokens.Null) ? null : undefined,
+    };
+  });
+
+  arrayExpression = this.RULE('ArrayExpression', () => {
+    const elements = [];
+
+    this.CONSUME(tokens.LSquare);
+    this.MANY_SEP({
+      SEP: tokens.Comma,
+      DEF: () => {
+        elements.push(this.SUBRULE(this.expression));
+      },
+    });
+    this.CONSUME(tokens.RSquare);
+
+    return {
+      type: 'ArrayExpression',
+      elements,
     };
   });
 }
