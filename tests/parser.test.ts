@@ -75,3 +75,14 @@ test('Boolean', () => {
     value: false,
   });
 });
+
+test('Null', () => {
+  const expected = {
+    type: 'NullLiteral',
+    value: null,
+  };
+
+  expect(parse(`null`).nullLiteral()).toEqual(expected);
+  expect(parse(`NULL`).nullLiteral()).toEqual(expected);
+  expect(parse(`none`).nullLiteral()).toEqual(expected);
+});

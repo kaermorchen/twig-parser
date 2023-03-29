@@ -107,8 +107,9 @@ export default class TwigParser extends EmbeddedActionsParser {
     return this.OR({
       IGNORE_AMBIGUITIES: true,
       DEF: [
-        { ALT: () => this.SUBRULE(this.numberLiteral) },
+        { ALT: () => this.SUBRULE(this.nullLiteral) },
         { ALT: () => this.SUBRULE(this.booleanLiteral) },
+        { ALT: () => this.SUBRULE(this.numberLiteral) },
         { ALT: () => this.SUBRULE(this.stringLiteral) },
       ],
     });
@@ -132,6 +133,13 @@ export default class TwigParser extends EmbeddedActionsParser {
     return {
       type: 'BooleanLiteral',
       value: this.CONSUME(tokens.Boolean).image.toLowerCase() === 'true',
+    };
+  });
+
+  nullLiteral = this.RULE('nullLiteral', () => {
+    return {
+      type: 'NullLiteral',
+      value: this.CONSUME(tokens.Null) ? null : undefined,
     };
   });
 }
