@@ -98,3 +98,105 @@ test('ArrayExpression', () => {
     elements: [parse('1').numberLiteral(), parse('[2, 3]').arrayExpression()],
   });
 });
+
+test('PropertyKey', () => {
+  expect(parse(`"key"`).propertyKey()).toStrictEqual(
+    parse(`"key"`).stringLiteral()
+  );
+  expect(parse(`1`).propertyKey()).toStrictEqual(parse(`1`).numberLiteral());
+  expect(parse(`key`).propertyKey()).toStrictEqual(parse(`key`).identifier());
+  expect(parse(`(name)`).propertyKey()).toStrictEqual(
+    parse(`name`).expression()
+  );
+  // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
+});
+
+test('Property', () => {
+  expect(parse(`"key": 42`).property()).toStrictEqual({
+    type: 'Property',
+    key: {
+      type: 'StringLiteral',
+      value: 'key',
+    },
+    value: {
+      type: 'NumberLiteral',
+      value: 42,
+    },
+    shorthand: false,
+  });
+
+  expect(parse(`(name): "Anna"`).property()).toStrictEqual({
+    type: 'Property',
+    key: {
+      type: 'Identifier',
+      value: 'name',
+    },
+    value: {
+      type: 'StringLiteral',
+      value: 'Anna',
+    },
+    shorthand: false,
+  });
+
+  expect(parse(`foo`).property()).toStrictEqual({
+    type: 'Property',
+    key: {
+      type: 'StringLiteral',
+      value: 'foo',
+    },
+    value: {
+      type: 'Identifier',
+      value: 'foo',
+    },
+    shorthand: true,
+  });
+});
+
+test('HashExpression', () => {
+  expect(parse(`{}`).hashExpression()).toStrictEqual({
+    type: 'HashExpression',
+    properties: [],
+  });
+
+  expect(parse(`{"key": 23, foo: bar, val}`).hashExpression()).toStrictEqual({
+    type: 'HashExpression',
+    properties: [
+      {
+        type: 'Property',
+        key: {
+          type: 'StringLiteral',
+          value: 'key',
+        },
+        value: {
+          type: 'NumberLiteral',
+          value: 23,
+        },
+        shorthand: false,
+      },
+      {
+        type: 'Property',
+        key: {
+          type: 'Identifier',
+          value: 'foo',
+        },
+        value: {
+          type: 'Identifier',
+          value: 'bar',
+        },
+        shorthand: false,
+      },
+      {
+        type: 'Property',
+        key: {
+          type: 'StringLiteral',
+          value: 'val',
+        },
+        value: {
+          type: 'Identifier',
+          value: 'val',
+        },
+        shorthand: true,
+      },
+    ],
+  });
+});

@@ -94,6 +94,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.literal) },
       { ALT: () => this.SUBRULE(this.identifier) },
       { ALT: () => this.SUBRULE(this.arrayExpression) },
+      { ALT: () => this.SUBRULE(this.hashExpression) },
     ]);
   });
 
@@ -159,6 +160,81 @@ export default class TwigParser extends EmbeddedActionsParser {
     return {
       type: 'ArrayExpression',
       elements,
+    };
+  });
+
+  propertyKey = this.RULE('propertyKey', () => {
+    return this.OR([
+      {
+        // (foo)
+        ALT: () => {
+          let expr;
+          this.CONSUME(tokens.LParen);
+          expr = this.SUBRULE(this.expression);
+          this.CONSUME(tokens.RParen);
+          return expr;
+        },
+      },
+      {
+        // 'foo'
+        ALT: () => this.SUBRULE(this.stringLiteral),
+      },
+      {
+        // foo
+        ALT: () => this.SUBRULE(this.identifier),
+      },
+      {
+        // 42
+        ALT: () => this.SUBRULE(this.numberLiteral),
+      },
+    ]);
+  });
+
+  property = this.RULE('property', () => {
+    let key, value, shorthand;
+
+    this.OR([
+      {
+        ALT: () => {
+          key = this.SUBRULE(this.propertyKey);
+          this.CONSUME(tokens.Colon);
+          value = this.SUBRULE(this.expression);
+          shorthand = false;
+        },
+      },
+      {
+        ALT: () => {
+          const identifier = this.SUBRULE(this.identifier);
+          key = Object.assign({}, identifier, { type: 'StringLiteral' });
+          value = identifier;
+          shorthand = true;
+        },
+      },
+    ]);
+
+    return {
+      type: 'Property',
+      key,
+      value,
+      shorthand,
+    };
+  });
+
+  hashExpression = this.RULE('HashExpression', () => {
+    const properties = [];
+
+    this.CONSUME(tokens.LCurly);
+    this.MANY_SEP({
+      SEP: tokens.Comma,
+      DEF: () => {
+        properties.push(this.SUBRULE(this.property));
+      },
+    });
+    this.CONSUME(tokens.RCurly);
+
+    return {
+      type: 'HashExpression',
+      properties,
     };
   });
 }
