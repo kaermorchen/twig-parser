@@ -1,24 +1,28 @@
-import { CstParser } from 'chevrotain';
+import { EmbeddedActionsParser } from 'chevrotain';
 import { tokens } from './lexer.js';
 
-export default class TwigParser extends CstParser {
+export default class TwigParser extends EmbeddedActionsParser {
   constructor() {
     super(tokens);
     this.performSelfAnalysis();
   }
 
   template = this.RULE('template', () => {
-    this.SUBRULE(this.elements);
+    return this.SUBRULE(this.elements);
   });
 
   elements = this.RULE('elements', () => {
+    const elements = [];
+
     this.MANY(() => {
-      this.SUBRULE(this.element);
+      elements.push(this.SUBRULE(this.element));
     });
+
+    return elements;
   });
 
   element = this.RULE('element', () => {
-    this.OR([
+    return this.OR([
       { ALT: () => this.SUBRULE(this.text) },
       { ALT: () => this.SUBRULE(this.comment) },
       { ALT: () => this.SUBRULE(this.variable) },
@@ -27,68 +31,96 @@ export default class TwigParser extends CstParser {
   });
 
   text = this.RULE('text', () => {
-    this.CONSUME(tokens.Text);
+    return this.CONSUME(tokens.Text);
   });
 
   rawText = this.RULE('rawText', () => {
-    this.CONSUME(tokens.RawText);
+    return this.CONSUME(tokens.RawText);
   });
 
   comment = this.RULE('comment', () => {
+    let value = null;
+
     this.CONSUME(tokens.LComment);
     this.OPTION(() => {
-      this.CONSUME(tokens.Comment);
+      value = this.CONSUME(tokens.Comment).image;
     });
     this.CONSUME(tokens.RComment);
+
+    return {
+      type: 'Comment',
+      value,
+    };
   });
 
   variable = this.RULE('variable', () => {
+    let value = null;
+
     this.CONSUME(tokens.LVariable);
     this.OPTION(() => {
-      this.SUBRULE(this.expression);
+      value = this.SUBRULE(this.expression);
     });
     this.CONSUME(tokens.RVariable);
+
+    return {
+      type: 'Variable',
+      value,
+    };
   });
 
   block = this.RULE('block', () => {
-    this.OR([
-      { ALT: () => this.SUBRULE(this.verbatim) },
-    ]);
+    return this.OR([{ ALT: () => this.SUBRULE(this.verbatim) }]);
   });
 
   verbatim = this.RULE('verbatim', () => {
     this.CONSUME(tokens.LBlock);
     this.CONSUME(tokens.Verbatim);
     this.CONSUME(tokens.RBlock);
-    this.SUBRULE(this.rawText);
+
+    const value = this.SUBRULE(this.rawText).image;
+
     this.CONSUME1(tokens.LBlock);
     this.CONSUME1(tokens.EndVerbatim);
     this.CONSUME1(tokens.RBlock);
+
+    return {
+      type: 'VerbatimBlock',
+      value,
+    };
   });
 
   expression = this.RULE('expression', () => {
-    this.OR([
+    return this.OR([
       { ALT: () => this.SUBRULE(this.literal) },
-      { ALT: () => this.SUBRULE(this.name) },
+      { ALT: () => this.SUBRULE(this.identifier) },
     ]);
   });
 
-  name = this.RULE('name', () => {
-    this.CONSUME(tokens.Name);
+  identifier = this.RULE('identifier', () => {
+    return {
+      type: 'Identifier',
+      value: this.CONSUME(tokens.Identifier).image,
+    };
   });
 
   literal = this.RULE('literal', () => {
-    this.OR([
+    return this.OR([
       { ALT: () => this.SUBRULE(this.numberLiteral) },
       { ALT: () => this.SUBRULE(this.stringLiteral) },
     ]);
   });
 
   numberLiteral = this.RULE('numberLiteral', () => {
-    this.CONSUME(tokens.Number);
+    return {
+      type: 'NumberLiteral',
+      value: Number(this.CONSUME(tokens.Number).image),
+    };
   });
 
   stringLiteral = this.RULE('stringLiteral', () => {
-    this.CONSUME(tokens.String);
+    return {
+      type: 'StringLiteral',
+      value: this.CONSUME(tokens.String).image.slice(1, -1),
+    };
   });
 }

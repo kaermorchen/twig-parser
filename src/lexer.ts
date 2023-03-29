@@ -60,7 +60,7 @@ createToken({ name: 'VerticalBar', pattern: /\|/ });
 createToken({ name: 'Verbatim', pattern: /\bverbatim\b/ });
 createToken({ name: 'EndVerbatim', pattern: /\bendverbatim\b/ });
 createToken({
-  name: 'Name',
+  name: 'Identifier',
   pattern: /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
 });
 
