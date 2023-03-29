@@ -16,6 +16,13 @@ test('VerbatimBlock', () => {
   });
 });
 
+test('Identifier', () => {
+  expect(parse(`user`).identifier()).toEqual({
+    type: 'Identifier',
+    value: `user`,
+  });
+});
+
 test('Number', () => {
   expect(parse('0').numberLiteral(), 'Zero').toEqual({
     type: 'NumberLiteral',
@@ -50,9 +57,21 @@ test('String', () => {
   });
 });
 
-test('Identifier', () => {
-  expect(parse(`user`).identifier()).toEqual({
-    type: 'Identifier',
-    value: `user`,
+test('Boolean', () => {
+  expect(parse(`true`).booleanLiteral()).toEqual({
+    type: 'BooleanLiteral',
+    value: true,
+  });
+  expect(parse(`TRUE`).booleanLiteral()).toEqual({
+    type: 'BooleanLiteral',
+    value: true,
+  });
+  expect(parse(`false`).booleanLiteral()).toEqual({
+    type: 'BooleanLiteral',
+    value: false,
+  });
+  expect(parse(`FALSE`).booleanLiteral()).toEqual({
+    type: 'BooleanLiteral',
+    value: false,
   });
 });

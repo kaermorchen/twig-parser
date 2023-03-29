@@ -36,8 +36,7 @@ createToken({ name: 'RVariable', pattern: /[-~]?}}/ });
 createToken({ name: 'LBlock', pattern: /{%[-~]?/ });
 createToken({ name: 'RBlock', pattern: /[-~]?%}/ });
 
-createToken({ name: 'True', pattern: /true/ });
-createToken({ name: 'False', pattern: /false/ });
+createToken({ name: 'Boolean', pattern: /true|false/i });
 createToken({ name: 'Null', pattern: /null/ });
 createToken({ name: 'Dot', pattern: /\./ });
 createToken({ name: 'LCurly', pattern: /{/ });

@@ -104,10 +104,14 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   literal = this.RULE('literal', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.numberLiteral) },
-      { ALT: () => this.SUBRULE(this.stringLiteral) },
-    ]);
+    return this.OR({
+      IGNORE_AMBIGUITIES: true,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.numberLiteral) },
+        { ALT: () => this.SUBRULE(this.booleanLiteral) },
+        { ALT: () => this.SUBRULE(this.stringLiteral) },
+      ],
+    });
   });
 
   numberLiteral = this.RULE('numberLiteral', () => {
@@ -121,6 +125,13 @@ export default class TwigParser extends EmbeddedActionsParser {
     return {
       type: 'StringLiteral',
       value: this.CONSUME(tokens.String).image.slice(1, -1),
+    };
+  });
+
+  booleanLiteral = this.RULE('booleanLiteral', () => {
+    return {
+      type: 'BooleanLiteral',
+      value: this.CONSUME(tokens.Boolean).image.toLowerCase() === 'true',
     };
   });
 }
