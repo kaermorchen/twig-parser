@@ -26,7 +26,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.text) },
       { ALT: () => this.SUBRULE(this.comment) },
       { ALT: () => this.SUBRULE(this.variable) },
-      { ALT: () => this.SUBRULE(this.block) },
+      { ALT: () => this.SUBRULE(this.blocks) },
     ]);
   });
 
@@ -68,11 +68,11 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  block = this.RULE('block', () => {
-    return this.OR([{ ALT: () => this.SUBRULE(this.verbatim) }]);
+  blocks = this.RULE('blocks', () => {
+    return this.OR([{ ALT: () => this.SUBRULE(this.verbatimBlock) }]);
   });
 
-  verbatim = this.RULE('verbatim', () => {
+  verbatimBlock = this.RULE('verbatimBlock', () => {
     this.CONSUME(tokens.LBlock);
     this.CONSUME(tokens.Verbatim);
     this.CONSUME(tokens.RBlock);

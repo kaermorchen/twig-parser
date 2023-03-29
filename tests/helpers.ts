@@ -10,3 +10,10 @@ export function tpl2asr(tpl: string) {
 
   return parser.template();
 }
+
+export function parse(tpl: string) {
+  const { tokens } = lexer.tokenize(tpl);
+  parser.input = tokens;
+
+  return parser;
+}

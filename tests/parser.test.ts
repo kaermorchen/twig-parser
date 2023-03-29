@@ -1,52 +1,58 @@
 import { test, expect } from 'vitest';
-import { tpl2asr } from './helpers.js';
+import { parse } from './helpers.js';
 
-test('Template', () => {
-  expect(tpl2asr(''), 'Empty template').toMatchSnapshot();
-  expect(tpl2asr(`{{ '{{' }}`)).toMatchSnapshot();
-  expect(tpl2asr('Hello world'), 'Only text').toMatchSnapshot();
-});
+test('VerbatimBlock', () => {
+  const value = `<ul>
+      {% for item in seq %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>`;
 
-test('Comment', () => {
-  expect(tpl2asr('{# #}'), 'Empty comment').toMatchSnapshot();
-  expect(tpl2asr('{# This is a comment #}'), 'Singleline comment').toMatchSnapshot();
-  expect(tpl2asr(`{#
-    First line
-    Second line
-  #}`), 'Multiline comment').toMatchSnapshot();
-});
-
-test('Variable', () => {
-  expect(tpl2asr('{{ }}'), 'Empty variable').toMatchSnapshot();
-  expect(tpl2asr('{{ 42 }}'), 'Value').toMatchSnapshot();
-});
-
-test('Block', () => {
-  expect(tpl2asr('{% %}'), 'Empty variable').toMatchSnapshot();
+  expect(
+    parse(`{% verbatim %}${value}{% endverbatim %}`).verbatimBlock()
+  ).toEqual({
+    type: 'VerbatimBlock',
+    value,
+  });
 });
 
 test('Number', () => {
-  expect(tpl2asr('{{ 0 }}'), 'Zero').toMatchSnapshot();
-  expect(tpl2asr('{{ 42 }}'), 'Integer').toMatchSnapshot();
-  expect(tpl2asr('{{ 42.23 }}'), 'Float').toMatchSnapshot();
+  expect(parse('0').numberLiteral(), 'Zero').toEqual({
+    type: 'NumberLiteral',
+    value: 0,
+  });
+  expect(parse('42').numberLiteral(), 'Integer').toEqual({
+    type: 'NumberLiteral',
+    value: 42,
+  });
+  expect(parse('42.23').numberLiteral(), 'Float').toEqual({
+    type: 'NumberLiteral',
+    value: 42.23,
+  });
 });
 
 test('String', () => {
-  expect(tpl2asr('{{ "Hello world" }}')).toMatchSnapshot();
-  expect(tpl2asr(`{{ 'Hello world' }}`)).toMatchSnapshot();
-  expect(tpl2asr(`{{ 'It\\'s good' }}`)).toMatchSnapshot();
+  expect(parse(`"Hello world"`).stringLiteral()).toEqual({
+    type: 'StringLiteral',
+    value: 'Hello world',
+  });
+  expect(parse(`'Hello world'`).stringLiteral()).toEqual({
+    type: 'StringLiteral',
+    value: 'Hello world',
+  });
+  expect(parse(`""`).stringLiteral()).toEqual({
+    type: 'StringLiteral',
+    value: '',
+  });
+  expect(parse(`'It\\'s good'`).stringLiteral()).toEqual({
+    type: 'StringLiteral',
+    value: `It\\'s good`,
+  });
 });
 
-test('Name', () => {
-  expect(tpl2asr('{{ user }}')).toMatchSnapshot();
-});
-
-test('Verbatim', () => {
-  expect(tpl2asr(`{% verbatim %}
-  <ul>
-  {% for item in seq %}
-      <li>{{ item }}</li>
-  {% endfor %}
-  </ul>
-{% endverbatim %}`)).toMatchSnapshot();
+test('Identifier', () => {
+  expect(parse(`user`).identifier()).toEqual({
+    type: 'Identifier',
+    value: `user`,
+  });
 });
