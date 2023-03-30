@@ -95,6 +95,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.arrayExpression) },
       { ALT: () => this.SUBRULE(this.hashExpression) },
       { ALT: () => this.SUBRULE(this.identifier) },
+      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
     ]);
   });
 
@@ -235,5 +236,15 @@ export default class TwigParser extends EmbeddedActionsParser {
       type: 'HashExpression',
       properties,
     };
+  });
+
+  parenthesisExpression = this.RULE('parenthesisExpression', () => {
+    let expression;
+
+    this.CONSUME(tokens.LParen);
+    expression = this.SUBRULE(this.expression);
+    this.CONSUME(tokens.RParen);
+
+    return expression;
   });
 }

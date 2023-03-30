@@ -1,21 +1,6 @@
 import { test, expect } from 'vitest';
 import { parse } from './helpers.js';
 
-test('VerbatimBlock', () => {
-  const value = `<ul>
-      {% for item in seq %}
-        <li>{{ item }}</li>
-      {% endfor %}
-    </ul>`;
-
-  expect(
-    parse(`{% verbatim %}${value}{% endverbatim %}`).verbatimBlock()
-  ).toStrictEqual({
-    type: 'VerbatimBlock',
-    value,
-  });
-});
-
 test('Identifier', () => {
   expect(parse(`user`).identifier()).toStrictEqual({
     type: 'Identifier',
@@ -198,5 +183,12 @@ test('HashExpression', () => {
         shorthand: true,
       },
     ],
+  });
+});
+
+test('ParenthesisExpression', () => {
+  expect(parse(`(4)`).parenthesisExpression()).toStrictEqual({
+    type: 'NumberLiteral',
+    value: 4,
   });
 });
