@@ -1,4 +1,5 @@
 import { EmbeddedActionsParser } from 'chevrotain';
+import { off } from 'process';
 import { tokens } from './lexer.js';
 
 export default class TwigParser extends EmbeddedActionsParser {
@@ -90,13 +91,20 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   expression = this.RULE('expression', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.literal) },
-      { ALT: () => this.SUBRULE(this.arrayExpression) },
-      { ALT: () => this.SUBRULE(this.hashExpression) },
-      { ALT: () => this.SUBRULE(this.identifier) },
-      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
-    ]);
+    let binaryExpression;
+    const atomicExpression = this.SUBRULE(this.atomicExpression);
+
+    this.OPTION(() => {
+      binaryExpression = this.SUBRULE1(this.binaryExpression);
+    });
+
+    if (atomicExpression && binaryExpression) {
+      return Object.assign({}, binaryExpression, { left: atomicExpression });
+    }
+
+    if (atomicExpression) {
+      return atomicExpression;
+    }
   });
 
   identifier = this.RULE('identifier', () => {
@@ -144,6 +152,43 @@ export default class TwigParser extends EmbeddedActionsParser {
       type: 'NullLiteral',
       value: this.CONSUME(tokens.Null) ? null : undefined,
     };
+  });
+
+  operator = this.RULE('operator', () => {
+    return this.OR([
+      { ALT: () => this.CONSUME(tokens.OrBinary).image },
+      { ALT: () => this.CONSUME(tokens.AndBinary).image },
+      { ALT: () => this.CONSUME(tokens.BitwiseOrBinary).image },
+      { ALT: () => this.CONSUME(tokens.BitwiseXorBinary).image },
+      { ALT: () => this.CONSUME(tokens.BitwiseAndBinary).image },
+      { ALT: () => this.CONSUME(tokens.EqualBinary).image },
+      { ALT: () => this.CONSUME(tokens.NotEqualBinary).image },
+      { ALT: () => this.CONSUME(tokens.SpaceshipBinary).image },
+      { ALT: () => this.CONSUME(tokens.GreaterEqualBinary).image },
+      { ALT: () => this.CONSUME(tokens.LessEqualBinary).image },
+      { ALT: () => this.CONSUME(tokens.LessBinary).image },
+      { ALT: () => this.CONSUME(tokens.GreaterBinary).image },
+      { ALT: () => this.CONSUME(tokens.NotInBinary).image },
+      { ALT: () => this.CONSUME(tokens.InBinary).image },
+      { ALT: () => this.CONSUME(tokens.MatchesBinary).image },
+      { ALT: () => this.CONSUME(tokens.StartsWithBinary).image },
+      { ALT: () => this.CONSUME(tokens.EndsWithBinary).image },
+      { ALT: () => this.CONSUME(tokens.HasSomeBinary).image },
+      { ALT: () => this.CONSUME(tokens.HasEveryBinary).image },
+      { ALT: () => this.CONSUME(tokens.RangeBinary).image },
+      { ALT: () => this.CONSUME(tokens.AddBinary).image },
+      { ALT: () => this.CONSUME(tokens.SubBinary).image },
+      { ALT: () => this.CONSUME(tokens.ConcatBinary).image },
+      { ALT: () => this.CONSUME(tokens.NotUnary).image },
+      { ALT: () => this.CONSUME(tokens.MulBinary).image },
+      { ALT: () => this.CONSUME(tokens.DivBinary).image },
+      { ALT: () => this.CONSUME(tokens.FloorDivBinary).image },
+      { ALT: () => this.CONSUME(tokens.ModBinary).image },
+      { ALT: () => this.CONSUME(tokens.IsNotBinary).image },
+      { ALT: () => this.CONSUME(tokens.IsBinary).image },
+      { ALT: () => this.CONSUME(tokens.PowerBinary).image },
+      { ALT: () => this.CONSUME(tokens.NullCoalesceExpression).image },
+    ]);
   });
 
   arrayExpression = this.RULE('ArrayExpression', () => {
@@ -238,6 +283,35 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  binaryExpression = this.RULE('binaryExpression', () => {
+    let operator, right;
+
+    this.OPTION(() => {
+      operator = this.SUBRULE1(this.operator);
+      right = this.SUBRULE2(this.expression);
+
+      // this.OPTION1(() => this.SUBRULE3(this.binaryExpression));
+    });
+
+    if (operator && right) {
+      return {
+        type: 'BinaryExpression',
+        operator,
+        right,
+      };
+    }
+  });
+
+  atomicExpression = this.RULE('atomicExpression', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
+      { ALT: () => this.SUBRULE(this.arrayExpression) },
+      { ALT: () => this.SUBRULE(this.hashExpression) },
+      { ALT: () => this.SUBRULE(this.identifier) },
+      { ALT: () => this.SUBRULE(this.literal) },
+    ]);
+  });
+
   parenthesisExpression = this.RULE('parenthesisExpression', () => {
     let expression;
 
@@ -246,57 +320,5 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.CONSUME(tokens.RParen);
 
     return expression;
-  });
-
-  operator = this.RULE('operator', () => {
-    return this.OR([
-      { ALT: () => this.CONSUME(tokens.OrBinary).image },
-      { ALT: () => this.CONSUME(tokens.AndBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseOrBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseXorBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseAndBinary).image },
-      { ALT: () => this.CONSUME(tokens.EqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.SpaceshipBinary).image },
-      { ALT: () => this.CONSUME(tokens.GreaterEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.LessEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.LessBinary).image },
-      { ALT: () => this.CONSUME(tokens.GreaterBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotInBinary).image },
-      { ALT: () => this.CONSUME(tokens.InBinary).image },
-      { ALT: () => this.CONSUME(tokens.MatchesBinary).image },
-      { ALT: () => this.CONSUME(tokens.StartsWithBinary).image },
-      { ALT: () => this.CONSUME(tokens.EndsWithBinary).image },
-      { ALT: () => this.CONSUME(tokens.HasSomeBinary).image },
-      { ALT: () => this.CONSUME(tokens.HasEveryBinary).image },
-      { ALT: () => this.CONSUME(tokens.RangeBinary).image },
-      { ALT: () => this.CONSUME(tokens.AddBinary).image },
-      { ALT: () => this.CONSUME(tokens.SubBinary).image },
-      { ALT: () => this.CONSUME(tokens.ConcatBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotUnary).image },
-      { ALT: () => this.CONSUME(tokens.MulBinary).image },
-      { ALT: () => this.CONSUME(tokens.DivBinary).image },
-      { ALT: () => this.CONSUME(tokens.FloorDivBinary).image },
-      { ALT: () => this.CONSUME(tokens.ModBinary).image },
-      { ALT: () => this.CONSUME(tokens.IsNotBinary).image },
-      { ALT: () => this.CONSUME(tokens.IsBinary).image },
-      { ALT: () => this.CONSUME(tokens.PowerBinary).image },
-      { ALT: () => this.CONSUME(tokens.NullCoalesceExpression).image },
-    ]);
-  });
-
-  binaryExpression = this.RULE('binaryExpression', () => {
-    let left, operator, right;
-
-    left = this.SUBRULE(this.expression);
-    operator = this.SUBRULE1(this.operator);
-    right = this.SUBRULE2(this.expression);
-
-    return {
-      type: 'BinaryExpression',
-      left,
-      operator,
-      right,
-    };
   });
 }

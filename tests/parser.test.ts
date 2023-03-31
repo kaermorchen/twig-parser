@@ -227,3 +227,46 @@ test('Operator', () => {
   expect(parse(`**`).operator()).toStrictEqual('**');
   expect(parse(`??`).operator()).toStrictEqual('??');
 });
+
+test('BinaryExpression', () => {
+  // expect(parse(`1 + 2`).binaryExpression()).toStrictEqual({
+  //   type: 'BinaryExpression',
+  //   left: {
+  //     type: 'NumberLiteral',
+  //     value: 1,
+  //   },
+  //   operator: '+',
+  //   right: {
+  //     type: 'NumberLiteral',
+  //     value: 2,
+  //   },
+  // });
+});
+
+test('Expression', () => {
+  expect(parse(`"Hello"`).expression()).toStrictEqual({
+    type: 'StringLiteral',
+    value: 'Hello',
+  });
+
+  expect(parse(`1 + 2 * 3`).expression()).toStrictEqual({
+    type: 'BinaryExpression',
+    left: {
+      type: 'NumberLiteral',
+      value: 1,
+    },
+    operator: '+',
+    right: {
+      type: 'BinaryExpression',
+      left: {
+        type: 'NumberLiteral',
+        value: 2,
+      },
+      operator: '*',
+      right: {
+        type: 'NumberLiteral',
+        value: 3,
+      },
+    },
+  });
+});
