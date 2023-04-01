@@ -9,53 +9,53 @@ test('Identifier', () => {
 });
 
 test('Number', () => {
-  expect(parse('0').numberLiteral(), 'Zero').toStrictEqual({
-    type: 'NumberLiteral',
+  expect(parse('0').NumericLiteral(), 'Zero').toStrictEqual({
+    type: 'NumericLiteral',
     value: 0,
   });
-  expect(parse('42').numberLiteral(), 'Integer').toStrictEqual({
-    type: 'NumberLiteral',
+  expect(parse('42').NumericLiteral(), 'Integer').toStrictEqual({
+    type: 'NumericLiteral',
     value: 42,
   });
-  expect(parse('42.23').numberLiteral(), 'Float').toStrictEqual({
-    type: 'NumberLiteral',
+  expect(parse('42.23').NumericLiteral(), 'Float').toStrictEqual({
+    type: 'NumericLiteral',
     value: 42.23,
   });
 });
 
 test('String', () => {
-  expect(parse(`"Hello world"`).stringLiteral()).toStrictEqual({
+  expect(parse(`"Hello world"`).StringLiteral()).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello world',
   });
-  expect(parse(`'Hello world'`).stringLiteral()).toStrictEqual({
+  expect(parse(`'Hello world'`).StringLiteral()).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello world',
   });
-  expect(parse(`""`).stringLiteral()).toStrictEqual({
+  expect(parse(`""`).StringLiteral()).toStrictEqual({
     type: 'StringLiteral',
     value: '',
   });
-  expect(parse(`'It\\'s good'`).stringLiteral()).toStrictEqual({
+  expect(parse(`'It\\'s good'`).StringLiteral()).toStrictEqual({
     type: 'StringLiteral',
     value: `It\\'s good`,
   });
 });
 
 test('Boolean', () => {
-  expect(parse(`true`).booleanLiteral()).toStrictEqual({
+  expect(parse(`true`).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: true,
   });
-  expect(parse(`TRUE`).booleanLiteral()).toStrictEqual({
+  expect(parse(`TRUE`).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: true,
   });
-  expect(parse(`false`).booleanLiteral()).toStrictEqual({
+  expect(parse(`false`).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: false,
   });
-  expect(parse(`FALSE`).booleanLiteral()).toStrictEqual({
+  expect(parse(`FALSE`).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: false,
   });
@@ -67,9 +67,9 @@ test('Null', () => {
     value: null,
   };
 
-  expect(parse(`null`).nullLiteral()).toStrictEqual(expected);
-  expect(parse(`NULL`).nullLiteral()).toStrictEqual(expected);
-  expect(parse(`none`).nullLiteral()).toStrictEqual(expected);
+  expect(parse(`null`).NullLiteral()).toStrictEqual(expected);
+  expect(parse(`NULL`).NullLiteral()).toStrictEqual(expected);
+  expect(parse(`none`).NullLiteral()).toStrictEqual(expected);
 });
 
 test('ArrayLiteral', () => {
@@ -80,18 +80,18 @@ test('ArrayLiteral', () => {
 
   expect(parse(`[1, [2, 3]]`).ArrayLiteral()).toStrictEqual({
     type: 'ArrayLiteral',
-    elements: [parse('1').numberLiteral(), parse('[2, 3]').ArrayLiteral()],
+    elements: [parse('1').NumericLiteral(), parse('[2, 3]').ArrayLiteral()],
   });
 });
 
 test('PropertyName', () => {
   expect(parse(`"key"`).PropertyName()).toStrictEqual(
-    parse(`"key"`).stringLiteral()
+    parse(`"key"`).StringLiteral()
   );
-  expect(parse(`1`).PropertyName()).toStrictEqual(parse(`1`).numberLiteral());
+  expect(parse(`1`).PropertyName()).toStrictEqual(parse(`1`).NumericLiteral());
   expect(parse(`key`).PropertyName()).toStrictEqual(parse(`key`).Identifier());
   expect(parse(`(name)`).PropertyName()).toStrictEqual(
-    parse(`name`).expression()
+    parse(`name`).Expression()
   );
   // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
 });
@@ -104,7 +104,7 @@ test('PropertyAssignment', () => {
       value: 'key',
     },
     value: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 42,
     },
     shorthand: false,
@@ -153,7 +153,7 @@ test('ObjectLiteral', () => {
           value: 'key',
         },
         value: {
-          type: 'NumberLiteral',
+          type: 'NumericLiteral',
           value: 23,
         },
         shorthand: false,
@@ -188,36 +188,36 @@ test('ObjectLiteral', () => {
 
 test('ParenthesisExpression', () => {
   expect(parse(`(4)`).ParenthesisExpression()).toStrictEqual({
-    type: 'NumberLiteral',
+    type: 'NumericLiteral',
     value: 4,
   });
 });
 
 test('BinaryExpression', () => {
-  expect(parse(`1 + 2`).expression()).toStrictEqual({
+  expect(parse(`1 + 2`).Expression()).toStrictEqual({
     type: 'BinaryExpression',
     left: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 1,
     },
     operator: '+',
     right: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 2,
     },
   });
 
-  expect(parse(`4 * 2 + 2 * 3`).expression()).toStrictEqual({
+  expect(parse(`4 * 2 + 2 * 3`).Expression()).toStrictEqual({
     type: 'BinaryExpression',
     left: {
       type: 'BinaryExpression',
       left: {
-        type: 'NumberLiteral',
+        type: 'NumericLiteral',
         value: 4,
       },
       operator: '*',
       right: {
-        type: 'NumberLiteral',
+        type: 'NumericLiteral',
         value: 2,
       },
     },
@@ -225,12 +225,12 @@ test('BinaryExpression', () => {
     right: {
       type: 'BinaryExpression',
       left: {
-        type: 'NumberLiteral',
+        type: 'NumericLiteral',
         value: 2,
       },
       operator: '*',
       right: {
-        type: 'NumberLiteral',
+        type: 'NumericLiteral',
         value: 3,
       },
     },
@@ -238,7 +238,7 @@ test('BinaryExpression', () => {
 });
 
 test('Expression', () => {
-  expect(parse(`"Hello"`).expression()).toStrictEqual({
+  expect(parse(`"Hello"`).Expression()).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello',
   });
@@ -252,12 +252,12 @@ test('AssignmentExpression', () => {
 
   expect(parse(`4 > 1`).AssignmentExpression()).toStrictEqual({
     left: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 4,
     },
     operator: '>',
     right: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 1,
     },
     type: 'BinaryExpression',
@@ -265,11 +265,11 @@ test('AssignmentExpression', () => {
 
   expect(parse(`true ? 1 : 2`).AssignmentExpression()).toStrictEqual({
     alternate: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 2,
     },
     consequent: {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: 1,
     },
     test: {

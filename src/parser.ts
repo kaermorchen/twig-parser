@@ -87,7 +87,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.CONSUME(t.LVariable);
     this.OPTION(() => {
-      value = this.SUBRULE(this.expression);
+      value = this.SUBRULE(this.Expression);
     });
     this.CONSUME(t.RVariable);
 
@@ -118,8 +118,8 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  expression = this.RULE('expression', () => {
-    return this.SUBRULE(this.BinaryExpression);
+  Expression = this.RULE('Expression', () => {
+    return this.SUBRULE(this.AssignmentExpression);
   });
 
   Identifier = this.RULE('identifier', () => {
@@ -131,35 +131,35 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   AbsLiteral = this.RULE('AbsLiteral', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.nullLiteral) },
-      { ALT: () => this.SUBRULE(this.booleanLiteral) },
-      { ALT: () => this.SUBRULE(this.numberLiteral) },
-      { ALT: () => this.SUBRULE(this.stringLiteral) },
+      { ALT: () => this.SUBRULE(this.NullLiteral) },
+      { ALT: () => this.SUBRULE(this.BooleanLiteral) },
+      { ALT: () => this.SUBRULE(this.NumericLiteral) },
+      { ALT: () => this.SUBRULE(this.StringLiteral) },
     ]);
   });
 
-  numberLiteral = this.RULE('numberLiteral', () => {
+  NumericLiteral = this.RULE('NumericLiteral', () => {
     return {
-      type: 'NumberLiteral',
+      type: 'NumericLiteral',
       value: Number(this.CONSUME(t.Number).image),
     };
   });
 
-  stringLiteral = this.RULE('stringLiteral', () => {
+  StringLiteral = this.RULE('StringLiteral', () => {
     return {
       type: 'StringLiteral',
       value: this.CONSUME(t.String).image.slice(1, -1),
     };
   });
 
-  booleanLiteral = this.RULE('booleanLiteral', () => {
+  BooleanLiteral = this.RULE('BooleanLiteral', () => {
     return {
       type: 'BooleanLiteral',
       value: this.CONSUME(t.Boolean).image.toLowerCase() === 'true',
     };
   });
 
-  nullLiteral = this.RULE('nullLiteral', () => {
+  NullLiteral = this.RULE('NullLiteral', () => {
     return {
       type: 'NullLiteral',
       value: this.CONSUME(t.Null) ? null : undefined,
@@ -218,14 +218,14 @@ export default class TwigParser extends EmbeddedActionsParser {
         ALT: () => {
           let expr;
           this.CONSUME(t.LParen);
-          expr = this.SUBRULE(this.expression);
+          expr = this.SUBRULE(this.Expression);
           this.CONSUME(t.RParen);
           return expr;
         },
       },
       {
         // 'foo'
-        ALT: () => this.SUBRULE(this.stringLiteral),
+        ALT: () => this.SUBRULE(this.StringLiteral),
       },
       {
         // foo
@@ -233,7 +233,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       },
       {
         // 42
-        ALT: () => this.SUBRULE(this.numberLiteral),
+        ALT: () => this.SUBRULE(this.NumericLiteral),
       },
     ]);
   });
@@ -378,7 +378,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     let expression;
 
     this.CONSUME(t.LParen);
-    expression = this.SUBRULE(this.expression);
+    expression = this.SUBRULE(this.Expression);
     this.CONSUME(t.RParen);
 
     return expression;
