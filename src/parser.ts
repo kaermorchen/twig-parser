@@ -1,5 +1,5 @@
-import { EmbeddedActionsParser, Rule } from 'chevrotain';
-import { tokens as t } from './lexer.js';
+import { EmbeddedActionsParser } from 'chevrotain';
+import * as t from './lexer.js';
 
 function createOperatorRule(
   name: string,
@@ -125,7 +125,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   Identifier = this.RULE('identifier', () => {
     return {
       type: 'Identifier',
-      value: this.CONSUME(t.Identifier).image,
+      value: this.CONSUME(t.IdentifierName).image,
     };
   });
 
@@ -167,7 +167,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   BinaryExpression = this.RULE('BinaryExpression', () => {
-    return this.SUBRULE(this.operator10);
+    return this.SUBRULE(this.Precedenc10);
   });
 
   AssignmentExpression = this.RULE('AssignmentExpression', () => {
@@ -295,84 +295,32 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
   });
 
-  operator300 = createOperatorRule(
-    'operator300',
-    t.Operator300,
-    this.PrimaryExpression,
-    this
-  );
-  operator200 = createOperatorRule(
-    'operator200',
-    t.Operator200,
-    this.operator300,
-    this
-  );
-  operator100 = createOperatorRule(
-    'operator100',
-    t.Operator100,
-    this.operator200,
-    this
-  );
-  operator60 = createOperatorRule(
-    'operator60',
-    t.Operator60,
-    this.operator100,
-    this
-  );
-  operator40 = createOperatorRule(
-    'operator40',
-    t.Operator40,
-    this.operator60,
-    this
-  );
-  operator30 = createOperatorRule(
-    'operator30',
-    t.Operator30,
-    this.operator40,
-    this
-  );
-  operator25 = createOperatorRule(
-    'operator25',
-    t.Operator25,
-    this.operator30,
-    this
-  );
-  operator20 = createOperatorRule(
-    'operator20',
-    t.Operator20,
-    this.operator25,
-    this
-  );
-  operator18 = createOperatorRule(
-    'operator18',
-    t.Operator18,
-    this.operator20,
-    this
-  );
-  operator17 = createOperatorRule(
-    'operator17',
-    t.Operator17,
-    this.operator18,
-    this
-  );
-  operator16 = createOperatorRule(
-    'operator16',
-    t.Operator16,
-    this.operator17,
-    this
-  );
-  operator15 = createOperatorRule(
-    'operator15',
-    t.Operator15,
-    this.operator16,
-    this
-  );
-  operator10 = createOperatorRule(
-    'operator10',
-    t.Operator10,
-    this.operator15,
-    this
-  );
+  // prettier-ignore
+  Precedenc300 = createOperatorRule('Precedenc300', t.Precedenc300, this.PrimaryExpression, this);
+  // prettier-ignore
+  Precedenc200 = createOperatorRule('Precedenc200', t.Precedenc200, this.Precedenc300, this);
+  // prettier-ignore
+  Precedenc100 = createOperatorRule('Precedenc100', t.Precedenc100, this.Precedenc200, this);
+  // prettier-ignore
+  Precedenc60 = createOperatorRule('Precedenc60', t.Precedenc60, this.Precedenc100, this);
+  // prettier-ignore
+  Precedenc40 = createOperatorRule('Precedenc40', t.Precedenc40, this.Precedenc60, this);
+  // prettier-ignore
+  Precedenc30 = createOperatorRule('Precedenc30', t.Precedenc30, this.Precedenc40, this);
+  // prettier-ignore
+  Precedenc25 = createOperatorRule('Precedenc25', t.Precedenc25, this.Precedenc30, this);
+  // prettier-ignore
+  Precedenc20 = createOperatorRule('Precedenc20', t.Precedenc20, this.Precedenc25, this);
+  // prettier-ignore
+  Precedenc18 = createOperatorRule('Precedenc18', t.Precedenc18, this.Precedenc20, this);
+  // prettier-ignore
+  Precedenc17 = createOperatorRule('Precedenc17', t.Precedenc17, this.Precedenc18, this);
+  // prettier-ignore
+  Precedenc16 = createOperatorRule('Precedenc16', t.Precedenc16, this.Precedenc17, this);
+  // prettier-ignore
+  Precedenc15 = createOperatorRule('Precedenc15', t.Precedenc15, this.Precedenc16, this);
+  // prettier-ignore
+  Precedenc10 = createOperatorRule('Precedenc10', t.Precedence10, this.Precedenc15, this);
 
   ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
     let expression;
@@ -382,5 +330,40 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.CONSUME(t.RParen);
 
     return expression;
+  });
+
+  MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
+    this.SUBRULE(this.PrimaryExpression);
+
+    this.MANY2(() => {
+      return this.OR2([
+        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
+        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
+        { ALT: () => this.SUBRULE(this.Arguments) },
+      ]);
+    });
+  });
+
+  BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
+    this.CONSUME(t.LBracket);
+    this.SUBRULE(this.Expression);
+    this.CONSUME(t.RBracket);
+  });
+
+  DotMemberExpression = this.RULE('DotMemberExpression', () => {
+    this.CONSUME(t.Dot);
+    this.CONSUME(t.IdentifierName);
+  });
+
+  Arguments = this.RULE('Arguments', () => {
+    this.CONSUME(t.LParen);
+    this.OPTION(() => {
+      this.SUBRULE(this.AssignmentExpression);
+      this.MANY(() => {
+        this.CONSUME(t.Comma);
+        this.SUBRULE2(this.AssignmentExpression);
+      });
+    });
+    this.CONSUME(t.RParen);
   });
 }
