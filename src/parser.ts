@@ -211,7 +211,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  propertyKey = this.RULE('propertyKey', () => {
+  PropertyName = this.RULE('PropertyName', () => {
     return this.OR([
       {
         // (foo)
@@ -238,15 +238,15 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
   });
 
-  property = this.RULE('property', () => {
+  PropertyAssignment = this.RULE('PropertyAssignment', () => {
     let key, value, shorthand;
 
     this.OR([
       {
         ALT: () => {
-          key = this.SUBRULE(this.propertyKey);
+          key = this.SUBRULE(this.PropertyName);
           this.CONSUME(t.Colon);
-          value = this.SUBRULE(this.expression);
+          value = this.SUBRULE(this.AssignmentExpression);
           shorthand = false;
         },
       },
@@ -260,37 +260,37 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
 
     return {
-      type: 'Property',
+      type: 'PropertyAssignment',
       key,
       value,
       shorthand,
     };
   });
 
-  HashLiteral = this.RULE('HashLiteral', () => {
+  ObjectLiteral = this.RULE('ObjectLiteral', () => {
     const properties = [];
 
     this.CONSUME(t.LCurly);
     this.MANY_SEP({
       SEP: t.Comma,
       DEF: () => {
-        properties.push(this.SUBRULE(this.property));
+        properties.push(this.SUBRULE(this.PropertyAssignment));
       },
     });
     this.CONSUME(t.RCurly);
 
     return {
-      type: 'HashLiteral',
+      type: 'ObjectLiteral',
       properties,
     };
   });
 
   PrimaryExpression = this.RULE('PrimaryExpression', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.AbsLiteral) },
       { ALT: () => this.SUBRULE(this.Identifier) },
+      { ALT: () => this.SUBRULE(this.AbsLiteral) },
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
-      { ALT: () => this.SUBRULE(this.HashLiteral) },
+      { ALT: () => this.SUBRULE(this.ObjectLiteral) },
       { ALT: () => this.SUBRULE(this.ParenthesisExpression) },
     ]);
   });

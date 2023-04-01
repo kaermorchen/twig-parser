@@ -84,21 +84,21 @@ test('ArrayLiteral', () => {
   });
 });
 
-test('PropertyKey', () => {
-  expect(parse(`"key"`).propertyKey()).toStrictEqual(
+test('PropertyName', () => {
+  expect(parse(`"key"`).PropertyName()).toStrictEqual(
     parse(`"key"`).stringLiteral()
   );
-  expect(parse(`1`).propertyKey()).toStrictEqual(parse(`1`).numberLiteral());
-  expect(parse(`key`).propertyKey()).toStrictEqual(parse(`key`).Identifier());
-  expect(parse(`(name)`).propertyKey()).toStrictEqual(
+  expect(parse(`1`).PropertyName()).toStrictEqual(parse(`1`).numberLiteral());
+  expect(parse(`key`).PropertyName()).toStrictEqual(parse(`key`).Identifier());
+  expect(parse(`(name)`).PropertyName()).toStrictEqual(
     parse(`name`).expression()
   );
   // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
 });
 
-test('Property', () => {
-  expect(parse(`"key": 42`).property()).toStrictEqual({
-    type: 'Property',
+test('PropertyAssignment', () => {
+  expect(parse(`"key": 42`).PropertyAssignment()).toStrictEqual({
+    type: 'PropertyAssignment',
     key: {
       type: 'StringLiteral',
       value: 'key',
@@ -110,8 +110,8 @@ test('Property', () => {
     shorthand: false,
   });
 
-  expect(parse(`(name): "Anna"`).property()).toStrictEqual({
-    type: 'Property',
+  expect(parse(`(name): "Anna"`).PropertyAssignment()).toStrictEqual({
+    type: 'PropertyAssignment',
     key: {
       type: 'Identifier',
       value: 'name',
@@ -123,8 +123,8 @@ test('Property', () => {
     shorthand: false,
   });
 
-  expect(parse(`foo`).property()).toStrictEqual({
-    type: 'Property',
+  expect(parse(`foo`).PropertyAssignment()).toStrictEqual({
+    type: 'PropertyAssignment',
     key: {
       type: 'StringLiteral',
       value: 'foo',
@@ -137,17 +137,17 @@ test('Property', () => {
   });
 });
 
-test('HashLiteral', () => {
-  expect(parse(`{}`).HashLiteral()).toStrictEqual({
-    type: 'HashLiteral',
+test('ObjectLiteral', () => {
+  expect(parse(`{}`).ObjectLiteral()).toStrictEqual({
+    type: 'ObjectLiteral',
     properties: [],
   });
 
-  expect(parse(`{"key": 23, foo: bar, val}`).HashLiteral()).toStrictEqual({
-    type: 'HashLiteral',
+  expect(parse(`{"key": 23, foo: bar, val}`).ObjectLiteral()).toStrictEqual({
+    type: 'ObjectLiteral',
     properties: [
       {
-        type: 'Property',
+        type: 'PropertyAssignment',
         key: {
           type: 'StringLiteral',
           value: 'key',
@@ -159,7 +159,7 @@ test('HashLiteral', () => {
         shorthand: false,
       },
       {
-        type: 'Property',
+        type: 'PropertyAssignment',
         key: {
           type: 'Identifier',
           value: 'foo',
@@ -171,7 +171,7 @@ test('HashLiteral', () => {
         shorthand: false,
       },
       {
-        type: 'Property',
+        type: 'PropertyAssignment',
         key: {
           type: 'StringLiteral',
           value: 'val',
