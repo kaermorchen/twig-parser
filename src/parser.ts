@@ -256,11 +256,11 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   atomicExpression = this.RULE('atomicExpression', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
+      { ALT: () => this.SUBRULE(this.literal) },
+      { ALT: () => this.SUBRULE(this.identifier) },
       { ALT: () => this.SUBRULE(this.arrayExpression) },
       { ALT: () => this.SUBRULE(this.hashExpression) },
-      { ALT: () => this.SUBRULE(this.identifier) },
-      { ALT: () => this.SUBRULE(this.literal) },
+      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
     ]);
   });
 
