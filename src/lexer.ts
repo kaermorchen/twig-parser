@@ -16,19 +16,19 @@ function createToken(config: ITokenConfig): TokenType {
   return token;
 }
 
-export const Precedence10 = createToken({ name: 'Precedenc10', pattern: Lexer.NA });
-export const Precedenc15 = createToken({ name: 'Precedenc15', pattern: Lexer.NA });
-export const Precedenc16 = createToken({ name: 'Precedenc16', pattern: Lexer.NA });
-export const Precedenc17 = createToken({ name: 'Precedenc17', pattern: Lexer.NA });
-export const Precedenc18 = createToken({ name: 'Precedenc18', pattern: Lexer.NA });
-export const Precedenc20 = createToken({ name: 'Precedenc20', pattern: Lexer.NA });
-export const Precedenc25 = createToken({ name: 'Precedenc25', pattern: Lexer.NA });
-export const Precedenc30 = createToken({ name: 'Precedenc30', pattern: Lexer.NA });
-export const Precedenc40 = createToken({ name: 'Precedenc40', pattern: Lexer.NA });
-export const Precedenc60 = createToken({ name: 'Precedenc60', pattern: Lexer.NA });
-export const Precedenc100 = createToken({ name: 'Precedenc100', pattern: Lexer.NA });
-export const Precedenc200 = createToken({ name: 'Precedenc200', pattern: Lexer.NA });
-export const Precedenc300 = createToken({ name: 'Precedenc300', pattern: Lexer.NA });
+export const Precedence10 = createToken({ name: 'Precedence10', pattern: Lexer.NA });
+export const Precedence15 = createToken({ name: 'Precedence15', pattern: Lexer.NA });
+export const Precedence16 = createToken({ name: 'Precedence16', pattern: Lexer.NA });
+export const Precedence17 = createToken({ name: 'Precedence17', pattern: Lexer.NA });
+export const Precedence18 = createToken({ name: 'Precedence18', pattern: Lexer.NA });
+export const Precedence20 = createToken({ name: 'Precedence20', pattern: Lexer.NA });
+export const Precedence25 = createToken({ name: 'Precedence25', pattern: Lexer.NA });
+export const Precedence30 = createToken({ name: 'Precedence30', pattern: Lexer.NA });
+export const Precedence40 = createToken({ name: 'Precedence40', pattern: Lexer.NA });
+export const Precedence60 = createToken({ name: 'Precedence60', pattern: Lexer.NA });
+export const Precedence100 = createToken({ name: 'Precedence100', pattern: Lexer.NA });
+export const Precedence200 = createToken({ name: 'Precedence200', pattern: Lexer.NA });
+export const Precedence300 = createToken({ name: 'Precedence300', pattern: Lexer.NA });
 
 export const WhiteSpace = createToken({ name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED });
 export const Number = createToken({
@@ -58,38 +58,44 @@ export const Boolean = createToken({ name: 'Boolean', pattern: /true|false/i });
 export const Null = createToken({ name: 'Null', pattern: /null|none/i });
 export const Arrow = createToken({ name: 'Arrow', pattern: /=>/ });
 
+
+
 export const OrBinary = createToken({ name: 'OrBinary', pattern: /or/, categories: [Precedence10] });
-export const AndBinary = createToken({ name: 'AndBinary', pattern: /and/, categories: [Precedenc15] });
-export const BitwiseOrBinary = createToken({ name: 'BitwiseOrBinary', pattern: /b-or/, categories: [Precedenc16] });
-export const BitwiseXorBinary = createToken({ name: 'BitwiseXorBinary', pattern: /b-xor/, categories: [Precedenc17] });
-export const BitwiseAndBinary = createToken({ name: 'BitwiseAndBinary', pattern: /b-and/, categories: [Precedenc18] });
-export const EqualBinary = createToken({ name: 'EqualBinary', pattern: /==/, categories: [Precedenc20] });
-export const NotEqualBinary = createToken({ name: 'NotEqualBinary', pattern: /!=/, categories: [Precedenc20] });
-export const SpaceshipBinary = createToken({ name: 'SpaceshipBinary', pattern: /<=>/, categories: [Precedenc20] });
-export const GreaterEqualBinary = createToken({ name: 'GreaterEqualBinary', pattern: />=/, categories: [Precedenc20] });
-export const LessEqualBinary = createToken({ name: 'LessEqualBinary', pattern: /<=/, categories: [Precedenc20] });
-export const LessBinary = createToken({ name: 'LessBinary', pattern: /</, categories: [Precedenc20] });
-export const GreaterBinary = createToken({ name: 'GreaterBinary', pattern: />/, categories: [Precedenc20] });
-export const NotInBinary = createToken({ name: 'NotInBinary', pattern: /not in/, categories: [Precedenc20] });
-export const InBinary = createToken({ name: 'InBinary', pattern: /in/, categories: [Precedenc20] });
-export const MatchesBinary = createToken({ name: 'MatchesBinary', pattern: /matches/, categories: [Precedenc20] });
-export const StartsWithBinary = createToken({ name: 'StartsWithBinary', pattern: /starts with/, categories: [Precedenc20] });
-export const EndsWithBinary = createToken({ name: 'EndsWithBinary', pattern: /ends with/, categories: [Precedenc20] });
-export const HasSomeBinary = createToken({ name: 'HasSomeBinary', pattern: /has some/, categories: [Precedenc20] });
-export const HasEveryBinary = createToken({ name: 'HasEveryBinary', pattern: /has every/, categories: [Precedenc20] });
-export const RangeBinary = createToken({ name: 'RangeBinary', pattern: /\.\./, categories: [Precedenc25] });
-export const AddBinary = createToken({ name: 'AddBinary', pattern: /\+/, categories: [Precedenc30] });
-export const SubBinary = createToken({ name: 'SubBinary', pattern: /\-/, categories: [Precedenc30] });
-export const ConcatBinary = createToken({ name: 'ConcatBinary', pattern: /\~/, categories: [Precedenc40] });
-export const NotUnary = createToken({ name: 'NotUnary', pattern: /not/ });
-export const PowerBinary = createToken({ name: 'PowerBinary', pattern: /\*\*/, categories: [Precedenc200] });
-export const MulBinary = createToken({ name: 'MulBinary', pattern: /\*/, categories: [Precedenc60] });
-export const FloorDivBinary = createToken({ name: 'FloorDivBinary', pattern: /\/\//, categories: [Precedenc60] });
-export const DivBinary = createToken({ name: 'DivBinary', pattern: /\//, categories: [Precedenc60] });
-export const ModBinary = createToken({ name: 'ModBinary', pattern: /%/, categories: [Precedenc60] });
-export const IsNotBinary = createToken({ name: 'IsNotBinary', pattern: /is not/, categories: [Precedenc100] });
-export const IsBinary = createToken({ name: 'IsBinary', pattern: /is/, categories: [Precedenc100] });
-export const NullCoalesceExpression = createToken({ name: 'NullCoalesceExpression', pattern: /\?\?/, categories: [Precedenc300] });
+export const AndBinary = createToken({ name: 'AndBinary', pattern: /and/, categories: [Precedence15] });
+export const BitwiseOrBinary = createToken({ name: 'BitwiseOrBinary', pattern: /b-or/, categories: [Precedence16] });
+export const BitwiseXorBinary = createToken({ name: 'BitwiseXorBinary', pattern: /b-xor/, categories: [Precedence17] });
+export const BitwiseAndBinary = createToken({ name: 'BitwiseAndBinary', pattern: /b-and/, categories: [Precedence18] });
+export const EqualBinary = createToken({ name: 'EqualBinary', pattern: /==/, categories: [Precedence20] });
+export const NotEqualBinary = createToken({ name: 'NotEqualBinary', pattern: /!=/, categories: [Precedence20] });
+export const SpaceshipBinary = createToken({ name: 'SpaceshipBinary', pattern: /<=>/, categories: [Precedence20] });
+export const GreaterEqualBinary = createToken({ name: 'GreaterEqualBinary', pattern: />=/, categories: [Precedence20] });
+export const LessEqualBinary = createToken({ name: 'LessEqualBinary', pattern: /<=/, categories: [Precedence20] });
+export const LessBinary = createToken({ name: 'LessBinary', pattern: /</, categories: [Precedence20] });
+export const GreaterBinary = createToken({ name: 'GreaterBinary', pattern: />/, categories: [Precedence20] });
+export const NotInBinary = createToken({ name: 'NotInBinary', pattern: /not in/, categories: [Precedence20] });
+export const InBinary = createToken({ name: 'InBinary', pattern: /in/, categories: [Precedence20] });
+export const MatchesBinary = createToken({ name: 'MatchesBinary', pattern: /matches/, categories: [Precedence20] });
+export const StartsWithBinary = createToken({ name: 'StartsWithBinary', pattern: /starts with/, categories: [Precedence20] });
+export const EndsWithBinary = createToken({ name: 'EndsWithBinary', pattern: /ends with/, categories: [Precedence20] });
+export const HasSomeBinary = createToken({ name: 'HasSomeBinary', pattern: /has some/, categories: [Precedence20] });
+export const HasEveryBinary = createToken({ name: 'HasEveryBinary', pattern: /has every/, categories: [Precedence20] });
+export const RangeBinary = createToken({ name: 'RangeBinary', pattern: /\.\./, categories: [Precedence25] });
+export const Plus = createToken({ name: 'AddBinary', pattern: /\+/, categories: [Precedence30] });
+export const Minus = createToken({ name: 'SubBinary', pattern: /\-/, categories: [Precedence30] });
+export const ConcatBinary = createToken({ name: 'ConcatBinary', pattern: /\~/, categories: [Precedence40] });
+export const PowerBinary = createToken({ name: 'PowerBinary', pattern: /\*\*/, categories: [Precedence200] });
+export const MulBinary = createToken({ name: 'MulBinary', pattern: /\*/, categories: [Precedence60] });
+export const FloorDivBinary = createToken({ name: 'FloorDivBinary', pattern: /\/\//, categories: [Precedence60] });
+export const DivBinary = createToken({ name: 'DivBinary', pattern: /\//, categories: [Precedence60] });
+export const ModBinary = createToken({ name: 'ModBinary', pattern: /%/, categories: [Precedence60] });
+export const IsNotBinary = createToken({ name: 'IsNotBinary', pattern: /is not/, categories: [Precedence100] });
+export const IsBinary = createToken({ name: 'IsBinary', pattern: /is/, categories: [Precedence100] });
+export const NullCoalesceExpression = createToken({ name: 'NullCoalesceExpression', pattern: /\?\?/, categories: [Precedence300] });
+
+export const Not = createToken({ name: 'Not', pattern: /not/ });
+export const Exclamation = createToken({ name: 'Exclamation', pattern: /!/ });
+export const PlusPlus = createToken({ name: 'PlusPlus', pattern: /\+\+/ });
+export const MinusMinus = createToken({ name: 'MinusMinus', pattern: /\-\-/ });
 
 export const Dot = createToken({ name: 'Dot', pattern: /\./ });
 export const LCurly = createToken({ name: 'LCurly', pattern: /{/ });

@@ -279,3 +279,55 @@ test('AssignmentExpression', () => {
     type: 'ConditionalExpression',
   });
 });
+
+test('MemberExpression', () => {
+  expect(parse(`user.name`).MemberExpression()).toStrictEqual({
+    object: {
+      type: 'Identifier',
+      value: 'user',
+    },
+    property: {
+      type: 'Identifier',
+      value: 'name',
+    },
+    type: 'MemberExpression',
+  });
+
+  expect(parse(`user['name']`).MemberExpression()).toStrictEqual({
+    object: {
+      type: 'Identifier',
+      value: 'user',
+    },
+    property: {
+      type: 'StringLiteral',
+      value: 'name',
+    },
+    type: 'MemberExpression',
+  });
+
+  expect(parse(`user.a.b`).MemberExpression()).toStrictEqual({
+    type: 'MemberExpression',
+    object: {
+      type: 'MemberExpression',
+      object: {
+        type: 'Identifier',
+        value: 'user',
+      },
+      property: {
+        type: 'Identifier',
+        value: 'a',
+      },
+    },
+    property: {
+      type: 'Identifier',
+      value: 'b',
+    },
+  });
+});
+
+// test('UnaryExpression', () => {
+//   expect(parse(`-4`).UnaryExpression()).toStrictEqual({
+//     type: 'StringLiteral',
+//     value: 'Hello',
+//   });
+// });

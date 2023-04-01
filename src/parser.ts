@@ -167,7 +167,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   BinaryExpression = this.RULE('BinaryExpression', () => {
-    return this.SUBRULE(this.Precedenc10);
+    return this.SUBRULE(this.Precedence10);
   });
 
   AssignmentExpression = this.RULE('AssignmentExpression', () => {
@@ -296,31 +296,31 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   // prettier-ignore
-  Precedenc300 = createOperatorRule('Precedenc300', t.Precedenc300, this.PrimaryExpression, this);
+  Precedence300 = createOperatorRule('Precedence300', t.Precedence300, this.PrimaryExpression, this);
   // prettier-ignore
-  Precedenc200 = createOperatorRule('Precedenc200', t.Precedenc200, this.Precedenc300, this);
+  Precedence200 = createOperatorRule('Precedence200', t.Precedence200, this.Precedence300, this);
   // prettier-ignore
-  Precedenc100 = createOperatorRule('Precedenc100', t.Precedenc100, this.Precedenc200, this);
+  Precedence100 = createOperatorRule('Precedence100', t.Precedence100, this.Precedence200, this);
   // prettier-ignore
-  Precedenc60 = createOperatorRule('Precedenc60', t.Precedenc60, this.Precedenc100, this);
+  Precedence60 = createOperatorRule('Precedence60', t.Precedence60, this.Precedence100, this);
   // prettier-ignore
-  Precedenc40 = createOperatorRule('Precedenc40', t.Precedenc40, this.Precedenc60, this);
+  Precedence40 = createOperatorRule('Precedence40', t.Precedence40, this.Precedence60, this);
   // prettier-ignore
-  Precedenc30 = createOperatorRule('Precedenc30', t.Precedenc30, this.Precedenc40, this);
+  Precedence30 = createOperatorRule('Precedence30', t.Precedence30, this.Precedence40, this);
   // prettier-ignore
-  Precedenc25 = createOperatorRule('Precedenc25', t.Precedenc25, this.Precedenc30, this);
+  Precedence25 = createOperatorRule('Precedence25', t.Precedence25, this.Precedence30, this);
   // prettier-ignore
-  Precedenc20 = createOperatorRule('Precedenc20', t.Precedenc20, this.Precedenc25, this);
+  Precedence20 = createOperatorRule('Precedence20', t.Precedence20, this.Precedence25, this);
   // prettier-ignore
-  Precedenc18 = createOperatorRule('Precedenc18', t.Precedenc18, this.Precedenc20, this);
+  Precedence18 = createOperatorRule('Precedence18', t.Precedence18, this.Precedence20, this);
   // prettier-ignore
-  Precedenc17 = createOperatorRule('Precedenc17', t.Precedenc17, this.Precedenc18, this);
+  Precedence17 = createOperatorRule('Precedence17', t.Precedence17, this.Precedence18, this);
   // prettier-ignore
-  Precedenc16 = createOperatorRule('Precedenc16', t.Precedenc16, this.Precedenc17, this);
+  Precedence16 = createOperatorRule('Precedence16', t.Precedence16, this.Precedence17, this);
   // prettier-ignore
-  Precedenc15 = createOperatorRule('Precedenc15', t.Precedenc15, this.Precedenc16, this);
+  Precedence15 = createOperatorRule('Precedence15', t.Precedence15, this.Precedence16, this);
   // prettier-ignore
-  Precedenc10 = createOperatorRule('Precedenc10', t.Precedence10, this.Precedenc15, this);
+  Precedence10 = createOperatorRule('Precedence10', t.Precedence10, this.Precedence15, this);
 
   ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
     let expression;
@@ -332,27 +332,43 @@ export default class TwigParser extends EmbeddedActionsParser {
     return expression;
   });
 
-  MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
-    this.SUBRULE(this.PrimaryExpression);
+  MemberExpression = this.RULE('MemberExpression', () => {
+    const object = this.SUBRULE(this.PrimaryExpression);
+    let property;
 
-    this.MANY2(() => {
-      return this.OR2([
+    this.OPTION(() => {
+      property = this.OR([
         { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
         { ALT: () => this.SUBRULE(this.DotMemberExpression) },
-        { ALT: () => this.SUBRULE(this.Arguments) },
       ]);
     });
+
+    if (property) {
+      return {
+        type: 'MemberExpression',
+        object,
+        property,
+      };
+    } else {
+      return object;
+    }
+  });
+
+  MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
+    return this.SUBRULE(this.MemberExpression);
   });
 
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
     this.CONSUME(t.LBracket);
-    this.SUBRULE(this.Expression);
+    const expr = this.SUBRULE(this.Expression);
     this.CONSUME(t.RBracket);
+
+    return expr;
   });
 
   DotMemberExpression = this.RULE('DotMemberExpression', () => {
     this.CONSUME(t.Dot);
-    this.CONSUME(t.IdentifierName);
+    return this.SUBRULE(this.Identifier);
   });
 
   Arguments = this.RULE('Arguments', () => {
@@ -365,5 +381,29 @@ export default class TwigParser extends EmbeddedActionsParser {
       });
     });
     this.CONSUME(t.RParen);
+  });
+
+  UnaryExpression = this.RULE('UnaryExpression', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.MemberCallNewExpression) },
+      {
+        ALT: () => {
+          const operator = this.OR1([
+            { ALT: () => this.CONSUME(t.Plus).image },
+            { ALT: () => this.CONSUME(t.Minus).image },
+            { ALT: () => this.CONSUME(t.Not).image },
+            { ALT: () => this.CONSUME(t.Exclamation).image },
+          ]);
+
+          const argument = this.SUBRULE1(this.MemberCallNewExpression);
+
+          return {
+            type: 'UnaryExpression',
+            operator,
+            argument,
+          };
+        },
+      },
+    ]);
   });
 }
