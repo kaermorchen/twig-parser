@@ -243,3 +243,39 @@ test('Expression', () => {
     value: 'Hello',
   });
 });
+
+test('AssignmentExpression', () => {
+  expect(parse(`"Hello"`).AssignmentExpression()).toStrictEqual({
+    type: 'StringLiteral',
+    value: 'Hello',
+  });
+
+  expect(parse(`4 > 1`).AssignmentExpression()).toStrictEqual({
+    left: {
+      type: 'NumberLiteral',
+      value: 4,
+    },
+    operator: '>',
+    right: {
+      type: 'NumberLiteral',
+      value: 1,
+    },
+    type: 'BinaryExpression',
+  });
+
+  expect(parse(`true ? 1 : 2`).AssignmentExpression()).toStrictEqual({
+    alternate: {
+      type: 'NumberLiteral',
+      value: 2,
+    },
+    consequent: {
+      type: 'NumberLiteral',
+      value: 1,
+    },
+    test: {
+      type: 'BooleanLiteral',
+      value: true,
+    },
+    type: 'ConditionalExpression',
+  });
+});
