@@ -11,7 +11,7 @@ export function tpl2asr(tpl: string) {
   return parser.template();
 }
 
-export function parse(tpl: string) {
+export function parse(tpl: string): TwigParser {
   const { tokens } = lexer.tokenize(tpl);
   parser.input = tokens;
 

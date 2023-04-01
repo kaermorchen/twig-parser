@@ -1,5 +1,5 @@
 import { EmbeddedActionsParser, Rule } from 'chevrotain';
-import { tokens } from './lexer.js';
+import { tokens as t } from './lexer.js';
 
 function createOperatorRule(name: string, consumeOperator, subrule, ctx: TwigParser) {
   return ctx.RULE(name, () => {
@@ -25,7 +25,7 @@ function createOperatorRule(name: string, consumeOperator, subrule, ctx: TwigPar
 
 export default class TwigParser extends EmbeddedActionsParser {
   constructor() {
-    super(tokens);
+    super(t);
     this.performSelfAnalysis();
   }
 
@@ -53,21 +53,21 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   text = this.RULE('text', () => {
-    return this.CONSUME(tokens.Text);
+    return this.CONSUME(t.Text);
   });
 
   rawText = this.RULE('rawText', () => {
-    return this.CONSUME(tokens.RawText);
+    return this.CONSUME(t.RawText);
   });
 
   comment = this.RULE('comment', () => {
     let value = null;
 
-    this.CONSUME(tokens.LComment);
+    this.CONSUME(t.LComment);
     this.OPTION(() => {
-      value = this.CONSUME(tokens.Comment).image;
+      value = this.CONSUME(t.Comment).image;
     });
-    this.CONSUME(tokens.RComment);
+    this.CONSUME(t.RComment);
 
     return {
       type: 'Comment',
@@ -78,11 +78,11 @@ export default class TwigParser extends EmbeddedActionsParser {
   variable = this.RULE('variable', () => {
     let value = null;
 
-    this.CONSUME(tokens.LVariable);
+    this.CONSUME(t.LVariable);
     this.OPTION(() => {
       value = this.SUBRULE(this.expression);
     });
-    this.CONSUME(tokens.RVariable);
+    this.CONSUME(t.RVariable);
 
     return {
       type: 'Variable',
@@ -95,15 +95,15 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   verbatimBlock = this.RULE('verbatimBlock', () => {
-    this.CONSUME(tokens.LBlock);
-    this.CONSUME(tokens.Verbatim);
-    this.CONSUME(tokens.RBlock);
+    this.CONSUME(t.LBlock);
+    this.CONSUME(t.Verbatim);
+    this.CONSUME(t.RBlock);
 
     const value = this.SUBRULE(this.rawText).image;
 
-    this.CONSUME1(tokens.LBlock);
-    this.CONSUME1(tokens.EndVerbatim);
-    this.CONSUME1(tokens.RBlock);
+    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.EndVerbatim);
+    this.CONSUME1(t.RBlock);
 
     return {
       type: 'VerbatimBlock',
@@ -115,67 +115,64 @@ export default class TwigParser extends EmbeddedActionsParser {
     return this.SUBRULE(this.operator10);
   });
 
-  identifier = this.RULE('identifier', () => {
+  Identifier = this.RULE('identifier', () => {
     return {
       type: 'Identifier',
-      value: this.CONSUME(tokens.Identifier).image,
+      value: this.CONSUME(t.Identifier).image,
     };
   });
 
-  literal = this.RULE('literal', () => {
-    return this.OR({
-      IGNORE_AMBIGUITIES: true,
-      DEF: [
-        { ALT: () => this.SUBRULE(this.nullLiteral) },
-        { ALT: () => this.SUBRULE(this.booleanLiteral) },
-        { ALT: () => this.SUBRULE(this.numberLiteral) },
-        { ALT: () => this.SUBRULE(this.stringLiteral) },
-      ],
-    });
+  AbsLiteral = this.RULE('AbsLiteral', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.nullLiteral) },
+      { ALT: () => this.SUBRULE(this.booleanLiteral) },
+      { ALT: () => this.SUBRULE(this.numberLiteral) },
+      { ALT: () => this.SUBRULE(this.stringLiteral) },
+    ]);
   });
 
   numberLiteral = this.RULE('numberLiteral', () => {
     return {
       type: 'NumberLiteral',
-      value: Number(this.CONSUME(tokens.Number).image),
+      value: Number(this.CONSUME(t.Number).image),
     };
   });
 
   stringLiteral = this.RULE('stringLiteral', () => {
     return {
       type: 'StringLiteral',
-      value: this.CONSUME(tokens.String).image.slice(1, -1),
+      value: this.CONSUME(t.String).image.slice(1, -1),
     };
   });
 
   booleanLiteral = this.RULE('booleanLiteral', () => {
     return {
       type: 'BooleanLiteral',
-      value: this.CONSUME(tokens.Boolean).image.toLowerCase() === 'true',
+      value: this.CONSUME(t.Boolean).image.toLowerCase() === 'true',
     };
   });
 
   nullLiteral = this.RULE('nullLiteral', () => {
     return {
       type: 'NullLiteral',
-      value: this.CONSUME(tokens.Null) ? null : undefined,
+      value: this.CONSUME(t.Null) ? null : undefined,
     };
   });
 
-  arrayExpression = this.RULE('ArrayExpression', () => {
+  ArrayLiteral = this.RULE('ArrayLiteral', () => {
     const elements = [];
 
-    this.CONSUME(tokens.LSquare);
+    this.CONSUME(t.LBracket);
     this.MANY_SEP({
-      SEP: tokens.Comma,
+      SEP: t.Comma,
       DEF: () => {
         elements.push(this.SUBRULE(this.expression));
       },
     });
-    this.CONSUME(tokens.RSquare);
+    this.CONSUME(t.RBracket);
 
     return {
-      type: 'ArrayExpression',
+      type: 'ArrayLiteral',
       elements,
     };
   });
@@ -186,9 +183,9 @@ export default class TwigParser extends EmbeddedActionsParser {
         // (foo)
         ALT: () => {
           let expr;
-          this.CONSUME(tokens.LParen);
+          this.CONSUME(t.LParen);
           expr = this.SUBRULE(this.expression);
-          this.CONSUME(tokens.RParen);
+          this.CONSUME(t.RParen);
           return expr;
         },
       },
@@ -198,7 +195,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       },
       {
         // foo
-        ALT: () => this.SUBRULE(this.identifier),
+        ALT: () => this.SUBRULE(this.Identifier),
       },
       {
         // 42
@@ -214,14 +211,14 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           key = this.SUBRULE(this.propertyKey);
-          this.CONSUME(tokens.Colon);
+          this.CONSUME(t.Colon);
           value = this.SUBRULE(this.expression);
           shorthand = false;
         },
       },
       {
         ALT: () => {
-          value = this.SUBRULE(this.identifier);
+          value = this.SUBRULE(this.Identifier);
           key = Object.assign({}, value, { type: 'StringLiteral' });
           shorthand = true;
         },
@@ -236,54 +233,54 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  hashExpression = this.RULE('HashExpression', () => {
+  HashLiteral = this.RULE('HashLiteral', () => {
     const properties = [];
 
-    this.CONSUME(tokens.LCurly);
+    this.CONSUME(t.LCurly);
     this.MANY_SEP({
-      SEP: tokens.Comma,
+      SEP: t.Comma,
       DEF: () => {
         properties.push(this.SUBRULE(this.property));
       },
     });
-    this.CONSUME(tokens.RCurly);
+    this.CONSUME(t.RCurly);
 
     return {
-      type: 'HashExpression',
+      type: 'HashLiteral',
       properties,
     };
   });
 
-  atomicExpression = this.RULE('atomicExpression', () => {
+  PrimaryExpression = this.RULE('PrimaryExpression', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.literal) },
-      { ALT: () => this.SUBRULE(this.identifier) },
-      { ALT: () => this.SUBRULE(this.arrayExpression) },
-      { ALT: () => this.SUBRULE(this.hashExpression) },
-      { ALT: () => this.SUBRULE(this.parenthesisExpression) },
+      { ALT: () => this.SUBRULE(this.AbsLiteral) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+      { ALT: () => this.SUBRULE(this.ArrayLiteral) },
+      { ALT: () => this.SUBRULE(this.HashLiteral) },
+      { ALT: () => this.SUBRULE(this.ParenthesisExpression) },
     ]);
   });
 
-  operator300 = createOperatorRule('operator300', tokens.Operator300, this.atomicExpression, this);
-  operator200 = createOperatorRule('operator200', tokens.Operator200, this.operator300, this);
-  operator100 = createOperatorRule('operator100', tokens.Operator100, this.operator200, this);
-  operator60 = createOperatorRule('operator60', tokens.Operator60, this.operator100, this);
-  operator40 = createOperatorRule('operator40', tokens.Operator40, this.operator60, this);
-  operator30 = createOperatorRule('operator30', tokens.Operator30, this.operator40, this);
-  operator25 = createOperatorRule('operator25', tokens.Operator25, this.operator30, this);
-  operator20 = createOperatorRule('operator20', tokens.Operator20, this.operator25, this);
-  operator18 = createOperatorRule('operator18', tokens.Operator18, this.operator20, this);
-  operator17 = createOperatorRule('operator17', tokens.Operator17, this.operator18, this);
-  operator16 = createOperatorRule('operator16', tokens.Operator16, this.operator17, this);
-  operator15 = createOperatorRule('operator15', tokens.Operator15, this.operator16, this);
-  operator10 = createOperatorRule('operator10', tokens.Operator10, this.operator15, this);
+  operator300 = createOperatorRule('operator300', t.Operator300, this.PrimaryExpression, this);
+  operator200 = createOperatorRule('operator200', t.Operator200, this.operator300, this);
+  operator100 = createOperatorRule('operator100', t.Operator100, this.operator200, this);
+  operator60 = createOperatorRule('operator60', t.Operator60, this.operator100, this);
+  operator40 = createOperatorRule('operator40', t.Operator40, this.operator60, this);
+  operator30 = createOperatorRule('operator30', t.Operator30, this.operator40, this);
+  operator25 = createOperatorRule('operator25', t.Operator25, this.operator30, this);
+  operator20 = createOperatorRule('operator20', t.Operator20, this.operator25, this);
+  operator18 = createOperatorRule('operator18', t.Operator18, this.operator20, this);
+  operator17 = createOperatorRule('operator17', t.Operator17, this.operator18, this);
+  operator16 = createOperatorRule('operator16', t.Operator16, this.operator17, this);
+  operator15 = createOperatorRule('operator15', t.Operator15, this.operator16, this);
+  operator10 = createOperatorRule('operator10', t.Operator10, this.operator15, this);
 
-  parenthesisExpression = this.RULE('parenthesisExpression', () => {
+  ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
     let expression;
 
-    this.CONSUME(tokens.LParen);
+    this.CONSUME(t.LParen);
     expression = this.SUBRULE(this.expression);
-    this.CONSUME(tokens.RParen);
+    this.CONSUME(t.RParen);
 
     return expression;
   });

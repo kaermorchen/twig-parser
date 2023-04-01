@@ -88,8 +88,8 @@ createToken({ name: 'NullCoalesceExpression', pattern: /\?\?/, categories: creat
 createToken({ name: 'Dot', pattern: /\./ });
 createToken({ name: 'LCurly', pattern: /{/ });
 createToken({ name: 'RCurly', pattern: /}/ });
-createToken({ name: 'LSquare', pattern: /\[/ });
-createToken({ name: 'RSquare', pattern: /]/ });
+createToken({ name: 'LBracket', pattern: /\[/ });
+createToken({ name: 'RBracket', pattern: /]/ });
 createToken({ name: 'LParen', pattern: /\(/ });
 createToken({ name: 'RParen', pattern: /\)/ });
 createToken({ name: 'Comma', pattern: /,/ });

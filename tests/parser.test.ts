@@ -2,7 +2,7 @@ import { test, expect } from 'vitest';
 import { parse } from './helpers.js';
 
 test('Identifier', () => {
-  expect(parse(`user`).identifier()).toStrictEqual({
+  expect(parse(`user`).Identifier()).toStrictEqual({
     type: 'Identifier',
     value: `user`,
   });
@@ -72,15 +72,15 @@ test('Null', () => {
   expect(parse(`none`).nullLiteral()).toStrictEqual(expected);
 });
 
-test('ArrayExpression', () => {
-  expect(parse(`[]`).arrayExpression()).toStrictEqual({
-    type: 'ArrayExpression',
+test('ArrayLiteral', () => {
+  expect(parse(`[]`).ArrayLiteral()).toStrictEqual({
+    type: 'ArrayLiteral',
     elements: [],
   });
 
-  expect(parse(`[1, [2, 3]]`).arrayExpression()).toStrictEqual({
-    type: 'ArrayExpression',
-    elements: [parse('1').numberLiteral(), parse('[2, 3]').arrayExpression()],
+  expect(parse(`[1, [2, 3]]`).ArrayLiteral()).toStrictEqual({
+    type: 'ArrayLiteral',
+    elements: [parse('1').numberLiteral(), parse('[2, 3]').ArrayLiteral()],
   });
 });
 
@@ -89,7 +89,7 @@ test('PropertyKey', () => {
     parse(`"key"`).stringLiteral()
   );
   expect(parse(`1`).propertyKey()).toStrictEqual(parse(`1`).numberLiteral());
-  expect(parse(`key`).propertyKey()).toStrictEqual(parse(`key`).identifier());
+  expect(parse(`key`).propertyKey()).toStrictEqual(parse(`key`).Identifier());
   expect(parse(`(name)`).propertyKey()).toStrictEqual(
     parse(`name`).expression()
   );
@@ -137,14 +137,14 @@ test('Property', () => {
   });
 });
 
-test('HashExpression', () => {
-  expect(parse(`{}`).hashExpression()).toStrictEqual({
-    type: 'HashExpression',
+test('HashLiteral', () => {
+  expect(parse(`{}`).HashLiteral()).toStrictEqual({
+    type: 'HashLiteral',
     properties: [],
   });
 
-  expect(parse(`{"key": 23, foo: bar, val}`).hashExpression()).toStrictEqual({
-    type: 'HashExpression',
+  expect(parse(`{"key": 23, foo: bar, val}`).HashLiteral()).toStrictEqual({
+    type: 'HashLiteral',
     properties: [
       {
         type: 'Property',
@@ -187,7 +187,7 @@ test('HashExpression', () => {
 });
 
 test('ParenthesisExpression', () => {
-  expect(parse(`(4)`).parenthesisExpression()).toStrictEqual({
+  expect(parse(`(4)`).ParenthesisExpression()).toStrictEqual({
     type: 'NumberLiteral',
     value: 4,
   });
