@@ -1,9 +1,16 @@
 import { EmbeddedActionsParser, Rule } from 'chevrotain';
 import { tokens as t } from './lexer.js';
 
-function createOperatorRule(name: string, consumeOperator, subrule, ctx: TwigParser) {
+function createOperatorRule(
+  name: string,
+  consumeOperator,
+  subrule,
+  ctx: TwigParser
+) {
   return ctx.RULE(name, () => {
-    let operator, right, left = ctx.SUBRULE(subrule);
+    let operator,
+      right,
+      left = ctx.SUBRULE(subrule);
 
     ctx.OPTION(() => {
       operator = ctx.CONSUME(consumeOperator).image;
@@ -112,7 +119,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   expression = this.RULE('expression', () => {
-    return this.SUBRULE(this.operator10);
+    return this.SUBRULE(this.BinaryExpression);
   });
 
   Identifier = this.RULE('identifier', () => {
@@ -159,6 +166,33 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  BinaryExpression = this.RULE('BinaryExpression', () => {
+    return this.SUBRULE(this.operator10);
+  });
+
+  AssignmentExpression = this.RULE('AssignmentExpression', () => {
+    const test = this.SUBRULE(this.BinaryExpression);
+    let consequent, alternate;
+
+    this.OPTION(() => {
+      this.CONSUME(t.Question);
+      consequent = this.SUBRULE1(this.AssignmentExpression);
+      this.CONSUME(t.Colon);
+      alternate = this.SUBRULE2(this.AssignmentExpression);
+    });
+
+    if (consequent && alternate) {
+      return {
+        type: 'ConditionalExpression',
+        test,
+        consequent,
+        alternate,
+      };
+    } else {
+      return test;
+    }
+  });
+
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
     const elements = [];
 
@@ -166,7 +200,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.MANY_SEP({
       SEP: t.Comma,
       DEF: () => {
-        elements.push(this.SUBRULE(this.expression));
+        elements.push(this.SUBRULE(this.AssignmentExpression));
       },
     });
     this.CONSUME(t.RBracket);
@@ -261,19 +295,84 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
   });
 
-  operator300 = createOperatorRule('operator300', t.Operator300, this.PrimaryExpression, this);
-  operator200 = createOperatorRule('operator200', t.Operator200, this.operator300, this);
-  operator100 = createOperatorRule('operator100', t.Operator100, this.operator200, this);
-  operator60 = createOperatorRule('operator60', t.Operator60, this.operator100, this);
-  operator40 = createOperatorRule('operator40', t.Operator40, this.operator60, this);
-  operator30 = createOperatorRule('operator30', t.Operator30, this.operator40, this);
-  operator25 = createOperatorRule('operator25', t.Operator25, this.operator30, this);
-  operator20 = createOperatorRule('operator20', t.Operator20, this.operator25, this);
-  operator18 = createOperatorRule('operator18', t.Operator18, this.operator20, this);
-  operator17 = createOperatorRule('operator17', t.Operator17, this.operator18, this);
-  operator16 = createOperatorRule('operator16', t.Operator16, this.operator17, this);
-  operator15 = createOperatorRule('operator15', t.Operator15, this.operator16, this);
-  operator10 = createOperatorRule('operator10', t.Operator10, this.operator15, this);
+  operator300 = createOperatorRule(
+    'operator300',
+    t.Operator300,
+    this.PrimaryExpression,
+    this
+  );
+  operator200 = createOperatorRule(
+    'operator200',
+    t.Operator200,
+    this.operator300,
+    this
+  );
+  operator100 = createOperatorRule(
+    'operator100',
+    t.Operator100,
+    this.operator200,
+    this
+  );
+  operator60 = createOperatorRule(
+    'operator60',
+    t.Operator60,
+    this.operator100,
+    this
+  );
+  operator40 = createOperatorRule(
+    'operator40',
+    t.Operator40,
+    this.operator60,
+    this
+  );
+  operator30 = createOperatorRule(
+    'operator30',
+    t.Operator30,
+    this.operator40,
+    this
+  );
+  operator25 = createOperatorRule(
+    'operator25',
+    t.Operator25,
+    this.operator30,
+    this
+  );
+  operator20 = createOperatorRule(
+    'operator20',
+    t.Operator20,
+    this.operator25,
+    this
+  );
+  operator18 = createOperatorRule(
+    'operator18',
+    t.Operator18,
+    this.operator20,
+    this
+  );
+  operator17 = createOperatorRule(
+    'operator17',
+    t.Operator17,
+    this.operator18,
+    this
+  );
+  operator16 = createOperatorRule(
+    'operator16',
+    t.Operator16,
+    this.operator17,
+    this
+  );
+  operator15 = createOperatorRule(
+    'operator15',
+    t.Operator15,
+    this.operator16,
+    this
+  );
+  operator10 = createOperatorRule(
+    'operator10',
+    t.Operator10,
+    this.operator15,
+    this
+  );
 
   ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
     let expression;
