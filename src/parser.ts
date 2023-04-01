@@ -1,6 +1,27 @@
-import { EmbeddedActionsParser } from 'chevrotain';
-import { off } from 'process';
+import { EmbeddedActionsParser, Rule } from 'chevrotain';
 import { tokens } from './lexer.js';
+
+function createOperatorRule(name: string, consumeOperator, subrule, ctx: TwigParser) {
+  return ctx.RULE(name, () => {
+    let operator, right, left = ctx.SUBRULE(subrule);
+
+    ctx.OPTION(() => {
+      operator = ctx.CONSUME(consumeOperator).image;
+      right = ctx.SUBRULE2(subrule);
+    });
+
+    if (operator && right) {
+      return {
+        type: 'BinaryExpression',
+        left,
+        operator,
+        right,
+      };
+    } else {
+      return left;
+    }
+  });
+}
 
 export default class TwigParser extends EmbeddedActionsParser {
   constructor() {
@@ -91,20 +112,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   expression = this.RULE('expression', () => {
-    let binaryExpression;
-    const atomicExpression = this.SUBRULE(this.atomicExpression);
-
-    this.OPTION(() => {
-      binaryExpression = this.SUBRULE1(this.binaryExpression);
-    });
-
-    if (atomicExpression && binaryExpression) {
-      return Object.assign({}, binaryExpression, { left: atomicExpression });
-    }
-
-    if (atomicExpression) {
-      return atomicExpression;
-    }
+    return this.SUBRULE(this.operator10);
   });
 
   identifier = this.RULE('identifier', () => {
@@ -152,43 +160,6 @@ export default class TwigParser extends EmbeddedActionsParser {
       type: 'NullLiteral',
       value: this.CONSUME(tokens.Null) ? null : undefined,
     };
-  });
-
-  operator = this.RULE('operator', () => {
-    return this.OR([
-      { ALT: () => this.CONSUME(tokens.OrBinary).image },
-      { ALT: () => this.CONSUME(tokens.AndBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseOrBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseXorBinary).image },
-      { ALT: () => this.CONSUME(tokens.BitwiseAndBinary).image },
-      { ALT: () => this.CONSUME(tokens.EqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.SpaceshipBinary).image },
-      { ALT: () => this.CONSUME(tokens.GreaterEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.LessEqualBinary).image },
-      { ALT: () => this.CONSUME(tokens.LessBinary).image },
-      { ALT: () => this.CONSUME(tokens.GreaterBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotInBinary).image },
-      { ALT: () => this.CONSUME(tokens.InBinary).image },
-      { ALT: () => this.CONSUME(tokens.MatchesBinary).image },
-      { ALT: () => this.CONSUME(tokens.StartsWithBinary).image },
-      { ALT: () => this.CONSUME(tokens.EndsWithBinary).image },
-      { ALT: () => this.CONSUME(tokens.HasSomeBinary).image },
-      { ALT: () => this.CONSUME(tokens.HasEveryBinary).image },
-      { ALT: () => this.CONSUME(tokens.RangeBinary).image },
-      { ALT: () => this.CONSUME(tokens.AddBinary).image },
-      { ALT: () => this.CONSUME(tokens.SubBinary).image },
-      { ALT: () => this.CONSUME(tokens.ConcatBinary).image },
-      { ALT: () => this.CONSUME(tokens.NotUnary).image },
-      { ALT: () => this.CONSUME(tokens.MulBinary).image },
-      { ALT: () => this.CONSUME(tokens.DivBinary).image },
-      { ALT: () => this.CONSUME(tokens.FloorDivBinary).image },
-      { ALT: () => this.CONSUME(tokens.ModBinary).image },
-      { ALT: () => this.CONSUME(tokens.IsNotBinary).image },
-      { ALT: () => this.CONSUME(tokens.IsBinary).image },
-      { ALT: () => this.CONSUME(tokens.PowerBinary).image },
-      { ALT: () => this.CONSUME(tokens.NullCoalesceExpression).image },
-    ]);
   });
 
   arrayExpression = this.RULE('ArrayExpression', () => {
@@ -283,25 +254,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  binaryExpression = this.RULE('binaryExpression', () => {
-    let operator, right;
-
-    this.OPTION(() => {
-      operator = this.SUBRULE1(this.operator);
-      right = this.SUBRULE2(this.expression);
-
-      // this.OPTION1(() => this.SUBRULE3(this.binaryExpression));
-    });
-
-    if (operator && right) {
-      return {
-        type: 'BinaryExpression',
-        operator,
-        right,
-      };
-    }
-  });
-
   atomicExpression = this.RULE('atomicExpression', () => {
     return this.OR([
       { ALT: () => this.SUBRULE(this.parenthesisExpression) },
@@ -311,6 +263,20 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.literal) },
     ]);
   });
+
+  operator300 = createOperatorRule('operator300', tokens.Operator300, this.atomicExpression, this);
+  operator200 = createOperatorRule('operator200', tokens.Operator200, this.operator300, this);
+  operator100 = createOperatorRule('operator100', tokens.Operator100, this.operator200, this);
+  operator60 = createOperatorRule('operator60', tokens.Operator60, this.operator100, this);
+  operator40 = createOperatorRule('operator40', tokens.Operator40, this.operator60, this);
+  operator30 = createOperatorRule('operator30', tokens.Operator30, this.operator40, this);
+  operator25 = createOperatorRule('operator25', tokens.Operator25, this.operator30, this);
+  operator20 = createOperatorRule('operator20', tokens.Operator20, this.operator25, this);
+  operator18 = createOperatorRule('operator18', tokens.Operator18, this.operator20, this);
+  operator17 = createOperatorRule('operator17', tokens.Operator17, this.operator18, this);
+  operator16 = createOperatorRule('operator16', tokens.Operator16, this.operator17, this);
+  operator15 = createOperatorRule('operator15', tokens.Operator15, this.operator16, this);
+  operator10 = createOperatorRule('operator10', tokens.Operator10, this.operator15, this);
 
   parenthesisExpression = this.RULE('parenthesisExpression', () => {
     let expression;

@@ -193,67 +193,33 @@ test('ParenthesisExpression', () => {
   });
 });
 
-test('Operator', () => {
-  expect(parse(`or`).operator()).toStrictEqual('or');
-  expect(parse(`and`).operator()).toStrictEqual('and');
-  expect(parse(`b-or`).operator()).toStrictEqual('b-or');
-  expect(parse(`b-xor`).operator()).toStrictEqual('b-xor');
-  expect(parse(`b-and`).operator()).toStrictEqual('b-and');
-  expect(parse(`==`).operator()).toStrictEqual('==');
-  expect(parse(`!=`).operator()).toStrictEqual('!=');
-  expect(parse(`<=>`).operator()).toStrictEqual('<=>');
-  expect(parse(`>=`).operator()).toStrictEqual('>=');
-  expect(parse(`<=`).operator()).toStrictEqual('<=');
-  expect(parse(`<`).operator()).toStrictEqual('<');
-  expect(parse(`>`).operator()).toStrictEqual('>');
-  expect(parse(`not in`).operator()).toStrictEqual('not in');
-  expect(parse(`in`).operator()).toStrictEqual('in');
-  expect(parse(`matches`).operator()).toStrictEqual('matches');
-  expect(parse(`starts with`).operator()).toStrictEqual('starts with');
-  expect(parse(`ends with`).operator()).toStrictEqual('ends with');
-  expect(parse(`has some`).operator()).toStrictEqual('has some');
-  expect(parse(`has every`).operator()).toStrictEqual('has every');
-  expect(parse('..').operator()).toStrictEqual('..');
-  expect(parse(`+`).operator()).toStrictEqual('+');
-  expect(parse(`-`).operator()).toStrictEqual('-');
-  expect(parse(`~`).operator()).toStrictEqual('~');
-  expect(parse(`not`).operator()).toStrictEqual('not');
-  expect(parse(`*`).operator()).toStrictEqual('*');
-  expect(parse(`/`).operator()).toStrictEqual('/');
-  expect(parse(`//`).operator()).toStrictEqual('//');
-  expect(parse(`%`).operator()).toStrictEqual('%');
-  expect(parse(`is not`).operator()).toStrictEqual('is not');
-  expect(parse(`is`).operator()).toStrictEqual('is');
-  expect(parse(`**`).operator()).toStrictEqual('**');
-  expect(parse(`??`).operator()).toStrictEqual('??');
-});
-
 test('BinaryExpression', () => {
-  // expect(parse(`1 + 2`).binaryExpression()).toStrictEqual({
-  //   type: 'BinaryExpression',
-  //   left: {
-  //     type: 'NumberLiteral',
-  //     value: 1,
-  //   },
-  //   operator: '+',
-  //   right: {
-  //     type: 'NumberLiteral',
-  //     value: 2,
-  //   },
-  // });
-});
-
-test('Expression', () => {
-  expect(parse(`"Hello"`).expression()).toStrictEqual({
-    type: 'StringLiteral',
-    value: 'Hello',
-  });
-
-  expect(parse(`1 + 2 * 3`).expression()).toStrictEqual({
+  expect(parse(`1 + 2`).expression()).toStrictEqual({
     type: 'BinaryExpression',
     left: {
       type: 'NumberLiteral',
       value: 1,
+    },
+    operator: '+',
+    right: {
+      type: 'NumberLiteral',
+      value: 2,
+    },
+  });
+
+  expect(parse(`4 * 2 + 2 * 3`).expression()).toStrictEqual({
+    type: 'BinaryExpression',
+    left: {
+      type: 'BinaryExpression',
+      left: {
+        type: 'NumberLiteral',
+        value: 4,
+      },
+      operator: '*',
+      right: {
+        type: 'NumberLiteral',
+        value: 2,
+      },
     },
     operator: '+',
     right: {
@@ -268,5 +234,12 @@ test('Expression', () => {
         value: 3,
       },
     },
+  });
+});
+
+test('Expression', () => {
+  expect(parse(`"Hello"`).expression()).toStrictEqual({
+    type: 'StringLiteral',
+    value: 'Hello',
   });
 });
