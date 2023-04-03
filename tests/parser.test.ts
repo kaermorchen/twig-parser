@@ -325,9 +325,22 @@ test('MemberExpression', () => {
   });
 });
 
-// test('UnaryExpression', () => {
-//   expect(parse(`-4`).UnaryExpression()).toStrictEqual({
-//     type: 'StringLiteral',
-//     value: 'Hello',
-//   });
-// });
+test('UnaryExpression', () => {
+  expect(parse(`-4`).UnaryExpression()).toStrictEqual({
+    argument: {
+      type: 'NumericLiteral',
+      value: 4,
+    },
+    operator: '-',
+    type: 'UnaryExpression',
+  });
+
+  expect(parse(`not true`).UnaryExpression()).toStrictEqual({
+    argument: {
+      type: 'BooleanLiteral',
+      value: true,
+    },
+    operator: 'not',
+    type: 'UnaryExpression',
+  });
+});

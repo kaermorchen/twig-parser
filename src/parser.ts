@@ -36,6 +36,50 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.performSelfAnalysis();
   }
 
+  Identifier = this.RULE('identifier', () => {
+    return {
+      type: 'Identifier',
+      value: this.CONSUME(t.IdentifierName).image,
+    };
+  });
+
+  AbsLiteral = this.RULE('AbsLiteral', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.NullLiteral) },
+      { ALT: () => this.SUBRULE(this.BooleanLiteral) },
+      { ALT: () => this.SUBRULE(this.NumericLiteral) },
+      { ALT: () => this.SUBRULE(this.StringLiteral) },
+    ]);
+  });
+
+  NumericLiteral = this.RULE('NumericLiteral', () => {
+    return {
+      type: 'NumericLiteral',
+      value: Number(this.CONSUME(t.Number).image),
+    };
+  });
+
+  StringLiteral = this.RULE('StringLiteral', () => {
+    return {
+      type: 'StringLiteral',
+      value: this.CONSUME(t.String).image.slice(1, -1),
+    };
+  });
+
+  BooleanLiteral = this.RULE('BooleanLiteral', () => {
+    return {
+      type: 'BooleanLiteral',
+      value: this.CONSUME(t.Boolean).image.toLowerCase() === 'true',
+    };
+  });
+
+  NullLiteral = this.RULE('NullLiteral', () => {
+    return {
+      type: 'NullLiteral',
+      value: this.CONSUME(t.Null) ? null : undefined,
+    };
+  });
+
   template = this.RULE('template', () => {
     return this.SUBRULE(this.elements);
   });
@@ -118,79 +162,24 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  Expression = this.RULE('Expression', () => {
-    return this.SUBRULE(this.AssignmentExpression);
-  });
-
-  Identifier = this.RULE('identifier', () => {
-    return {
-      type: 'Identifier',
-      value: this.CONSUME(t.IdentifierName).image,
-    };
-  });
-
-  AbsLiteral = this.RULE('AbsLiteral', () => {
+  PrimaryExpression = this.RULE('PrimaryExpression', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.NullLiteral) },
-      { ALT: () => this.SUBRULE(this.BooleanLiteral) },
-      { ALT: () => this.SUBRULE(this.NumericLiteral) },
-      { ALT: () => this.SUBRULE(this.StringLiteral) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+      { ALT: () => this.SUBRULE(this.AbsLiteral) },
+      { ALT: () => this.SUBRULE(this.ArrayLiteral) },
+      { ALT: () => this.SUBRULE(this.ObjectLiteral) },
+      { ALT: () => this.SUBRULE(this.ParenthesisExpression) },
     ]);
   });
 
-  NumericLiteral = this.RULE('NumericLiteral', () => {
-    return {
-      type: 'NumericLiteral',
-      value: Number(this.CONSUME(t.Number).image),
-    };
-  });
+  ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
+    let expression;
 
-  StringLiteral = this.RULE('StringLiteral', () => {
-    return {
-      type: 'StringLiteral',
-      value: this.CONSUME(t.String).image.slice(1, -1),
-    };
-  });
+    this.CONSUME(t.LParen);
+    expression = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RParen);
 
-  BooleanLiteral = this.RULE('BooleanLiteral', () => {
-    return {
-      type: 'BooleanLiteral',
-      value: this.CONSUME(t.Boolean).image.toLowerCase() === 'true',
-    };
-  });
-
-  NullLiteral = this.RULE('NullLiteral', () => {
-    return {
-      type: 'NullLiteral',
-      value: this.CONSUME(t.Null) ? null : undefined,
-    };
-  });
-
-  BinaryExpression = this.RULE('BinaryExpression', () => {
-    return this.SUBRULE(this.Precedence10);
-  });
-
-  AssignmentExpression = this.RULE('AssignmentExpression', () => {
-    const test = this.SUBRULE(this.BinaryExpression);
-    let consequent, alternate;
-
-    this.OPTION(() => {
-      this.CONSUME(t.Question);
-      consequent = this.SUBRULE1(this.AssignmentExpression);
-      this.CONSUME(t.Colon);
-      alternate = this.SUBRULE2(this.AssignmentExpression);
-    });
-
-    if (consequent && alternate) {
-      return {
-        type: 'ConditionalExpression',
-        test,
-        consequent,
-        alternate,
-      };
-    } else {
-      return test;
-    }
+    return expression;
   });
 
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
@@ -211,31 +200,22 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  PropertyName = this.RULE('PropertyName', () => {
-    return this.OR([
-      {
-        // (foo)
-        ALT: () => {
-          let expr;
-          this.CONSUME(t.LParen);
-          expr = this.SUBRULE(this.Expression);
-          this.CONSUME(t.RParen);
-          return expr;
-        },
+  ObjectLiteral = this.RULE('ObjectLiteral', () => {
+    const properties = [];
+
+    this.CONSUME(t.LCurly);
+    this.MANY_SEP({
+      SEP: t.Comma,
+      DEF: () => {
+        properties.push(this.SUBRULE(this.PropertyAssignment));
       },
-      {
-        // 'foo'
-        ALT: () => this.SUBRULE(this.StringLiteral),
-      },
-      {
-        // foo
-        ALT: () => this.SUBRULE(this.Identifier),
-      },
-      {
-        // 42
-        ALT: () => this.SUBRULE(this.NumericLiteral),
-      },
-    ]);
+    });
+    this.CONSUME(t.RCurly);
+
+    return {
+      type: 'ObjectLiteral',
+      properties,
+    };
   });
 
   PropertyAssignment = this.RULE('PropertyAssignment', () => {
@@ -267,95 +247,56 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  ObjectLiteral = this.RULE('ObjectLiteral', () => {
-    const properties = [];
-
-    this.CONSUME(t.LCurly);
-    this.MANY_SEP({
-      SEP: t.Comma,
-      DEF: () => {
-        properties.push(this.SUBRULE(this.PropertyAssignment));
-      },
-    });
-    this.CONSUME(t.RCurly);
-
-    return {
-      type: 'ObjectLiteral',
-      properties,
-    };
-  });
-
-  PrimaryExpression = this.RULE('PrimaryExpression', () => {
+  PropertyName = this.RULE('PropertyName', () => {
     return this.OR([
-      { ALT: () => this.SUBRULE(this.Identifier) },
-      { ALT: () => this.SUBRULE(this.AbsLiteral) },
-      { ALT: () => this.SUBRULE(this.ArrayLiteral) },
-      { ALT: () => this.SUBRULE(this.ObjectLiteral) },
-      { ALT: () => this.SUBRULE(this.ParenthesisExpression) },
+      {
+        // (foo)
+        ALT: () => {
+          let expr;
+          this.CONSUME(t.LParen);
+          expr = this.SUBRULE(this.Expression);
+          this.CONSUME(t.RParen);
+          return expr;
+        },
+      },
+      {
+        // 'foo'
+        ALT: () => this.SUBRULE(this.StringLiteral),
+      },
+      {
+        // foo
+        ALT: () => this.SUBRULE(this.Identifier),
+      },
+      {
+        // 42
+        ALT: () => this.SUBRULE(this.NumericLiteral),
+      },
     ]);
-  });
-
-  // prettier-ignore
-  Precedence300 = createOperatorRule('Precedence300', t.Precedence300, this.PrimaryExpression, this);
-  // prettier-ignore
-  Precedence200 = createOperatorRule('Precedence200', t.Precedence200, this.Precedence300, this);
-  // prettier-ignore
-  Precedence100 = createOperatorRule('Precedence100', t.Precedence100, this.Precedence200, this);
-  // prettier-ignore
-  Precedence60 = createOperatorRule('Precedence60', t.Precedence60, this.Precedence100, this);
-  // prettier-ignore
-  Precedence40 = createOperatorRule('Precedence40', t.Precedence40, this.Precedence60, this);
-  // prettier-ignore
-  Precedence30 = createOperatorRule('Precedence30', t.Precedence30, this.Precedence40, this);
-  // prettier-ignore
-  Precedence25 = createOperatorRule('Precedence25', t.Precedence25, this.Precedence30, this);
-  // prettier-ignore
-  Precedence20 = createOperatorRule('Precedence20', t.Precedence20, this.Precedence25, this);
-  // prettier-ignore
-  Precedence18 = createOperatorRule('Precedence18', t.Precedence18, this.Precedence20, this);
-  // prettier-ignore
-  Precedence17 = createOperatorRule('Precedence17', t.Precedence17, this.Precedence18, this);
-  // prettier-ignore
-  Precedence16 = createOperatorRule('Precedence16', t.Precedence16, this.Precedence17, this);
-  // prettier-ignore
-  Precedence15 = createOperatorRule('Precedence15', t.Precedence15, this.Precedence16, this);
-  // prettier-ignore
-  Precedence10 = createOperatorRule('Precedence10', t.Precedence10, this.Precedence15, this);
-
-  ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
-    let expression;
-
-    this.CONSUME(t.LParen);
-    expression = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RParen);
-
-    return expression;
-  });
-
-  MemberExpression = this.RULE('MemberExpression', () => {
-    const object = this.SUBRULE(this.PrimaryExpression);
-    let property;
-
-    this.OPTION(() => {
-      property = this.OR([
-        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
-        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
-      ]);
-    });
-
-    if (property) {
-      return {
-        type: 'MemberExpression',
-        object,
-        property,
-      };
-    } else {
-      return object;
-    }
   });
 
   MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
     return this.SUBRULE(this.MemberExpression);
+  });
+
+  MemberExpression = this.RULE('MemberExpression', () => {
+    let object = this.SUBRULE(this.PrimaryExpression);
+
+    this.MANY(() => {
+      const property = this.OR([
+        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
+        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
+      ]);
+
+      if (property) {
+        object = {
+          type: 'MemberExpression',
+          object,
+          property,
+        }
+      }
+    });
+
+    return object;
   });
 
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
@@ -395,7 +336,7 @@ export default class TwigParser extends EmbeddedActionsParser {
             { ALT: () => this.CONSUME(t.Exclamation).image },
           ]);
 
-          const argument = this.SUBRULE1(this.MemberCallNewExpression);
+          const argument = this.SUBRULE1(this.UnaryExpression);
 
           return {
             type: 'UnaryExpression',
@@ -405,5 +346,63 @@ export default class TwigParser extends EmbeddedActionsParser {
         },
       },
     ]);
+  });
+
+  // prettier-ignore
+  Precedence300 = createOperatorRule('Precedence300', t.Precedence300, this.UnaryExpression, this);
+  // prettier-ignore
+  Precedence200 = createOperatorRule('Precedence200', t.Precedence200, this.Precedence300, this);
+  // prettier-ignore
+  Precedence100 = createOperatorRule('Precedence100', t.Precedence100, this.Precedence200, this);
+  // prettier-ignore
+  Precedence60 = createOperatorRule('Precedence60', t.Precedence60, this.Precedence100, this);
+  // prettier-ignore
+  Precedence40 = createOperatorRule('Precedence40', t.Precedence40, this.Precedence60, this);
+  // prettier-ignore
+  Precedence30 = createOperatorRule('Precedence30', t.Precedence30, this.Precedence40, this);
+  // prettier-ignore
+  Precedence25 = createOperatorRule('Precedence25', t.Precedence25, this.Precedence30, this);
+  // prettier-ignore
+  Precedence20 = createOperatorRule('Precedence20', t.Precedence20, this.Precedence25, this);
+  // prettier-ignore
+  Precedence18 = createOperatorRule('Precedence18', t.Precedence18, this.Precedence20, this);
+  // prettier-ignore
+  Precedence17 = createOperatorRule('Precedence17', t.Precedence17, this.Precedence18, this);
+  // prettier-ignore
+  Precedence16 = createOperatorRule('Precedence16', t.Precedence16, this.Precedence17, this);
+  // prettier-ignore
+  Precedence15 = createOperatorRule('Precedence15', t.Precedence15, this.Precedence16, this);
+  // prettier-ignore
+  Precedence10 = createOperatorRule('Precedence10', t.Precedence10, this.Precedence15, this);
+
+  BinaryExpression = this.RULE('BinaryExpression', () => {
+    return this.SUBRULE(this.Precedence10);
+  });
+
+  AssignmentExpression = this.RULE('AssignmentExpression', () => {
+    const test = this.SUBRULE(this.BinaryExpression);
+    let consequent, alternate;
+
+    this.OPTION(() => {
+      this.CONSUME(t.Question);
+      consequent = this.SUBRULE1(this.AssignmentExpression);
+      this.CONSUME(t.Colon);
+      alternate = this.SUBRULE2(this.AssignmentExpression);
+    });
+
+    if (consequent && alternate) {
+      return {
+        type: 'ConditionalExpression',
+        test,
+        consequent,
+        alternate,
+      };
+    } else {
+      return test;
+    }
+  });
+
+  Expression = this.RULE('Expression', () => {
+    return this.SUBRULE(this.AssignmentExpression);
   });
 }
