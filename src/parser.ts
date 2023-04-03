@@ -324,6 +324,28 @@ export default class TwigParser extends EmbeddedActionsParser {
     return this.SUBRULE(this.AssignmentExpression);
   });
 
+  Text = this.RULE('Text', () => {
+    return {
+      type: 'Text',
+      value: this.CONSUME(t.Text).image,
+    };
+  });
+
+  Comment = this.RULE('Comment', () => {
+    let value = null;
+
+    this.CONSUME(t.LComment);
+    this.OPTION(() => {
+      value = this.CONSUME(t.Comment).image;
+    });
+    this.CONSUME(t.RComment);
+
+    return {
+      type: 'Comment',
+      value,
+    };
+  });
+
   Statement = this.RULE('Statement', () => {
     return this.OR([{ ALT: () => this.SUBRULE(this.VariableStatement) }]);
   });
@@ -339,15 +361,27 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  SourceElements = this.RULE('SourceElements', () => {
+    const elements = [];
+
+    this.MANY(() => {
+      const element = this.OR([
+        { ALT: () => this.SUBRULE(this.Text) },
+        { ALT: () => this.SUBRULE(this.Comment) },
+        { ALT: () => this.SUBRULE(this.Statement) },
+      ]);
+
+      elements.push(element);
+    });
+
+    return elements;
+  });
+
   Program = this.RULE('Program', () => {
     return {
       type: 'Program',
       body: this.SUBRULE(this.SourceElements),
     };
-  });
-
-  SourceElements = this.RULE('SourceElements', () => {
-    return this.MANY(() => this.SUBRULE(this.Statement));
   });
 
   // template = this.RULE('template', () => {

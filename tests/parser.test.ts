@@ -396,3 +396,31 @@ test('VariableStatement', () => {
     type: 'VariableStatement',
   });
 });
+
+// test('Text', () => {
+//   expect(parse(`Hello world`).Text()).toStrictEqual({
+//     value: 'Hello world',
+//     type: 'Text',
+//   });
+// });
+
+test('Comment', () => {
+  expect(parse(`{# Lorem Ipsum #}`).Comment()).toStrictEqual({
+    value: 'Lorem Ipsum',
+    type: 'Comment',
+  });
+});
+
+test('Program', () => {
+  expect(
+    parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`).Program()
+  ).toStrictEqual({
+    type: 'Program',
+    body: [
+      {
+        value: '<div></div>',
+        type: 'Text',
+      },
+    ],
+  });
+});
