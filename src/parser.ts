@@ -80,88 +80,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  template = this.RULE('template', () => {
-    return this.SUBRULE(this.elements);
-  });
-
-  elements = this.RULE('elements', () => {
-    const elements = [];
-
-    this.MANY(() => {
-      elements.push(this.SUBRULE(this.element));
-    });
-
-    return elements;
-  });
-
-  element = this.RULE('element', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.text) },
-      { ALT: () => this.SUBRULE(this.comment) },
-      { ALT: () => this.SUBRULE(this.variable) },
-      { ALT: () => this.SUBRULE(this.blocks) },
-    ]);
-  });
-
-  text = this.RULE('text', () => {
-    return this.CONSUME(t.Text);
-  });
-
-  rawText = this.RULE('rawText', () => {
-    return this.CONSUME(t.RawText);
-  });
-
-  comment = this.RULE('comment', () => {
-    let value = null;
-
-    this.CONSUME(t.LComment);
-    this.OPTION(() => {
-      value = this.CONSUME(t.Comment).image;
-    });
-    this.CONSUME(t.RComment);
-
-    return {
-      type: 'Comment',
-      value,
-    };
-  });
-
-  variable = this.RULE('variable', () => {
-    let value = null;
-
-    this.CONSUME(t.LVariable);
-    this.OPTION(() => {
-      value = this.SUBRULE(this.Expression);
-    });
-    this.CONSUME(t.RVariable);
-
-    return {
-      type: 'Variable',
-      value,
-    };
-  });
-
-  blocks = this.RULE('blocks', () => {
-    return this.OR([{ ALT: () => this.SUBRULE(this.verbatimBlock) }]);
-  });
-
-  verbatimBlock = this.RULE('verbatimBlock', () => {
-    this.CONSUME(t.LBlock);
-    this.CONSUME(t.Verbatim);
-    this.CONSUME(t.RBlock);
-
-    const value = this.SUBRULE(this.rawText).image;
-
-    this.CONSUME1(t.LBlock);
-    this.CONSUME1(t.EndVerbatim);
-    this.CONSUME1(t.RBlock);
-
-    return {
-      type: 'VerbatimBlock',
-      value,
-    };
-  });
-
   PrimaryExpression = this.RULE('PrimaryExpression', () => {
     return this.OR([
       { ALT: () => this.SUBRULE(this.Identifier) },
@@ -292,7 +210,7 @@ export default class TwigParser extends EmbeddedActionsParser {
           type: 'MemberExpression',
           object,
           property,
-        }
+        };
       }
     });
 
@@ -405,4 +323,112 @@ export default class TwigParser extends EmbeddedActionsParser {
   Expression = this.RULE('Expression', () => {
     return this.SUBRULE(this.AssignmentExpression);
   });
+
+  Statement = this.RULE('Statement', () => {
+    return this.OR([{ ALT: () => this.SUBRULE(this.VariableStatement) }]);
+  });
+
+  VariableStatement = this.RULE('VariableStatement', () => {
+    this.CONSUME(t.LVariable);
+    const value = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RVariable);
+
+    return {
+      type: 'VariableStatement',
+      value,
+    };
+  });
+
+  Program = this.RULE('Program', () => {
+    return {
+      type: 'Program',
+      body: this.SUBRULE(this.SourceElements),
+    };
+  });
+
+  SourceElements = this.RULE('SourceElements', () => {
+    return this.MANY(() => this.SUBRULE(this.Statement));
+  });
+
+  // template = this.RULE('template', () => {
+  //   return this.SUBRULE(this.elements);
+  // });
+
+  // elements = this.RULE('elements', () => {
+  //   const elements = [];
+
+  //   this.MANY(() => {
+  //     elements.push(this.SUBRULE(this.element));
+  //   });
+
+  //   return elements;
+  // });
+
+  // element = this.RULE('element', () => {
+  //   return this.OR([
+  //     { ALT: () => this.SUBRULE(this.text) },
+  //     { ALT: () => this.SUBRULE(this.comment) },
+  //     { ALT: () => this.SUBRULE(this.variable) },
+  //     { ALT: () => this.SUBRULE(this.blocks) },
+  //   ]);
+  // });
+
+  // text = this.RULE('text', () => {
+  //   return this.CONSUME(t.Text);
+  // });
+
+  // rawText = this.RULE('rawText', () => {
+  //   return this.CONSUME(t.RawText);
+  // });
+
+  // comment = this.RULE('comment', () => {
+  //   let value = null;
+
+  //   this.CONSUME(t.LComment);
+  //   this.OPTION(() => {
+  //     value = this.CONSUME(t.Comment).image;
+  //   });
+  //   this.CONSUME(t.RComment);
+
+  //   return {
+  //     type: 'Comment',
+  //     value,
+  //   };
+  // });
+
+  // variable = this.RULE('variable', () => {
+  //   let value = null;
+
+  //   this.CONSUME(t.LVariable);
+  //   this.OPTION(() => {
+  //     value = this.SUBRULE(this.Expression);
+  //   });
+  //   this.CONSUME(t.RVariable);
+
+  //   return {
+  //     type: 'Variable',
+  //     value,
+  //   };
+  // });
+
+  // blocks = this.RULE('blocks', () => {
+  //   return this.OR([{ ALT: () => this.SUBRULE(this.verbatimBlock) }]);
+  // });
+
+  // verbatimBlock = this.RULE('verbatimBlock', () => {
+  //   this.CONSUME(t.LBlock);
+  //   this.CONSUME(t.Verbatim);
+  //   this.CONSUME(t.RBlock);
+
+  //   const value = this.SUBRULE(this.rawText).image;
+
+  //   this.CONSUME1(t.LBlock);
+  //   this.CONSUME1(t.EndVerbatim);
+  //   this.CONSUME1(t.RBlock);
+
+  //   return {
+  //     type: 'VerbatimBlock',
+  //     value,
+  //   };
+  // });
 }

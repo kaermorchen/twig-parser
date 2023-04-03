@@ -235,6 +235,27 @@ test('BinaryExpression', () => {
       },
     },
   });
+
+  expect(parse(`2 * (2 + 2)`).Expression()).toStrictEqual({
+    type: 'BinaryExpression',
+    left: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    operator: '*',
+    right: {
+      type: 'BinaryExpression',
+      left: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      operator: '+',
+      right: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+    },
+  });
 });
 
 test('Expression', () => {
@@ -342,5 +363,36 @@ test('UnaryExpression', () => {
     },
     operator: 'not',
     type: 'UnaryExpression',
+  });
+});
+
+test('VariableStatement', () => {
+  expect(parse(`{{ 4 }}`).VariableStatement()).toStrictEqual({
+    value: {
+      type: 'NumericLiteral',
+      value: 4,
+    },
+    type: 'VariableStatement',
+  });
+
+  expect(parse(`{{ {a: "true"} }}`).VariableStatement()).toStrictEqual({
+    value: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'Identifier',
+            value: 'a',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'true',
+          },
+        },
+      ],
+    },
+    type: 'VariableStatement',
   });
 });
