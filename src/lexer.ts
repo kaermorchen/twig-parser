@@ -156,7 +156,6 @@ export const Comment = createToken(
     line_breaks: true,
     pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
       const startBlockPattern = /\s*\#\}/;
-      startBlockPattern.lastIndex = startOffset;
 
       const execResult = startBlockPattern.exec(text);
 
@@ -532,13 +531,12 @@ export const Text = createToken(
     name: 'Text',
     line_breaks: true,
     pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
-      const startBlockPattern = /\{[{%#]/;
+      const startBlockPattern = /\{[{%#]/y;
       startBlockPattern.lastIndex = startOffset;
-
       const execResult = startBlockPattern.exec(text);
 
       return execResult === null
-        ? [text]
+        ? [text.substring(startOffset)]
         : [text.substring(startOffset, execResult.index)];
     },
   },

@@ -80,7 +80,10 @@ test('ArrayLiteral', () => {
 
   expect(parse(`[1, [2, 3]]`, 'statement').ArrayLiteral()).toStrictEqual({
     type: 'ArrayLiteral',
-    elements: [parse('1', 'statement').NumericLiteral(), parse('[2, 3]', 'statement').ArrayLiteral()],
+    elements: [
+      parse('1', 'statement').NumericLiteral(),
+      parse('[2, 3]', 'statement').ArrayLiteral(),
+    ],
   });
 });
 
@@ -88,8 +91,12 @@ test('PropertyName', () => {
   expect(parse(`"key"`, 'statement').PropertyName()).toStrictEqual(
     parse(`"key"`, 'statement').StringLiteral()
   );
-  expect(parse(`1`, 'statement').PropertyName()).toStrictEqual(parse(`1`, 'statement').NumericLiteral());
-  expect(parse(`key`, 'statement').PropertyName()).toStrictEqual(parse(`key`, 'statement').Identifier());
+  expect(parse(`1`, 'statement').PropertyName()).toStrictEqual(
+    parse(`1`, 'statement').NumericLiteral()
+  );
+  expect(parse(`key`, 'statement').PropertyName()).toStrictEqual(
+    parse(`key`, 'statement').Identifier()
+  );
   expect(parse(`(name)`, 'statement').PropertyName()).toStrictEqual(
     parse(`name`, 'statement').Expression()
   );
@@ -110,7 +117,9 @@ test('PropertyAssignment', () => {
     shorthand: false,
   });
 
-  expect(parse(`(name): "Anna"`, 'statement').PropertyAssignment()).toStrictEqual({
+  expect(
+    parse(`(name): "Anna"`, 'statement').PropertyAssignment()
+  ).toStrictEqual({
     type: 'PropertyAssignment',
     key: {
       type: 'Identifier',
@@ -143,7 +152,9 @@ test('ObjectLiteral', () => {
     properties: [],
   });
 
-  expect(parse(`{"key": 23, foo: bar, val}`, 'statement').ObjectLiteral()).toStrictEqual({
+  expect(
+    parse(`{"key": 23, foo: bar, val}`, 'statement').ObjectLiteral()
+  ).toStrictEqual({
     type: 'ObjectLiteral',
     properties: [
       {
@@ -284,7 +295,9 @@ test('AssignmentExpression', () => {
     type: 'BinaryExpression',
   });
 
-  expect(parse(`true ? 1 : 2`, 'statement').AssignmentExpression()).toStrictEqual({
+  expect(
+    parse(`true ? 1 : 2`, 'statement').AssignmentExpression()
+  ).toStrictEqual({
     alternate: {
       type: 'NumericLiteral',
       value: 2,
@@ -375,7 +388,9 @@ test('VariableStatement', () => {
     type: 'VariableStatement',
   });
 
-  expect(parse(`{{ {a: "true"} }}`, 'template').VariableStatement()).toStrictEqual({
+  expect(
+    parse(`{{ {a: "true"} }}`, 'template').VariableStatement()
+  ).toStrictEqual({
     value: {
       type: 'ObjectLiteral',
       properties: [
@@ -411,16 +426,27 @@ test('Comment', () => {
   });
 });
 
-// test('Program', () => {
-//   expect(
-//     parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`, 'template').Program()
-//   ).toStrictEqual({
-//     type: 'Program',
-//     body: [
-//       {
-//         value: '<div></div>',
-//         type: 'Text',
-//       },
-//     ],
-//   });
-// });
+test('Program', () => {
+  expect(
+    parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`, 'template').Program()
+  ).toStrictEqual({
+    type: 'Program',
+    body: [
+      {
+        type: 'Comment',
+        value: 'Lorem Ipsum',
+      },
+      {
+        type: 'VariableStatement',
+        value: {
+          type: 'StringLiteral',
+          value: 'str',
+        },
+      },
+      {
+        type: 'Text',
+        value: `<div></div>`,
+      },
+    ],
+  });
+});
