@@ -579,22 +579,24 @@ test('FilterExpression', () => {
         type: 'Identifier',
         value: 'list',
       },
-      callee: {
-        type: 'Identifier',
-        value: 'join',
-      },
-      arguments: [
-        {
-          type: 'StringLiteral',
-          value: ', ',
+      filter: {
+        type: 'CallExpression',
+        callee: {
+          type: 'Identifier',
+          value: 'join',
         },
-      ],
+        arguments: [
+          {
+            type: 'StringLiteral',
+            value: ', ',
+          },
+        ],
+      },
     },
-    callee: {
+    filter: {
       type: 'Identifier',
       value: 'title',
     },
-    arguments: [],
   });
 
   expect(
@@ -603,16 +605,71 @@ test('FilterExpression', () => {
     {
       type: 'VariableStatement',
       value: {
-        arguments: [],
-        callee: {
-          type: 'Identifier',
-          value: 'title',
-        },
+        type: 'FilterExpression',
         expression: {
           type: 'StringLiteral',
           value: 'hello',
         },
+        filter: {
+          type: 'Identifier',
+          value: 'title',
+        },
+      },
+    },
+  ]);
+});
+
+test('ApplyStatement', () => {
+  expect(
+    parse(
+      `{% apply upper %}This text becomes uppercase{% endapply %}`,
+      'template'
+    ).SourceElements()
+  ).toStrictEqual([
+    {
+      type: 'ApplyStatement',
+      text: {
+        type: 'Text',
+        value: 'This text becomes uppercase',
+      },
+      filter: {
+        type: 'Identifier',
+        value: 'upper',
+      },
+    },
+  ]);
+
+  expect(
+    parse(
+      `{% apply lower|escape('html') %}<strong>SOME TEXT</strong>{% endapply %}`,
+      'template'
+    ).SourceElements()
+  ).toStrictEqual([
+    {
+      type: 'ApplyStatement',
+      text: {
+        type: 'Text',
+        value: '<strong>SOME TEXT</strong>',
+      },
+      filter: {
         type: 'FilterExpression',
+        expression: {
+          type: 'Identifier',
+          value: 'lower',
+        },
+        filter: {
+          type: 'CallExpression',
+          arguments: [
+            {
+              type: 'StringLiteral',
+              value: 'html',
+            },
+          ],
+          callee: {
+            type: 'Identifier',
+            value: 'escape',
+          },
+        },
       },
     },
   ]);

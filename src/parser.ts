@@ -358,26 +358,23 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.MANY(() => {
       this.CONSUME(t.VerticalBar);
-      const callee = this.SUBRULE(this.Identifier);
-      let args = [];
-
-      this.OPTION(() => {
-        this.CONSUME(t.LParen);
-        this.OPTION1(() => {
-          args = this.SUBRULE(this.FormalParameterList);
-        });
-        this.CONSUME(t.RParen);
-      });
+      const filter = this.SUBRULE(this.Filter);
 
       expression = {
         type: 'FilterExpression',
         expression,
-        callee,
-        arguments: args,
+        filter,
       };
     });
 
     return expression;
+  });
+
+  Filter = this.RULE('Filter', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.CallExpression) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+    ]);
   });
 
   Expression = this.RULE('Expression', () => {
@@ -476,6 +473,36 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  ApplyStatement = this.RULE('ApplyStatement', () => {
+    this.CONSUME(t.ApplyToken);
+
+    let filter = this.SUBRULE(this.Filter);
+
+    this.MANY(() => {
+      this.CONSUME(t.VerticalBar);
+      const nextFilter = this.SUBRULE1(this.Filter);
+
+      filter = {
+        type: 'FilterExpression',
+        expression: filter,
+        filter: nextFilter,
+      };
+    });
+
+    this.CONSUME(t.RBlock);
+
+    const text = this.SUBRULE(this.Text);
+
+    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.EndApplyToken);
+
+    return {
+      type: 'ApplyStatement',
+      text,
+      filter,
+    };
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlock);
     const statemant = this.OR({
@@ -483,6 +510,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       DEF: [
         { ALT: () => this.SUBRULE(this.SetInlineStatement) },
         { ALT: () => this.SUBRULE(this.SetBlockStatement) },
+        { ALT: () => this.SUBRULE(this.ApplyStatement) },
       ],
     });
     this.CONSUME1(t.RBlock);

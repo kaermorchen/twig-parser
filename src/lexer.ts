@@ -512,6 +512,13 @@ export const EndSetToken = createToken(
   { name: 'EndSetToken', pattern: /endset/ },
   [modes.statement]
 );
+export const ApplyToken = createToken({ name: 'ApplyToken', pattern: /apply/ }, [
+  modes.statement,
+]);
+export const EndApplyToken = createToken(
+  { name: 'EndApplyToken', pattern: /endapply/ },
+  [modes.statement]
+);
 
 export const IdentifierName = createToken(
   {
