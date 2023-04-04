@@ -365,7 +365,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       SEP: t.Comma,
       DEF: () => {
         vars.push(this.SUBRULE(this.Identifier));
-      }
+      },
     });
 
     this.CONSUME(t.EqualsToken);
@@ -374,13 +374,13 @@ export default class TwigParser extends EmbeddedActionsParser {
       SEP: t.Comma,
       DEF: () => {
         values.push(this.SUBRULE(this.Expression));
-      }
+      },
     });
 
     return vars.map((name, i) => ({
       type: 'VariableDeclaration',
       name,
-      init: values[i]
+      init: values[i],
     }));
   });
 
@@ -394,14 +394,40 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  Statement = this.RULE('Statement', () => {
-    this.CONSUME(t.LBlock);
-    const statement = this.OR([
-      { ALT: () => this.SUBRULE(this.SetInlineStatement) },
-    ]);
+  SetBlockStatement = this.RULE('SetBlockStatement', () => {
+    this.CONSUME(t.SetToken);
+    const name = this.SUBRULE(this.Identifier);
     this.CONSUME(t.RBlock);
 
-    return statement;
+    const init = this.SUBRULE1(this.Text);
+
+    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.EndSetToken);
+
+    return {
+      type: 'SetStatement',
+      declarations: [
+        {
+          type: 'VariableDeclaration',
+          name,
+          init,
+        },
+      ],
+    };
+  });
+
+  Statement = this.RULE('Statement', () => {
+    this.CONSUME(t.LBlock);
+    const statemant = this.OR({
+      // MAX_LOOKAHEAD: 3,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.SetInlineStatement) },
+        { ALT: () => this.SUBRULE(this.SetBlockStatement) },
+      ],
+    });
+    this.CONSUME1(t.RBlock);
+
+    return statemant;
   });
 
   SourceElements = this.RULE('SourceElements', () => {

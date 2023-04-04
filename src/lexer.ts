@@ -508,6 +508,9 @@ export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
 export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
   modes.statement,
 ]);
+export const EndSetToken = createToken({ name: 'EndSetToken', pattern: /endset/ }, [
+  modes.statement,
+]);
 
 export const IdentifierName = createToken(
   {
@@ -537,13 +540,12 @@ export const Text = createToken(
     name: 'Text',
     line_breaks: true,
     pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
-      const startBlockPattern = /\{[{%#]/y;
-      startBlockPattern.lastIndex = startOffset;
-      const execResult = startBlockPattern.exec(text);
+      const startBlockPattern = /\{[{%#]/;
+      const execResult = startBlockPattern.exec(text.substring(startOffset));
 
       return execResult === null
         ? [text.substring(startOffset)]
-        : [text.substring(startOffset, execResult.index)];
+        : [text.substring(startOffset, startOffset + execResult.index)];
     },
   },
   [modes.template]

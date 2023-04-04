@@ -504,3 +504,24 @@ test('SetInlineStatement', () => {
     ],
   });
 });
+
+test('SetBlockStatement', () => {
+  expect(
+    parse(`{% set greetings %}Hello user!{% endset %}`, 'template').Statement()
+  ).toStrictEqual({
+    type: 'SetStatement',
+    declarations: [
+      {
+        init: {
+          type: 'Text',
+          value: 'Hello user!',
+        },
+        name: {
+          type: 'Identifier',
+          value: 'greetings',
+        },
+        type: 'VariableDeclaration',
+      },
+    ],
+  });
+});
