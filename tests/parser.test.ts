@@ -525,3 +525,45 @@ test('SetBlockStatement', () => {
     ],
   });
 });
+
+test('CallExpression', () => {
+  expect(parse(`hello()`, 'statement').CallExpression()).toStrictEqual({
+    type: 'CallExpression',
+    callee: {
+      type: 'Identifier',
+      value: 'hello',
+    },
+    arguments: [],
+  });
+
+  expect(
+    parse(`hello(user, user.name, 4)`, 'statement').CallExpression()
+  ).toStrictEqual({
+    type: 'CallExpression',
+    callee: {
+      type: 'Identifier',
+      value: 'hello',
+    },
+    arguments: [
+      {
+        value: 'user',
+        type: 'Identifier',
+      },
+      {
+        object: {
+          type: 'Identifier',
+          value: 'user',
+        },
+        property: {
+          type: 'Identifier',
+          value: 'name',
+        },
+        type: 'MemberExpression',
+      },
+      {
+        type: 'NumericLiteral',
+        value: 4,
+      },
+    ],
+  });
+});

@@ -193,7 +193,10 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
-    return this.SUBRULE(this.MemberExpression);
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.CallExpression) },
+      { ALT: () => this.SUBRULE(this.MemberExpression) },
+    ]);
   });
 
   MemberExpression = this.RULE('MemberExpression', () => {
@@ -228,6 +231,36 @@ export default class TwigParser extends EmbeddedActionsParser {
   DotMemberExpression = this.RULE('DotMemberExpression', () => {
     this.CONSUME(t.Dot);
     return this.SUBRULE(this.Identifier);
+  });
+
+  CallExpression = this.RULE('CallExpression', () => {
+    let args = [];
+    const callee = this.SUBRULE(this.Identifier);
+
+    this.CONSUME(t.LParen);
+    this.OPTION2(() => {
+      args = this.SUBRULE(this.FormalParameterList);
+    });
+    this.CONSUME(t.RParen);
+
+    return {
+      type: 'CallExpression',
+      callee,
+      arguments: args,
+    };
+  });
+
+  FormalParameterList = this.RULE('FormalParameterList', () => {
+    const list = [];
+
+    this.MANY_SEP({
+      SEP: t.Comma,
+      DEF: () => {
+        list.push(this.SUBRULE(this.Expression));
+      },
+    })
+
+    return list;
   });
 
   Arguments = this.RULE('Arguments', () => {
