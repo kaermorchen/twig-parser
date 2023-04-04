@@ -537,7 +537,7 @@ test('CallExpression', () => {
   });
 
   expect(
-    parse(`hello(user, user.name, 4)`, 'statement').CallExpression()
+    parse(`hello(42, model="T800")`, 'statement').CallExpression()
   ).toStrictEqual({
     type: 'CallExpression',
     callee: {
@@ -546,23 +546,19 @@ test('CallExpression', () => {
     },
     arguments: [
       {
-        value: 'user',
-        type: 'Identifier',
-      },
-      {
-        object: {
-          type: 'Identifier',
-          value: 'user',
-        },
-        property: {
-          type: 'Identifier',
-          value: 'name',
-        },
-        type: 'MemberExpression',
-      },
-      {
         type: 'NumericLiteral',
-        value: 4,
+        value: 42,
+      },
+      {
+        type: 'NamedArgument',
+        key: {
+          type: 'Identifier',
+          value: 'model',
+        },
+        value: {
+          type: 'StringLiteral',
+          value: 'T800',
+        },
       },
     ],
   });

@@ -238,7 +238,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     const callee = this.SUBRULE(this.Identifier);
 
     this.CONSUME(t.LParen);
-    this.OPTION2(() => {
+    this.OPTION(() => {
       args = this.SUBRULE(this.FormalParameterList);
     });
     this.CONSUME(t.RParen);
@@ -256,7 +256,24 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.MANY_SEP({
       SEP: t.Comma,
       DEF: () => {
-        list.push(this.SUBRULE(this.Expression));
+        const param = this.OR([
+          {
+            ALT: () => {
+              const key = this.SUBRULE(this.Identifier);
+              this.CONSUME(t.EqualsToken);
+              const value = this.SUBRULE1(this.AssignmentExpression);
+
+              return {
+                type: 'NamedArgument',
+                key,
+                value,
+              };
+            },
+          },
+          { ALT: () => this.SUBRULE(this.Expression) },
+        ]);
+
+        list.push(param);
       },
     });
 
