@@ -4,15 +4,8 @@ import TwigParser from "../src/parser.js";
 const lexer = new TwigLexer();
 const parser = new TwigParser();
 
-export function tpl2asr(tpl: string) {
-  const { tokens } = lexer.tokenize(tpl);
-  parser.input = tokens;
-
-  return parser.template();
-}
-
-export function parse(tpl: string): TwigParser {
-  const { tokens } = lexer.tokenize(tpl);
+export function parse(tpl: string, initialMode: string): TwigParser {
+  const { tokens } = lexer.tokenize(tpl, initialMode);
   parser.input = tokens;
 
   return parser;
