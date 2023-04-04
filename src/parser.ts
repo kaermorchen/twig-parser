@@ -258,7 +258,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       DEF: () => {
         list.push(this.SUBRULE(this.Expression));
       },
-    })
+    });
 
     return list;
   });
@@ -353,8 +353,35 @@ export default class TwigParser extends EmbeddedActionsParser {
     }
   });
 
+  FilterExpression = this.RULE('FilterExpression', () => {
+    let expression = this.SUBRULE(this.AssignmentExpression);
+
+    this.MANY(() => {
+      this.CONSUME(t.VerticalBar);
+      const callee = this.SUBRULE(this.Identifier);
+      let args = [];
+
+      this.OPTION(() => {
+        this.CONSUME(t.LParen);
+        this.OPTION1(() => {
+          args = this.SUBRULE(this.FormalParameterList);
+        });
+        this.CONSUME(t.RParen);
+      });
+
+      expression = {
+        type: 'FilterExpression',
+        expression,
+        callee,
+        arguments: args,
+      };
+    });
+
+    return expression;
+  });
+
   Expression = this.RULE('Expression', () => {
-    return this.SUBRULE(this.AssignmentExpression);
+    return this.SUBRULE(this.FilterExpression);
   });
 
   Text = this.RULE('Text', () => {

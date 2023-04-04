@@ -567,3 +567,53 @@ test('CallExpression', () => {
     ],
   });
 });
+
+test('FilterExpression', () => {
+  expect(
+    parse(`list|join(', ')|title`, 'statement').FilterExpression()
+  ).toStrictEqual({
+    type: 'FilterExpression',
+    expression: {
+      type: 'FilterExpression',
+      expression: {
+        type: 'Identifier',
+        value: 'list',
+      },
+      callee: {
+        type: 'Identifier',
+        value: 'join',
+      },
+      arguments: [
+        {
+          type: 'StringLiteral',
+          value: ', ',
+        },
+      ],
+    },
+    callee: {
+      type: 'Identifier',
+      value: 'title',
+    },
+    arguments: [],
+  });
+
+  expect(
+    parse(`{{ "hello"|title }}`, 'template').SourceElements()
+  ).toStrictEqual([
+    {
+      type: 'VariableStatement',
+      value: {
+        arguments: [],
+        callee: {
+          type: 'Identifier',
+          value: 'title',
+        },
+        expression: {
+          type: 'StringLiteral',
+          value: 'hello',
+        },
+        type: 'FilterExpression',
+      },
+    },
+  ]);
+});
