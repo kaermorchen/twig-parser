@@ -450,3 +450,57 @@ test('Program', () => {
     ],
   });
 });
+
+test('SetInlineStatement', () => {
+  expect(
+    parse(`{% set name = 'Bruce Wayne' %}`, 'template').Statement()
+  ).toStrictEqual({
+    type: 'SetStatement',
+    declarations: [
+      {
+        init: {
+          type: 'StringLiteral',
+          value: 'Bruce Wayne',
+        },
+        name: {
+          type: 'Identifier',
+          value: 'name',
+        },
+        type: 'VariableDeclaration',
+      },
+    ],
+  });
+
+  expect(
+    parse(
+      `{% set name, nick_name = 'Bruce Wayne', 'Batman' %}`,
+      'template'
+    ).Statement()
+  ).toStrictEqual({
+    type: 'SetStatement',
+    declarations: [
+      {
+        init: {
+          type: 'StringLiteral',
+          value: 'Bruce Wayne',
+        },
+        name: {
+          type: 'Identifier',
+          value: 'name',
+        },
+        type: 'VariableDeclaration',
+      },
+      {
+        init: {
+          type: 'StringLiteral',
+          value: 'Batman',
+        },
+        name: {
+          type: 'Identifier',
+          value: 'nick_name',
+        },
+        type: 'VariableDeclaration',
+      },
+    ],
+  });
+});

@@ -502,6 +502,12 @@ export const Question = createToken({ name: 'Question', pattern: /\?/ }, [
 export const VerticalBar = createToken({ name: 'VerticalBar', pattern: /\|/ }, [
   modes.statement,
 ]);
+export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
+  modes.statement,
+]);
+export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
+  modes.statement,
+]);
 
 export const IdentifierName = createToken(
   {

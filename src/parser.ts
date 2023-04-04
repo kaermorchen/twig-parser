@@ -346,10 +346,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  Statement = this.RULE('Statement', () => {
-    return this.OR([{ ALT: () => this.SUBRULE(this.VariableStatement) }]);
-  });
-
   VariableStatement = this.RULE('VariableStatement', () => {
     this.CONSUME(t.LVariable);
     const value = this.SUBRULE(this.Expression);
@@ -361,6 +357,53 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
+    const vars = [];
+    const values = [];
+
+    this.AT_LEAST_ONE_SEP({
+      SEP: t.Comma,
+      DEF: () => {
+        vars.push(this.SUBRULE(this.Identifier));
+      }
+    });
+
+    this.CONSUME(t.EqualsToken);
+
+    this.AT_LEAST_ONE_SEP1({
+      SEP: t.Comma,
+      DEF: () => {
+        values.push(this.SUBRULE(this.Expression));
+      }
+    });
+
+    return vars.map((name, i) => ({
+      type: 'VariableDeclaration',
+      name,
+      init: values[i]
+    }));
+  });
+
+  SetInlineStatement = this.RULE('SetInlineStatement', () => {
+    this.CONSUME(t.SetToken);
+    const declarations = this.SUBRULE(this.VariableDeclarationList);
+
+    return {
+      type: 'SetStatement',
+      declarations,
+    };
+  });
+
+  Statement = this.RULE('Statement', () => {
+    this.CONSUME(t.LBlock);
+    const statement = this.OR([
+      { ALT: () => this.SUBRULE(this.SetInlineStatement) },
+    ]);
+    this.CONSUME(t.RBlock);
+
+    return statement;
+  });
+
   SourceElements = this.RULE('SourceElements', () => {
     const elements = [];
 
@@ -368,6 +411,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const element = this.OR([
         { ALT: () => this.SUBRULE(this.Text) },
         { ALT: () => this.SUBRULE(this.Comment) },
+        { ALT: () => this.SUBRULE(this.VariableStatement) },
         { ALT: () => this.SUBRULE(this.Statement) },
       ]);
 
@@ -383,86 +427,4 @@ export default class TwigParser extends EmbeddedActionsParser {
       body: this.SUBRULE(this.SourceElements),
     };
   });
-
-  // template = this.RULE('template', () => {
-  //   return this.SUBRULE(this.elements);
-  // });
-
-  // elements = this.RULE('elements', () => {
-  //   const elements = [];
-
-  //   this.MANY(() => {
-  //     elements.push(this.SUBRULE(this.element));
-  //   });
-
-  //   return elements;
-  // });
-
-  // element = this.RULE('element', () => {
-  //   return this.OR([
-  //     { ALT: () => this.SUBRULE(this.text) },
-  //     { ALT: () => this.SUBRULE(this.comment) },
-  //     { ALT: () => this.SUBRULE(this.variable) },
-  //     { ALT: () => this.SUBRULE(this.blocks) },
-  //   ]);
-  // });
-
-  // text = this.RULE('text', () => {
-  //   return this.CONSUME(t.Text);
-  // });
-
-  // rawText = this.RULE('rawText', () => {
-  //   return this.CONSUME(t.RawText);
-  // });
-
-  // comment = this.RULE('comment', () => {
-  //   let value = null;
-
-  //   this.CONSUME(t.LComment);
-  //   this.OPTION(() => {
-  //     value = this.CONSUME(t.Comment).image;
-  //   });
-  //   this.CONSUME(t.RComment);
-
-  //   return {
-  //     type: 'Comment',
-  //     value,
-  //   };
-  // });
-
-  // variable = this.RULE('variable', () => {
-  //   let value = null;
-
-  //   this.CONSUME(t.LVariable);
-  //   this.OPTION(() => {
-  //     value = this.SUBRULE(this.Expression);
-  //   });
-  //   this.CONSUME(t.RVariable);
-
-  //   return {
-  //     type: 'Variable',
-  //     value,
-  //   };
-  // });
-
-  // blocks = this.RULE('blocks', () => {
-  //   return this.OR([{ ALT: () => this.SUBRULE(this.verbatimBlock) }]);
-  // });
-
-  // verbatimBlock = this.RULE('verbatimBlock', () => {
-  //   this.CONSUME(t.LBlock);
-  //   this.CONSUME(t.Verbatim);
-  //   this.CONSUME(t.RBlock);
-
-  //   const value = this.SUBRULE(this.rawText).image;
-
-  //   this.CONSUME1(t.LBlock);
-  //   this.CONSUME1(t.EndVerbatim);
-  //   this.CONSUME1(t.RBlock);
-
-  //   return {
-  //     type: 'VerbatimBlock',
-  //     value,
-  //   };
-  // });
 }
