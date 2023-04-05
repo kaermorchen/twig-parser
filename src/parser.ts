@@ -458,6 +458,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   SetInlineStatement = this.RULE('SetInlineStatement', () => {
+    this.CONSUME(t.LBlock);
     this.CONSUME(t.SetToken);
 
     const variables = this.SUBRULE(this.VariableDeclarationList);
@@ -465,6 +466,8 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.CONSUME(t.EqualsToken);
 
     const values = this.SUBRULE(this.ExpressionList);
+
+    this.CONSUME(t.RBlock);
 
     const declarations = [];
 
@@ -483,6 +486,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   SetBlockStatement = this.RULE('SetBlockStatement', () => {
+    this.CONSUME(t.LBlock);
     this.CONSUME(t.SetToken);
     const name = this.SUBRULE(this.Identifier);
     this.CONSUME(t.RBlock);
@@ -491,6 +495,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.CONSUME1(t.LBlock);
     this.CONSUME1(t.EndSetToken);
+    this.CONSUME1(t.RBlock);
 
     return {
       type: 'SetStatement',
@@ -505,6 +510,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ApplyStatement = this.RULE('ApplyStatement', () => {
+    this.CONSUME(t.LBlock);
     this.CONSUME(t.ApplyToken);
 
     let filter = this.SUBRULE(this.Filter);
@@ -526,6 +532,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.CONSUME1(t.LBlock);
     this.CONSUME1(t.EndApplyToken);
+    this.CONSUME1(t.RBlock);
 
     return {
       type: 'ApplyStatement',
@@ -535,29 +542,34 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ForInStatement = this.RULE('ForInStatement', () => {
+    this.CONSUME(t.LBlock);
     this.CONSUME(t.ForToken);
     const variables = this.SUBRULE(this.VariableDeclarationList);
     this.CONSUME(t.InBinary);
     const expression = this.SUBRULE(this.Expression);
     this.CONSUME(t.RBlock);
 
-    // const body = this.SUBRULE(this.SourceElements);
+    let body = [];
 
-    this.CONSUME(t.LBlock);
-    this.CONSUME(t.EndForToken);
+    this.MANY(() => {
+      body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.EndForToken);
+    this.CONSUME1(t.RBlock);
 
     return {
       type: 'ForInStatement',
-      // body,
+      body,
       variables,
-      expression
+      expression,
     };
   });
 
   Statement = this.RULE('Statement', () => {
-    this.CONSUME(t.LBlock);
-    const statemant = this.OR({
-      // MAX_LOOKAHEAD: 3,
+    return this.OR({
+      MAX_LOOKAHEAD: 4,
       DEF: [
         { ALT: () => this.SUBRULE(this.SetInlineStatement) },
         { ALT: () => this.SUBRULE(this.SetBlockStatement) },
@@ -565,32 +577,31 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.ForInStatement) },
       ],
     });
-    this.CONSUME1(t.RBlock);
-
-    return statemant;
   });
 
-  SourceElements = this.RULE('SourceElements', () => {
-    const elements = [];
+  SourceElement = this.RULE('SourceElement', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.Text) },
+      { ALT: () => this.SUBRULE(this.Comment) },
+      { ALT: () => this.SUBRULE(this.VariableStatement) },
+      { ALT: () => this.SUBRULE(this.Statement) },
+    ]);
+  });
+
+  SourceElementList = this.RULE('SourceElementList', () => {
+    let body = [];
 
     this.MANY(() => {
-      const element = this.OR([
-        { ALT: () => this.SUBRULE(this.Text) },
-        { ALT: () => this.SUBRULE(this.Comment) },
-        { ALT: () => this.SUBRULE(this.VariableStatement) },
-        { ALT: () => this.SUBRULE(this.Statement) },
-      ]);
-
-      elements.push(element);
+      body.push(this.SUBRULE(this.SourceElement));
     });
 
-    return elements;
+    return body;
   });
 
   Program = this.RULE('Program', () => {
     return {
       type: 'Program',
-      body: this.SUBRULE(this.SourceElements),
+      body: this.SUBRULE(this.SourceElementList),
     };
   });
 }

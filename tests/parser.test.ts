@@ -596,7 +596,7 @@ test('FilterExpression', () => {
   });
 
   expect(
-    parse(`{{ "hello"|title }}`, 'template').SourceElements()
+    parse(`{{ "hello"|title }}`, 'template').SourceElementList()
   ).toStrictEqual([
     {
       type: 'VariableStatement',
@@ -620,7 +620,7 @@ test('ApplyStatement', () => {
     parse(
       `{% apply upper %}This text becomes uppercase{% endapply %}`,
       'template'
-    ).SourceElements()
+    ).SourceElementList()
   ).toStrictEqual([
     {
       type: 'ApplyStatement',
@@ -639,7 +639,7 @@ test('ApplyStatement', () => {
     parse(
       `{% apply lower|escape('html') %}<strong>SOME TEXT</strong>{% endapply %}`,
       'template'
-    ).SourceElements()
+    ).SourceElementList()
   ).toStrictEqual([
     {
       type: 'ApplyStatement',
@@ -673,13 +673,39 @@ test('ApplyStatement', () => {
 
 test('ForInStatement', () => {
   expect(
-    parse(`{% for user in users %}{% endfor %}`, 'template').Statement()
+    parse(
+      `{% for user in users %}<li>{{user.name}}</li>{% endfor %}`
+    ).ForInStatement()
   ).toStrictEqual({
-    type: 'ForInStatement',
+    body: [
+      {
+        type: 'Text',
+        value: '<li>',
+      },
+      {
+        type: 'VariableStatement',
+        value: {
+          object: {
+            type: 'Identifier',
+            value: 'user',
+          },
+          property: {
+            type: 'Identifier',
+            value: 'name',
+          },
+          type: 'MemberExpression',
+        },
+      },
+      {
+        type: 'Text',
+        value: '</li>',
+      },
+    ],
     expression: {
       type: 'Identifier',
       value: 'users',
     },
+    type: 'ForInStatement',
     variables: [
       {
         type: 'Identifier',
