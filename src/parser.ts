@@ -8,25 +8,18 @@ function createOperatorRule(
   ctx: TwigParser
 ) {
   return ctx.RULE(name, () => {
-    let operator,
-      right,
-      left = ctx.SUBRULE(subrule);
+    let result = ctx.SUBRULE(subrule);
 
     ctx.OPTION(() => {
-      operator = ctx.CONSUME(consumeOperator).image;
-      right = ctx.SUBRULE2(subrule);
+      result = {
+        type: 'BinaryExpression',
+        left: result,
+        operator: ctx.CONSUME(consumeOperator).image,
+        right: ctx.SUBRULE2(subrule),
+      };
     });
 
-    if (operator && right) {
-      return {
-        type: 'BinaryExpression',
-        left,
-        operator,
-        right,
-      };
-    } else {
-      return left;
-    }
+    return result;
   });
 }
 
