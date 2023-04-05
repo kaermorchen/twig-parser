@@ -431,36 +431,50 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  VariableDeclaration = this.RULE('VariableDeclaration', () => {
+    return this.SUBRULE(this.Identifier);
+  });
+
+  ExpressionList = this.RULE('ExpressionList', () => {
+    const arr = [this.SUBRULE(this.Expression)];
+
+    this.MANY(() => {
+      this.CONSUME(t.Comma);
+      arr.push(this.SUBRULE2(this.Expression));
+    });
+
+    return arr;
+  });
+
   VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
-    const vars = [];
-    const values = [];
+    const arr = [this.SUBRULE(this.VariableDeclaration)];
 
-    this.AT_LEAST_ONE_SEP({
-      SEP: t.Comma,
-      DEF: () => {
-        vars.push(this.SUBRULE(this.Identifier));
-      },
+    this.MANY(() => {
+      this.CONSUME(t.Comma);
+      arr.push(this.SUBRULE2(this.VariableDeclaration));
     });
 
-    this.CONSUME(t.EqualsToken);
-
-    this.AT_LEAST_ONE_SEP1({
-      SEP: t.Comma,
-      DEF: () => {
-        values.push(this.SUBRULE(this.Expression));
-      },
-    });
-
-    return vars.map((name, i) => ({
-      type: 'VariableDeclaration',
-      name,
-      init: values[i],
-    }));
+    return arr;
   });
 
   SetInlineStatement = this.RULE('SetInlineStatement', () => {
     this.CONSUME(t.SetToken);
-    const declarations = this.SUBRULE(this.VariableDeclarationList);
+
+    const variables = this.SUBRULE(this.VariableDeclarationList);
+
+    this.CONSUME(t.EqualsToken);
+
+    const values = this.SUBRULE(this.ExpressionList);
+
+    const declarations = [];
+
+    for (let i = 0; i < variables.length; i++) {
+      declarations.push({
+        type: 'VariableDeclaration',
+        name: variables[i],
+        init: values[i],
+      });
+    }
 
     return {
       type: 'SetStatement',
@@ -520,6 +534,26 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  ForInStatement = this.RULE('ForInStatement', () => {
+    this.CONSUME(t.ForToken);
+    const variables = this.SUBRULE(this.VariableDeclarationList);
+    this.CONSUME(t.InBinary);
+    const expression = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RBlock);
+
+    // const body = this.SUBRULE(this.SourceElements);
+
+    this.CONSUME(t.LBlock);
+    this.CONSUME(t.EndForToken);
+
+    return {
+      type: 'ForInStatement',
+      // body,
+      variables,
+      expression
+    };
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlock);
     const statemant = this.OR({
@@ -528,6 +562,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.SetInlineStatement) },
         { ALT: () => this.SUBRULE(this.SetBlockStatement) },
         { ALT: () => this.SUBRULE(this.ApplyStatement) },
+        { ALT: () => this.SUBRULE(this.ForInStatement) },
       ],
     });
     this.CONSUME1(t.RBlock);

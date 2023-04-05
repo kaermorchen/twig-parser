@@ -670,3 +670,21 @@ test('ApplyStatement', () => {
     },
   ]);
 });
+
+test('ForInStatement', () => {
+  expect(
+    parse(`{% for user in users %}{% endfor %}`, 'template').Statement()
+  ).toStrictEqual({
+    type: 'ForInStatement',
+    expression: {
+      type: 'Identifier',
+      value: 'users',
+    },
+    variables: [
+      {
+        type: 'Identifier',
+        value: 'user',
+      },
+    ],
+  });
+});

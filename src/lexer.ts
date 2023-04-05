@@ -505,6 +505,7 @@ export const VerticalBar = createToken({ name: 'VerticalBar', pattern: /\|/ }, [
 export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
   modes.statement,
 ]);
+
 export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
   modes.statement,
 ]);
@@ -512,11 +513,24 @@ export const EndSetToken = createToken(
   { name: 'EndSetToken', pattern: /endset/ },
   [modes.statement]
 );
-export const ApplyToken = createToken({ name: 'ApplyToken', pattern: /apply/ }, [
-  modes.statement,
-]);
+
+export const ApplyToken = createToken(
+  { name: 'ApplyToken', pattern: /apply/ },
+  [modes.statement]
+);
 export const EndApplyToken = createToken(
   { name: 'EndApplyToken', pattern: /endapply/ },
+  [modes.statement]
+);
+
+export const ForToken = createToken({ name: 'ForToken', pattern: /for/ }, [
+  modes.statement,
+]);
+export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
+  modes.statement,
+]);
+export const EndForToken = createToken(
+  { name: 'EndForToken', pattern: /endfor/ },
   [modes.statement]
 );
 
