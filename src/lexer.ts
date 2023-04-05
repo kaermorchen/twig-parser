@@ -1,26 +1,35 @@
 import {
   createToken as chevrotainCreateToken,
   CustomPatternMatcherReturn,
+  IMultiModeLexerDefinition,
   ITokenConfig,
   Lexer,
-  MultiModesDefinition,
   TokenType,
 } from 'chevrotain';
 
-const modes: MultiModesDefinition = {
-  statement: [],
-  template: [],
-  comment: [],
+export enum ModeKind {
+  Template = 'Template',
+  Statement = 'Statement',
+  Comment = 'Comment',
+}
+
+const lexerDefinition: IMultiModeLexerDefinition = {
+  modes: {
+    [ModeKind.Template]: [],
+    [ModeKind.Statement]: [],
+    [ModeKind.Comment]: [],
+  },
+  defaultMode: ModeKind.Template,
 };
 
 function createToken(
   config: ITokenConfig,
-  modes: TokenType[][] = []
+  modeKinds: ModeKind[] = []
 ): TokenType {
   const token = chevrotainCreateToken(config);
 
-  for (const mode of modes) {
-    mode.push(token);
+  for (const modeKind of modeKinds) {
+    lexerDefinition.modes[modeKind].push(token);
   }
 
   return token;
@@ -31,96 +40,96 @@ export const Precedence10 = createToken(
     name: 'Precedence10',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence15 = createToken(
   {
     name: 'Precedence15',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence16 = createToken(
   {
     name: 'Precedence16',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence17 = createToken(
   {
     name: 'Precedence17',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence18 = createToken(
   {
     name: 'Precedence18',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence20 = createToken(
   {
     name: 'Precedence20',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence25 = createToken(
   {
     name: 'Precedence25',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence30 = createToken(
   {
     name: 'Precedence30',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence40 = createToken(
   {
     name: 'Precedence40',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence60 = createToken(
   {
     name: 'Precedence60',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence100 = createToken(
   {
     name: 'Precedence100',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence200 = createToken(
   {
     name: 'Precedence200',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Precedence300 = createToken(
   {
     name: 'Precedence300',
     pattern: Lexer.NA,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
-export const WhiteSpace = createToken(
-  { name: 'WhiteSpace', pattern: /\s+/, group: Lexer.SKIPPED },
-  [modes.statement, modes.template, modes.comment]
+export const WhiteSpaceToken = createToken(
+  { name: 'WhiteSpaceToken', pattern: /\s+/, group: Lexer.SKIPPED },
+  [ModeKind.Statement, ModeKind.Template, ModeKind.Comment]
 );
 
 export const Number = createToken(
@@ -128,19 +137,19 @@ export const Number = createToken(
     name: 'Number',
     pattern: /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const String = createToken(
   {
     name: 'String',
     pattern: /"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const LComment = createToken(
-  { name: 'LComment', pattern: /{#/, push_mode: 'comment' },
-  [modes.template]
+  { name: 'LComment', pattern: /{#/, push_mode: ModeKind.Comment },
+  [ModeKind.Template]
 );
 export const RComment = createToken(
   {
@@ -148,7 +157,7 @@ export const RComment = createToken(
     pattern: /#}/,
     pop_mode: true,
   },
-  [modes.comment]
+  [ModeKind.Comment]
 );
 export const Comment = createToken(
   {
@@ -164,12 +173,12 @@ export const Comment = createToken(
         : null;
     },
   },
-  [modes.comment]
+  [ModeKind.Comment]
 );
 
 export const LVariable = createToken(
-  { name: 'LVariable', pattern: /{{[-~]?/, push_mode: 'statement' },
-  [modes.template]
+  { name: 'LVariable', pattern: /{{[-~]?/, push_mode: ModeKind.Statement },
+  [ModeKind.Template]
 );
 export const RVariable = createToken(
   {
@@ -177,12 +186,12 @@ export const RVariable = createToken(
     pattern: /[-~]?}}/,
     pop_mode: true,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const LBlock = createToken(
-  { name: 'LBlock', pattern: /{%[-~]?/, push_mode: 'statement' },
-  [modes.template]
+  { name: 'LBlock', pattern: /{%[-~]?/, push_mode: ModeKind.Statement },
+  [ModeKind.Template]
 );
 export const RBlock = createToken(
   {
@@ -190,18 +199,18 @@ export const RBlock = createToken(
     pattern: /[-~]?%}/,
     pop_mode: true,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const Boolean = createToken(
   { name: 'Boolean', pattern: /true|false/i },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Null = createToken({ name: 'Null', pattern: /null|none/i }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const Arrow = createToken({ name: 'Arrow', pattern: /=>/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 
 export const OrBinary = createToken(
@@ -210,7 +219,7 @@ export const OrBinary = createToken(
     pattern: /or/,
     categories: [Precedence10],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const AndBinary = createToken(
   {
@@ -218,7 +227,7 @@ export const AndBinary = createToken(
     pattern: /and/,
     categories: [Precedence15],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const BitwiseOrBinary = createToken(
   {
@@ -226,7 +235,7 @@ export const BitwiseOrBinary = createToken(
     pattern: /b-or/,
     categories: [Precedence16],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const BitwiseXorBinary = createToken(
   {
@@ -234,7 +243,7 @@ export const BitwiseXorBinary = createToken(
     pattern: /b-xor/,
     categories: [Precedence17],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const BitwiseAndBinary = createToken(
   {
@@ -242,7 +251,7 @@ export const BitwiseAndBinary = createToken(
     pattern: /b-and/,
     categories: [Precedence18],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const EqualBinary = createToken(
   {
@@ -250,7 +259,7 @@ export const EqualBinary = createToken(
     pattern: /==/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const NotEqualBinary = createToken(
   {
@@ -258,7 +267,7 @@ export const NotEqualBinary = createToken(
     pattern: /!=/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const SpaceshipBinary = createToken(
   {
@@ -266,7 +275,7 @@ export const SpaceshipBinary = createToken(
     pattern: /<=>/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const GreaterEqualBinary = createToken(
   {
@@ -274,7 +283,7 @@ export const GreaterEqualBinary = createToken(
     pattern: />=/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const LessEqualBinary = createToken(
   {
@@ -282,7 +291,7 @@ export const LessEqualBinary = createToken(
     pattern: /<=/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const LessBinary = createToken(
   {
@@ -290,7 +299,7 @@ export const LessBinary = createToken(
     pattern: /</,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const GreaterBinary = createToken(
   {
@@ -298,7 +307,7 @@ export const GreaterBinary = createToken(
     pattern: />/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const NotInBinary = createToken(
   {
@@ -306,7 +315,7 @@ export const NotInBinary = createToken(
     pattern: /not in/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const InBinary = createToken(
   {
@@ -314,7 +323,7 @@ export const InBinary = createToken(
     pattern: /in/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const MatchesBinary = createToken(
   {
@@ -322,7 +331,7 @@ export const MatchesBinary = createToken(
     pattern: /matches/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const StartsWithBinary = createToken(
   {
@@ -330,7 +339,7 @@ export const StartsWithBinary = createToken(
     pattern: /starts with/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const EndsWithBinary = createToken(
   {
@@ -338,7 +347,7 @@ export const EndsWithBinary = createToken(
     pattern: /ends with/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const HasSomeBinary = createToken(
   {
@@ -346,7 +355,7 @@ export const HasSomeBinary = createToken(
     pattern: /has some/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const HasEveryBinary = createToken(
   {
@@ -354,7 +363,7 @@ export const HasEveryBinary = createToken(
     pattern: /has every/,
     categories: [Precedence20],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const RangeBinary = createToken(
   {
@@ -362,7 +371,7 @@ export const RangeBinary = createToken(
     pattern: /\.\./,
     categories: [Precedence25],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Plus = createToken(
   {
@@ -370,7 +379,7 @@ export const Plus = createToken(
     pattern: /\+/,
     categories: [Precedence30],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const Minus = createToken(
   {
@@ -378,7 +387,7 @@ export const Minus = createToken(
     pattern: /\-/,
     categories: [Precedence30],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const ConcatBinary = createToken(
   {
@@ -386,7 +395,7 @@ export const ConcatBinary = createToken(
     pattern: /\~/,
     categories: [Precedence40],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const PowerBinary = createToken(
   {
@@ -394,7 +403,7 @@ export const PowerBinary = createToken(
     pattern: /\*\*/,
     categories: [Precedence200],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const MulBinary = createToken(
   {
@@ -402,7 +411,7 @@ export const MulBinary = createToken(
     pattern: /\*/,
     categories: [Precedence60],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const FloorDivBinary = createToken(
   {
@@ -410,7 +419,7 @@ export const FloorDivBinary = createToken(
     pattern: /\/\//,
     categories: [Precedence60],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const DivBinary = createToken(
   {
@@ -418,7 +427,7 @@ export const DivBinary = createToken(
     pattern: /\//,
     categories: [Precedence60],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const ModBinary = createToken(
   {
@@ -426,7 +435,7 @@ export const ModBinary = createToken(
     pattern: /%/,
     categories: [Precedence60],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const IsNotBinary = createToken(
   {
@@ -434,7 +443,7 @@ export const IsNotBinary = createToken(
     pattern: /is not/,
     categories: [Precedence100],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const IsBinary = createToken(
   {
@@ -442,7 +451,7 @@ export const IsBinary = createToken(
     pattern: /is/,
     categories: [Precedence100],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const NullCoalesceExpression = createToken(
   {
@@ -450,88 +459,88 @@ export const NullCoalesceExpression = createToken(
     pattern: /\?\?/,
     categories: [Precedence300],
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const Not = createToken({ name: 'Not', pattern: /not/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const Exclamation = createToken({ name: 'Exclamation', pattern: /!/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const PlusPlus = createToken({ name: 'PlusPlus', pattern: /\+\+/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const MinusMinus = createToken({ name: 'MinusMinus', pattern: /\-\-/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 
 export const Dot = createToken({ name: 'Dot', pattern: /\./ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const LCurly = createToken({ name: 'LCurly', pattern: /{/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const RCurly = createToken({ name: 'RCurly', pattern: /}/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const LBracket = createToken({ name: 'LBracket', pattern: /\[/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const RBracket = createToken({ name: 'RBracket', pattern: /]/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const LParen = createToken({ name: 'LParen', pattern: /\(/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const RParen = createToken({ name: 'RParen', pattern: /\)/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const Comma = createToken({ name: 'Comma', pattern: /,/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const Colon = createToken({ name: 'Colon', pattern: /:/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const SemiColon = createToken({ name: 'SemiColon', pattern: /;/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const Question = createToken({ name: 'Question', pattern: /\?/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const VerticalBar = createToken({ name: 'VerticalBar', pattern: /\|/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 
 export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const EndSetToken = createToken(
   { name: 'EndSetToken', pattern: /endset/ },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const ApplyToken = createToken(
   { name: 'ApplyToken', pattern: /apply/ },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 export const EndApplyToken = createToken(
   { name: 'EndApplyToken', pattern: /endapply/ },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const ForToken = createToken({ name: 'ForToken', pattern: /for/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
-  modes.statement,
+  ModeKind.Statement,
 ]);
 export const EndForToken = createToken(
   { name: 'EndForToken', pattern: /endfor/ },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 export const IdentifierName = createToken(
@@ -539,7 +548,7 @@ export const IdentifierName = createToken(
     name: 'IdentifierName',
     pattern: /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
   },
-  [modes.statement]
+  [ModeKind.Statement]
 );
 
 // export const RawText = createToken({
@@ -571,11 +580,11 @@ export const Text = createToken(
         : [allText.substring(0, execResult.index)];
     },
   },
-  [modes.template]
+  [ModeKind.Template]
 );
 
 export class TwigLexer extends Lexer {
   constructor() {
-    super({ modes, defaultMode: 'template' });
+    super(lexerDefinition);
   }
 }

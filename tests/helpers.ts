@@ -1,11 +1,11 @@
-import { TwigLexer } from "../src/lexer.js";
+import { ModeKind, TwigLexer } from "../src/lexer.js";
 import TwigParser from "../src/parser.js";
 
 const lexer = new TwigLexer();
 const parser = new TwigParser();
 
-export function parse(tpl: string, initialMode: string = 'template'): TwigParser {
-  const { tokens } = lexer.tokenize(tpl, initialMode);
+export function parse(tpl: string, modeKind: ModeKind = ModeKind.Template): TwigParser {
+  const { tokens } = lexer.tokenize(tpl, modeKind);
   parser.input = tokens;
 
   return parser;
