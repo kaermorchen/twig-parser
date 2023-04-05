@@ -132,36 +132,36 @@ export const WhiteSpaceToken = createToken(
   [ModeKind.Statement, ModeKind.Template, ModeKind.Comment]
 );
 
-export const Number = createToken(
+export const NumberToken = createToken(
   {
-    name: 'Number',
+    name: 'NumberToken',
     pattern: /[0-9]+(?:\.[0-9]+)?([Ee][\+\-][0-9]+)?/,
   },
   [ModeKind.Statement]
 );
-export const String = createToken(
+export const StringToken = createToken(
   {
-    name: 'String',
+    name: 'StringToken',
     pattern: /"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/,
   },
   [ModeKind.Statement]
 );
 
-export const LComment = createToken(
-  { name: 'LComment', pattern: /{#/, push_mode: ModeKind.Comment },
+export const LCommentToken = createToken(
+  { name: 'LCommentToken', pattern: /{#/, push_mode: ModeKind.Comment },
   [ModeKind.Template]
 );
-export const RComment = createToken(
+export const RCommentToken = createToken(
   {
-    name: 'RComment',
+    name: 'RCommentToken',
     pattern: /#}/,
     pop_mode: true,
   },
   [ModeKind.Comment]
 );
-export const Comment = createToken(
+export const CommentToken = createToken(
   {
-    name: 'Comment',
+    name: 'CommentToken',
     line_breaks: true,
     pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
       const startBlockPattern = /\s*\#\}/;
@@ -176,339 +176,367 @@ export const Comment = createToken(
   [ModeKind.Comment]
 );
 
-export const LVariable = createToken(
-  { name: 'LVariable', pattern: /{{[-~]?/, push_mode: ModeKind.Statement },
+export const LVariableToken = createToken(
+  { name: 'LVariableToken', pattern: /{{[-~]?/, push_mode: ModeKind.Statement },
   [ModeKind.Template]
 );
-export const RVariable = createToken(
+export const RVariableToken = createToken(
   {
-    name: 'RVariable',
+    name: 'RVariableToken',
     pattern: /[-~]?}}/,
     pop_mode: true,
   },
   [ModeKind.Statement]
 );
 
-export const LBlock = createToken(
-  { name: 'LBlock', pattern: /{%[-~]?/, push_mode: ModeKind.Statement },
+export const LBlockToken = createToken(
+  { name: 'LBlockToken', pattern: /{%[-~]?/, push_mode: ModeKind.Statement },
   [ModeKind.Template]
 );
-export const RBlock = createToken(
+export const RBlockToken = createToken(
   {
-    name: 'RBlock',
+    name: 'RBlockToken',
     pattern: /[-~]?%}/,
     pop_mode: true,
   },
   [ModeKind.Statement]
 );
 
-export const Boolean = createToken(
-  { name: 'Boolean', pattern: /true|false/i },
+export const BooleanToken = createToken(
+  {
+    name: 'BooleanToken',
+    pattern: Lexer.NA,
+  },
   [ModeKind.Statement]
 );
-export const Null = createToken({ name: 'Null', pattern: /null|none/i }, [
-  ModeKind.Statement,
-]);
-export const Arrow = createToken({ name: 'Arrow', pattern: /=>/ }, [
-  ModeKind.Statement,
-]);
 
-export const OrBinary = createToken(
+export const TrueToken = createToken(
+  { name: 'TrueToken', pattern: /true/i, categories: BooleanToken },
+  [ModeKind.Statement]
+);
+
+export const FalseToken = createToken(
+  { name: 'FalseToken', pattern: /false/i, categories: BooleanToken },
+  [ModeKind.Statement]
+);
+
+export const NullToken = createToken(
+  { name: 'NullToken', pattern: /null|none/i },
+  [ModeKind.Statement]
+);
+
+export const EqualsGreaterToken = createToken(
+  { name: 'EqualsGreaterToken', pattern: /=>/ },
+  [ModeKind.Statement]
+);
+
+export const OrToken = createToken(
   {
-    name: 'OrBinary',
+    name: 'OrToken',
     pattern: /or/,
     categories: [Precedence10],
   },
   [ModeKind.Statement]
 );
-export const AndBinary = createToken(
+export const AndToken = createToken(
   {
-    name: 'AndBinary',
+    name: 'AndToken',
     pattern: /and/,
     categories: [Precedence15],
   },
   [ModeKind.Statement]
 );
-export const BitwiseOrBinary = createToken(
+export const BitwiseOrToken = createToken(
   {
-    name: 'BitwiseOrBinary',
+    name: 'BitwiseOrToken',
     pattern: /b-or/,
     categories: [Precedence16],
   },
   [ModeKind.Statement]
 );
-export const BitwiseXorBinary = createToken(
+export const BitwiseXorToken = createToken(
   {
-    name: 'BitwiseXorBinary',
+    name: 'BitwiseXorToken',
     pattern: /b-xor/,
     categories: [Precedence17],
   },
   [ModeKind.Statement]
 );
-export const BitwiseAndBinary = createToken(
+export const BitwiseAndToken = createToken(
   {
-    name: 'BitwiseAndBinary',
+    name: 'BitwiseAndToken',
     pattern: /b-and/,
     categories: [Precedence18],
   },
   [ModeKind.Statement]
 );
-export const EqualBinary = createToken(
+export const EqualEqualToken = createToken(
   {
-    name: 'EqualBinary',
+    name: 'EqualEqualToken',
     pattern: /==/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const NotEqualBinary = createToken(
+export const ExclamationEqualsToken = createToken(
   {
-    name: 'NotEqualBinary',
+    name: 'ExclamationEqualsToken',
     pattern: /!=/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const SpaceshipBinary = createToken(
+export const SpaceshipToken = createToken(
   {
-    name: 'SpaceshipBinary',
+    name: 'SpaceshipToken',
     pattern: /<=>/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const GreaterEqualBinary = createToken(
+export const GreaterEqualToken = createToken(
   {
-    name: 'GreaterEqualBinary',
+    name: 'GreaterEqualToken',
     pattern: />=/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const LessEqualBinary = createToken(
+export const LessEqualToken = createToken(
   {
-    name: 'LessEqualBinary',
+    name: 'LessEqualToken',
     pattern: /<=/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const LessBinary = createToken(
+export const LessToken = createToken(
   {
-    name: 'LessBinary',
+    name: 'LessToken',
     pattern: /</,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const GreaterBinary = createToken(
+export const GreaterToken = createToken(
   {
-    name: 'GreaterBinary',
+    name: 'GreaterToken',
     pattern: />/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const NotInBinary = createToken(
+export const NotInToken = createToken(
   {
-    name: 'NotInBinary',
+    name: 'NotInToken',
     pattern: /not in/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const InBinary = createToken(
+export const InToken = createToken(
   {
-    name: 'InBinary',
+    name: 'InToken',
     pattern: /in/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const MatchesBinary = createToken(
+export const MatchesToken = createToken(
   {
-    name: 'MatchesBinary',
+    name: 'MatchesToken',
     pattern: /matches/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const StartsWithBinary = createToken(
+export const StartsWithToken = createToken(
   {
-    name: 'StartsWithBinary',
+    name: 'StartsWithToken',
     pattern: /starts with/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const EndsWithBinary = createToken(
+export const EndsWithToken = createToken(
   {
-    name: 'EndsWithBinary',
+    name: 'EndsWithToken',
     pattern: /ends with/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const HasSomeBinary = createToken(
+export const HasSomeToken = createToken(
   {
-    name: 'HasSomeBinary',
+    name: 'HasSomeToken',
     pattern: /has some/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const HasEveryBinary = createToken(
+export const HasEveryToken = createToken(
   {
-    name: 'HasEveryBinary',
+    name: 'HasEveryToken',
     pattern: /has every/,
     categories: [Precedence20],
   },
   [ModeKind.Statement]
 );
-export const RangeBinary = createToken(
+export const DotDotToken = createToken(
   {
-    name: 'RangeBinary',
+    name: 'DotDotToken',
     pattern: /\.\./,
     categories: [Precedence25],
   },
   [ModeKind.Statement]
 );
-export const Plus = createToken(
+export const PlusToken = createToken(
   {
-    name: 'AddBinary',
+    name: 'PlusToken',
     pattern: /\+/,
     categories: [Precedence30],
   },
   [ModeKind.Statement]
 );
-export const Minus = createToken(
+export const MinusToken = createToken(
   {
-    name: 'SubBinary',
+    name: 'MinusToken',
     pattern: /\-/,
     categories: [Precedence30],
   },
   [ModeKind.Statement]
 );
-export const ConcatBinary = createToken(
+export const TildeToken = createToken(
   {
-    name: 'ConcatBinary',
+    name: 'TildeToken',
     pattern: /\~/,
     categories: [Precedence40],
   },
   [ModeKind.Statement]
 );
-export const PowerBinary = createToken(
+export const AsteriskAsteriskToken = createToken(
   {
-    name: 'PowerBinary',
+    name: 'AsteriskAsteriskToken',
     pattern: /\*\*/,
     categories: [Precedence200],
   },
   [ModeKind.Statement]
 );
-export const MulBinary = createToken(
+export const AsteriskToken = createToken(
   {
-    name: 'MulBinary',
+    name: 'AsteriskToken',
     pattern: /\*/,
     categories: [Precedence60],
   },
   [ModeKind.Statement]
 );
-export const FloorDivBinary = createToken(
+export const SlashSlashToken = createToken(
   {
-    name: 'FloorDivBinary',
+    name: 'SlashSlashToken',
     pattern: /\/\//,
     categories: [Precedence60],
   },
   [ModeKind.Statement]
 );
-export const DivBinary = createToken(
+export const SlashToken = createToken(
   {
-    name: 'DivBinary',
+    name: 'SlashToken',
     pattern: /\//,
     categories: [Precedence60],
   },
   [ModeKind.Statement]
 );
-export const ModBinary = createToken(
+export const PercentToken = createToken(
   {
-    name: 'ModBinary',
+    name: 'PercentToken',
     pattern: /%/,
     categories: [Precedence60],
   },
   [ModeKind.Statement]
 );
-export const IsNotBinary = createToken(
+export const IsNotToken = createToken(
   {
-    name: 'IsNotBinary',
+    name: 'IsNotToken',
     pattern: /is not/,
     categories: [Precedence100],
   },
   [ModeKind.Statement]
 );
-export const IsBinary = createToken(
+export const IsToken = createToken(
   {
-    name: 'IsBinary',
+    name: 'IsToken',
     pattern: /is/,
     categories: [Precedence100],
   },
   [ModeKind.Statement]
 );
-export const NullCoalesceExpression = createToken(
+export const QuestionQuestionToken = createToken(
   {
-    name: 'NullCoalesceExpression',
+    name: 'QuestionQuestionToken',
     pattern: /\?\?/,
     categories: [Precedence300],
   },
   [ModeKind.Statement]
 );
 
-export const Not = createToken({ name: 'Not', pattern: /not/ }, [
+export const NotToken = createToken({ name: 'NotToken', pattern: /not/ }, [
   ModeKind.Statement,
 ]);
-export const Exclamation = createToken({ name: 'Exclamation', pattern: /!/ }, [
-  ModeKind.Statement,
-]);
-export const PlusPlus = createToken({ name: 'PlusPlus', pattern: /\+\+/ }, [
-  ModeKind.Statement,
-]);
-export const MinusMinus = createToken({ name: 'MinusMinus', pattern: /\-\-/ }, [
-  ModeKind.Statement,
-]);
+export const ExclamationToken = createToken(
+  { name: 'ExclamationToken', pattern: /!/ },
+  [ModeKind.Statement]
+);
+export const PlusPlusToken = createToken(
+  { name: 'PlusPlusToken', pattern: /\+\+/ },
+  [ModeKind.Statement]
+);
+export const MinusMinusToken = createToken(
+  { name: 'MinusMinusToken', pattern: /\-\-/ },
+  [ModeKind.Statement]
+);
 
-export const Dot = createToken({ name: 'Dot', pattern: /\./ }, [
+export const DotToken = createToken({ name: 'DotToken', pattern: /\./ }, [
   ModeKind.Statement,
 ]);
-export const LCurly = createToken({ name: 'LCurly', pattern: /{/ }, [
+export const OpenBraceToken = createToken(
+  { name: 'OpenBraceToken', pattern: /{/ },
+  [ModeKind.Statement]
+);
+export const CloseBraceToken = createToken(
+  { name: 'CloseBraceToken', pattern: /}/ },
+  [ModeKind.Statement]
+);
+export const OpenBracketToken = createToken(
+  { name: 'OpenBracketToken', pattern: /\[/ },
+  [ModeKind.Statement]
+);
+export const CloseBracketToken = createToken(
+  { name: 'CloseBracketToken', pattern: /]/ },
+  [ModeKind.Statement]
+);
+export const OpenParenToken = createToken(
+  { name: 'OpenParenToken', pattern: /\(/ },
+  [ModeKind.Statement]
+);
+export const CloseParenToken = createToken(
+  { name: 'CloseParenToken', pattern: /\)/ },
+  [ModeKind.Statement]
+);
+export const CommaToken = createToken({ name: 'CommaToken', pattern: /,/ }, [
   ModeKind.Statement,
 ]);
-export const RCurly = createToken({ name: 'RCurly', pattern: /}/ }, [
+export const ColonToken = createToken({ name: 'ColonToken', pattern: /:/ }, [
   ModeKind.Statement,
 ]);
-export const LBracket = createToken({ name: 'LBracket', pattern: /\[/ }, [
-  ModeKind.Statement,
-]);
-export const RBracket = createToken({ name: 'RBracket', pattern: /]/ }, [
-  ModeKind.Statement,
-]);
-export const LParen = createToken({ name: 'LParen', pattern: /\(/ }, [
-  ModeKind.Statement,
-]);
-export const RParen = createToken({ name: 'RParen', pattern: /\)/ }, [
-  ModeKind.Statement,
-]);
-export const Comma = createToken({ name: 'Comma', pattern: /,/ }, [
-  ModeKind.Statement,
-]);
-export const Colon = createToken({ name: 'Colon', pattern: /:/ }, [
-  ModeKind.Statement,
-]);
-export const SemiColon = createToken({ name: 'SemiColon', pattern: /;/ }, [
-  ModeKind.Statement,
-]);
-export const Question = createToken({ name: 'Question', pattern: /\?/ }, [
-  ModeKind.Statement,
-]);
-export const VerticalBar = createToken({ name: 'VerticalBar', pattern: /\|/ }, [
+export const SemiColonToken = createToken(
+  { name: 'SemiColonToken', pattern: /;/ },
+  [ModeKind.Statement]
+);
+export const QuestionToken = createToken(
+  { name: 'QuestionToken', pattern: /\?/ },
+  [ModeKind.Statement]
+);
+export const BarToken = createToken({ name: 'BarToken', pattern: /\|/ }, [
   ModeKind.Statement,
 ]);
 export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
@@ -543,9 +571,9 @@ export const EndForToken = createToken(
   [ModeKind.Statement]
 );
 
-export const IdentifierName = createToken(
+export const IdentifierToken = createToken(
   {
-    name: 'IdentifierName',
+    name: 'IdentifierToken',
     pattern: /[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/,
   },
   [ModeKind.Statement]
@@ -566,9 +594,9 @@ export const IdentifierName = createToken(
 //   },
 // });
 
-export const Text = createToken(
+export const TextToken = createToken(
   {
-    name: 'Text',
+    name: 'TextToken',
     line_breaks: true,
     pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
       const startBlockPattern = /\{[{%#]/;

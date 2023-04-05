@@ -39,7 +39,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   Identifier = this.RULE('identifier', () => {
     return {
       type: 'Identifier',
-      value: this.CONSUME(t.IdentifierName).image,
+      value: this.CONSUME(t.IdentifierToken).image,
     };
   });
 
@@ -55,28 +55,28 @@ export default class TwigParser extends EmbeddedActionsParser {
   NumericLiteral = this.RULE('NumericLiteral', () => {
     return {
       type: 'NumericLiteral',
-      value: Number(this.CONSUME(t.Number).image),
+      value: Number(this.CONSUME(t.NumberToken).image),
     };
   });
 
   StringLiteral = this.RULE('StringLiteral', () => {
     return {
       type: 'StringLiteral',
-      value: this.CONSUME(t.String).image.slice(1, -1),
+      value: this.CONSUME(t.StringToken).image.slice(1, -1),
     };
   });
 
   BooleanLiteral = this.RULE('BooleanLiteral', () => {
     return {
       type: 'BooleanLiteral',
-      value: this.CONSUME(t.Boolean).image.toLowerCase() === 'true',
+      value: this.CONSUME(t.BooleanToken).image.toLowerCase() === 'true',
     };
   });
 
   NullLiteral = this.RULE('NullLiteral', () => {
     return {
       type: 'NullLiteral',
-      value: this.CONSUME(t.Null) ? null : undefined,
+      value: this.CONSUME(t.NullToken) ? null : undefined,
     };
   });
 
@@ -93,9 +93,9 @@ export default class TwigParser extends EmbeddedActionsParser {
   ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
     let expression;
 
-    this.CONSUME(t.LParen);
+    this.CONSUME(t.OpenParenToken);
     expression = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RParen);
+    this.CONSUME(t.CloseParenToken);
 
     return expression;
   });
@@ -103,14 +103,14 @@ export default class TwigParser extends EmbeddedActionsParser {
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
     const elements = [];
 
-    this.CONSUME(t.LBracket);
+    this.CONSUME(t.OpenBracketToken);
     this.MANY_SEP({
-      SEP: t.Comma,
+      SEP: t.CommaToken,
       DEF: () => {
         elements.push(this.SUBRULE(this.AssignmentExpression));
       },
     });
-    this.CONSUME(t.RBracket);
+    this.CONSUME(t.CloseBracketToken);
 
     return {
       type: 'ArrayLiteral',
@@ -121,14 +121,14 @@ export default class TwigParser extends EmbeddedActionsParser {
   ObjectLiteral = this.RULE('ObjectLiteral', () => {
     const properties = [];
 
-    this.CONSUME(t.LCurly);
+    this.CONSUME(t.OpenBraceToken);
     this.MANY_SEP({
-      SEP: t.Comma,
+      SEP: t.CommaToken,
       DEF: () => {
         properties.push(this.SUBRULE(this.PropertyAssignment));
       },
     });
-    this.CONSUME(t.RCurly);
+    this.CONSUME(t.CloseBraceToken);
 
     return {
       type: 'ObjectLiteral',
@@ -143,7 +143,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           key = this.SUBRULE(this.PropertyName);
-          this.CONSUME(t.Colon);
+          this.CONSUME(t.ColonToken);
           value = this.SUBRULE(this.AssignmentExpression);
           shorthand = false;
         },
@@ -171,9 +171,9 @@ export default class TwigParser extends EmbeddedActionsParser {
         // (foo)
         ALT: () => {
           let expr;
-          this.CONSUME(t.LParen);
+          this.CONSUME(t.OpenParenToken);
           expr = this.SUBRULE(this.Expression);
-          this.CONSUME(t.RParen);
+          this.CONSUME(t.CloseParenToken);
           return expr;
         },
       },
@@ -211,7 +211,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.Identifier) },
       { ALT: () => this.SUBRULE(this.Arguments) },
     ]);
-    this.CONSUME(t.Arrow);
+    this.CONSUME(t.EqualsGreaterToken);
     let body = this.SUBRULE(this.Expression);
 
     return {
@@ -243,15 +243,15 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
-    this.CONSUME(t.LBracket);
+    this.CONSUME(t.OpenBracketToken);
     const expr = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RBracket);
+    this.CONSUME(t.CloseBracketToken);
 
     return expr;
   });
 
   DotMemberExpression = this.RULE('DotMemberExpression', () => {
-    this.CONSUME(t.Dot);
+    this.CONSUME(t.DotToken);
     return this.SUBRULE(this.Identifier);
   });
 
@@ -259,11 +259,11 @@ export default class TwigParser extends EmbeddedActionsParser {
     let args = [];
     const callee = this.SUBRULE(this.Identifier);
 
-    this.CONSUME(t.LParen);
+    this.CONSUME(t.OpenParenToken);
     this.OPTION(() => {
       args = this.SUBRULE(this.FormalParameterList);
     });
-    this.CONSUME(t.RParen);
+    this.CONSUME(t.CloseParenToken);
 
     return {
       type: 'CallExpression',
@@ -276,7 +276,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     const list = [];
 
     this.MANY_SEP({
-      SEP: t.Comma,
+      SEP: t.CommaToken,
       DEF: () => {
         const param = this.OR([
           {
@@ -305,15 +305,15 @@ export default class TwigParser extends EmbeddedActionsParser {
   Arguments = this.RULE('Arguments', () => {
     const args = [];
 
-    this.CONSUME(t.LParen);
+    this.CONSUME(t.OpenParenToken);
     this.OPTION(() => {
       args.push(this.SUBRULE(this.AssignmentExpression));
       this.MANY(() => {
-        this.CONSUME(t.Comma);
+        this.CONSUME(t.CommaToken);
         args.push(this.SUBRULE2(this.AssignmentExpression));
       });
     });
-    this.CONSUME(t.RParen);
+    this.CONSUME(t.CloseParenToken);
 
     return args;
   });
@@ -324,10 +324,10 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           const operator = this.OR1([
-            { ALT: () => this.CONSUME(t.Plus).image },
-            { ALT: () => this.CONSUME(t.Minus).image },
-            { ALT: () => this.CONSUME(t.Not).image },
-            { ALT: () => this.CONSUME(t.Exclamation).image },
+            { ALT: () => this.CONSUME(t.PlusToken).image },
+            { ALT: () => this.CONSUME(t.MinusToken).image },
+            { ALT: () => this.CONSUME(t.NotToken).image },
+            { ALT: () => this.CONSUME(t.ExclamationToken).image },
           ]);
 
           const argument = this.SUBRULE1(this.UnaryExpression);
@@ -378,9 +378,9 @@ export default class TwigParser extends EmbeddedActionsParser {
     let consequent, alternate;
 
     this.OPTION(() => {
-      this.CONSUME(t.Question);
+      this.CONSUME(t.QuestionToken);
       consequent = this.SUBRULE1(this.AssignmentExpression);
-      this.CONSUME(t.Colon);
+      this.CONSUME(t.ColonToken);
       alternate = this.SUBRULE2(this.AssignmentExpression);
     });
 
@@ -400,7 +400,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     let expression = this.SUBRULE(this.AssignmentExpression);
 
     this.MANY(() => {
-      this.CONSUME(t.VerticalBar);
+      this.CONSUME(t.BarToken);
       const filter = this.SUBRULE(this.Filter);
 
       expression = {
@@ -427,18 +427,18 @@ export default class TwigParser extends EmbeddedActionsParser {
   Text = this.RULE('Text', () => {
     return {
       type: 'Text',
-      value: this.CONSUME(t.Text).image,
+      value: this.CONSUME(t.TextToken).image,
     };
   });
 
   Comment = this.RULE('Comment', () => {
     let value = null;
 
-    this.CONSUME(t.LComment);
+    this.CONSUME(t.LCommentToken);
     this.OPTION(() => {
-      value = this.CONSUME(t.Comment).image;
+      value = this.CONSUME(t.CommentToken).image;
     });
-    this.CONSUME(t.RComment);
+    this.CONSUME(t.RCommentToken);
 
     return {
       type: 'Comment',
@@ -447,9 +447,9 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   VariableStatement = this.RULE('VariableStatement', () => {
-    this.CONSUME(t.LVariable);
+    this.CONSUME(t.LVariableToken);
     const value = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RVariable);
+    this.CONSUME(t.RVariableToken);
 
     return {
       type: 'VariableStatement',
@@ -465,7 +465,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     const arr = [this.SUBRULE(this.Expression)];
 
     this.MANY(() => {
-      this.CONSUME(t.Comma);
+      this.CONSUME(t.CommaToken);
       arr.push(this.SUBRULE2(this.Expression));
     });
 
@@ -476,7 +476,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     const arr = [this.SUBRULE(this.VariableDeclaration)];
 
     this.MANY(() => {
-      this.CONSUME(t.Comma);
+      this.CONSUME(t.CommaToken);
       arr.push(this.SUBRULE2(this.VariableDeclaration));
     });
 
@@ -484,7 +484,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   SetInlineStatement = this.RULE('SetInlineStatement', () => {
-    this.CONSUME(t.LBlock);
+    this.CONSUME(t.LBlockToken);
     this.CONSUME(t.SetToken);
 
     const variables = this.SUBRULE(this.VariableDeclarationList);
@@ -493,7 +493,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     const values = this.SUBRULE(this.ExpressionList);
 
-    this.CONSUME(t.RBlock);
+    this.CONSUME(t.RBlockToken);
 
     const declarations = [];
 
@@ -512,16 +512,16 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   SetBlockStatement = this.RULE('SetBlockStatement', () => {
-    this.CONSUME(t.LBlock);
+    this.CONSUME(t.LBlockToken);
     this.CONSUME(t.SetToken);
     const name = this.SUBRULE(this.Identifier);
-    this.CONSUME(t.RBlock);
+    this.CONSUME(t.RBlockToken);
 
     const init = this.SUBRULE1(this.Text);
 
-    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.LBlockToken);
     this.CONSUME1(t.EndSetToken);
-    this.CONSUME1(t.RBlock);
+    this.CONSUME1(t.RBlockToken);
 
     return {
       type: 'SetStatement',
@@ -536,13 +536,13 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ApplyStatement = this.RULE('ApplyStatement', () => {
-    this.CONSUME(t.LBlock);
+    this.CONSUME(t.LBlockToken);
     this.CONSUME(t.ApplyToken);
 
     let filter = this.SUBRULE(this.Filter);
 
     this.MANY(() => {
-      this.CONSUME(t.VerticalBar);
+      this.CONSUME(t.BarToken);
       const nextFilter = this.SUBRULE1(this.Filter);
 
       filter = {
@@ -552,13 +552,13 @@ export default class TwigParser extends EmbeddedActionsParser {
       };
     });
 
-    this.CONSUME(t.RBlock);
+    this.CONSUME(t.RBlockToken);
 
     const text = this.SUBRULE(this.Text);
 
-    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.LBlockToken);
     this.CONSUME1(t.EndApplyToken);
-    this.CONSUME1(t.RBlock);
+    this.CONSUME1(t.RBlockToken);
 
     return {
       type: 'ApplyStatement',
@@ -568,12 +568,12 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ForInStatement = this.RULE('ForInStatement', () => {
-    this.CONSUME(t.LBlock);
+    this.CONSUME(t.LBlockToken);
     this.CONSUME(t.ForToken);
     const variables = this.SUBRULE(this.VariableDeclarationList);
-    this.CONSUME(t.InBinary);
+    this.CONSUME(t.InToken);
     const expression = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RBlock);
+    this.CONSUME(t.RBlockToken);
 
     let body = [];
 
@@ -581,9 +581,9 @@ export default class TwigParser extends EmbeddedActionsParser {
       body.push(this.SUBRULE(this.SourceElement));
     });
 
-    this.CONSUME1(t.LBlock);
+    this.CONSUME1(t.LBlockToken);
     this.CONSUME1(t.EndForToken);
-    this.CONSUME1(t.RBlock);
+    this.CONSUME1(t.RBlockToken);
 
     return {
       type: 'ForInStatement',
