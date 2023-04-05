@@ -193,10 +193,32 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   MemberCallNewExpression = this.RULE('MemberCallNewExpression', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.CallExpression) },
-      { ALT: () => this.SUBRULE(this.MemberExpression) },
+    return this.OR({
+      // MAX_LOOKAHEAD: 3,
+      // IGNORE_AMBIGUITIES: true,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.CallExpression) },
+        // {
+        //   ALT: () => this.SUBRULE(this.ArrowFunctionExpression),
+        // },
+        { ALT: () => this.SUBRULE(this.MemberExpression) },
+      ],
+    });
+  });
+
+  ArrowFunctionExpression = this.RULE('ArrowFunctionExpression', () => {
+    let params = this.OR([
+      { ALT: () => this.SUBRULE(this.Identifier) },
+      { ALT: () => this.SUBRULE(this.Arguments) },
     ]);
+    this.CONSUME(t.Arrow);
+    let body = this.SUBRULE(this.Expression);
+
+    return {
+      type: 'ArrowFunctionExpression',
+      body,
+      params,
+    };
   });
 
   MemberExpression = this.RULE('MemberExpression', () => {
@@ -281,15 +303,19 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   Arguments = this.RULE('Arguments', () => {
+    const args = [];
+
     this.CONSUME(t.LParen);
     this.OPTION(() => {
-      this.SUBRULE(this.AssignmentExpression);
+      args.push(this.SUBRULE(this.AssignmentExpression));
       this.MANY(() => {
         this.CONSUME(t.Comma);
-        this.SUBRULE2(this.AssignmentExpression);
+        args.push(this.SUBRULE2(this.AssignmentExpression));
       });
     });
     this.CONSUME(t.RParen);
+
+    return args;
   });
 
   UnaryExpression = this.RULE('UnaryExpression', () => {

@@ -714,3 +714,58 @@ test('ForInStatement', () => {
     ],
   });
 });
+
+test('ArrowFunctionExpression', () => {
+  expect(
+    parse(`v => v * 2`, 'statement').ArrowFunctionExpression()
+  ).toStrictEqual({
+    params: {
+      type: 'Identifier',
+      value: 'v',
+    },
+    body: {
+      left: {
+        type: 'Identifier',
+        value: 'v',
+      },
+      operator: '*',
+      right: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'ArrowFunctionExpression',
+  });
+
+  expect(
+    parse(
+      `(first, second) => first + second`,
+      'statement'
+    ).ArrowFunctionExpression()
+  ).toStrictEqual({
+    params: [
+      {
+        type: 'Identifier',
+        value: 'first',
+      },
+      {
+        type: 'Identifier',
+        value: 'second',
+      },
+    ],
+    body: {
+      left: {
+        type: 'Identifier',
+        value: 'first',
+      },
+      operator: '+',
+      right: {
+        type: 'Identifier',
+        value: 'second',
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'ArrowFunctionExpression',
+  });
+});
