@@ -8,61 +8,47 @@ export default class TwigParser extends EmbeddedActionsParser {
   }
 
   // ok
-  Identifier = this.RULE('identifier', () => {
-    return {
-      type: 'Identifier',
-      value: this.CONSUME(t.IdentifierToken).image,
-    };
-  });
+  Identifier = this.RULE('Identifier', () => ({
+    type: 'Identifier',
+    value: this.CONSUME(t.IdentifierToken).image,
+  }));
 
   // ok
-  Literal = this.RULE('Literal', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.NullLiteral) },
-      { ALT: () => this.SUBRULE(this.BooleanLiteral) },
-      { ALT: () => this.SUBRULE(this.NumericLiteral) },
-      { ALT: () => this.SUBRULE(this.StringLiteral) },
-    ]);
-  });
+  Literal = this.RULE('Literal', () => this.OR([
+    { ALT: () => this.SUBRULE(this.NullLiteral) },
+    { ALT: () => this.SUBRULE(this.BooleanLiteral) },
+    { ALT: () => this.SUBRULE(this.NumericLiteral) },
+    { ALT: () => this.SUBRULE(this.StringLiteral) },
+  ]));
 
-  NumericLiteral = this.RULE('NumericLiteral', () => {
-    return {
-      type: 'NumericLiteral',
-      value: Number(this.CONSUME(t.NumberToken).image),
-    };
-  });
+  NumericLiteral = this.RULE('NumericLiteral', () => ({
+    type: 'NumericLiteral',
+    value: Number(this.CONSUME(t.NumberToken).image),
+  }));
 
-  StringLiteral = this.RULE('StringLiteral', () => {
-    return {
-      type: 'StringLiteral',
-      value: this.CONSUME(t.StringToken).image.slice(1, -1),
-    };
-  });
+  StringLiteral = this.RULE('StringLiteral', () => ({
+    type: 'StringLiteral',
+    value: this.CONSUME(t.StringToken).image.slice(1, -1),
+  }));
 
-  BooleanLiteral = this.RULE('BooleanLiteral', () => {
-    return {
-      type: 'BooleanLiteral',
-      value: this.CONSUME(t.BooleanToken).image.toLowerCase() === 'true',
-    };
-  });
+  BooleanLiteral = this.RULE('BooleanLiteral', () => ({
+    type: 'BooleanLiteral',
+    value: this.CONSUME(t.BooleanToken).image.toLowerCase() === 'true',
+  }));
 
-  NullLiteral = this.RULE('NullLiteral', () => {
-    return {
-      type: 'NullLiteral',
-      value: this.CONSUME(t.NullToken) ? null : undefined,
-    };
-  });
+  NullLiteral = this.RULE('NullLiteral', () => ({
+    type: 'NullLiteral',
+    value: this.CONSUME(t.NullToken) ? null : undefined,
+  }));
 
-  PrimaryExpression = this.RULE('PrimaryExpression', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.Identifier) },
-      { ALT: () => this.SUBRULE(this.Literal) },
-      { ALT: () => this.SUBRULE(this.ArrayLiteral) },
-      { ALT: () => this.SUBRULE(this.ObjectLiteral) },
-      // TODO: FunctionExpression
-      { ALT: () => this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList) },
-    ]);
-  });
+  PrimaryExpression = this.RULE('PrimaryExpression', () => this.OR([
+    { ALT: () => this.SUBRULE(this.Identifier) },
+    { ALT: () => this.SUBRULE(this.Literal) },
+    { ALT: () => this.SUBRULE(this.ArrayLiteral) },
+    { ALT: () => this.SUBRULE(this.ObjectLiteral) },
+    // TODO: FunctionExpression
+    { ALT: () => this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList) },
+  ]));
 
   // ok
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
@@ -83,6 +69,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  // ok
   ObjectLiteral = this.RULE('ObjectLiteral', () => {
     const properties = [];
 
@@ -132,34 +119,30 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   // ok
-  PropertyName = this.RULE('PropertyName', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.Identifier) },
-      { ALT: () => this.SUBRULE(this.StringLiteral) },
-      { ALT: () => this.SUBRULE(this.NumericLiteral) },
-      {
-        ALT: () => {
-          this.CONSUME(t.OpenParenToken);
-          const expr = this.SUBRULE(this.AssignmentExpression);
-          this.CONSUME(t.CloseParenToken);
-          return expr;
-        },
+  PropertyName = this.RULE('PropertyName', () => this.OR([
+    { ALT: () => this.SUBRULE(this.Identifier) },
+    { ALT: () => this.SUBRULE(this.StringLiteral) },
+    { ALT: () => this.SUBRULE(this.NumericLiteral) },
+    {
+      ALT: () => {
+        this.CONSUME(t.OpenParenToken);
+        const expr = this.SUBRULE(this.AssignmentExpression);
+        this.CONSUME(t.CloseParenToken);
+        return expr;
       },
-    ]);
-  });
+    },
+  ]));
 
   // ok
-  LeftHandSideExpression = this.RULE('LeftHandSideExpression', () => {
-    return this.OR({
-      // MAX_LOOKAHEAD: 3,
-      // IGNORE_AMBIGUITIES: true,
-      DEF: [
-        // TODO: MemberExpression should be first
-        { ALT: () => this.SUBRULE(this.CallExpression) },
-        { ALT: () => this.SUBRULE(this.MemberExpression) },
-      ],
-    });
-  });
+  LeftHandSideExpression = this.RULE('LeftHandSideExpression', () => this.OR({
+    // MAX_LOOKAHEAD: 3,
+    // IGNORE_AMBIGUITIES: true,
+    DEF: [
+      // TODO: MemberExpression should be first
+      { ALT: () => this.SUBRULE(this.MemberExpression) },
+      { ALT: () => this.SUBRULE(this.CallExpression) },
+    ],
+  }));
 
   CoverParenthesizedExpressionAndArrowParameterList = this.RULE(
     'CoverParenthesizedExpressionAndArrowParameterList',
@@ -419,7 +402,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   // Ok
   AdditiveExpression = this.RULE('AdditiveExpression', () =>
     this.OR([
-      { ALT: () => this.SUBRULE(this.MultiplicativeExpression) },
+      { ALT: () => this.SUBRULE(this.ConcatExpression) },
       {
         ALT: () => ({
           type: 'AdditiveExpression',
@@ -428,7 +411,7 @@ export default class TwigParser extends EmbeddedActionsParser {
             { ALT: () => this.CONSUME(t.PlusToken).image },
             { ALT: () => this.CONSUME(t.MinusToken).image },
           ]),
-          right: this.SUBRULE2(this.MultiplicativeExpression),
+          right: this.SUBRULE2(this.ConcatExpression),
         }),
       },
     ])
@@ -514,7 +497,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.BitwiseXORExpression) },
       {
         ALT: () => ({
-          type: 'BitwiseXORExpression',
+          type: 'BitwiseORExpression',
           left: this.SUBRULE1(this.BitwiseORExpression),
           operator: this.CONSUME(t.BitwiseOrToken).image,
           right: this.SUBRULE2(this.BitwiseXORExpression),
