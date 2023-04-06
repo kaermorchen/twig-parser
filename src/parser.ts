@@ -364,9 +364,27 @@ export default class TwigParser extends EmbeddedActionsParser {
   );
 
   // Ok
-  MultiplicativeExpression = this.RULE('MultiplicativeExpression', () =>
+  AssociativityExpression = this.RULE('AssociativityExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.ExponentiationExpression) },
+      {
+        ALT: () => ({
+          type: 'AssociativityExpression',
+          left: this.SUBRULE1(this.AssociativityExpression),
+          operator: this.OR1([
+            { ALT: () => this.CONSUME(t.IsNotToken).image },
+            { ALT: () => this.CONSUME(t.IsToken).image },
+          ]),
+          right: this.SUBRULE2(this.ExponentiationExpression),
+        }),
+      },
+    ])
+  );
+
+  // Ok
+  MultiplicativeExpression = this.RULE('MultiplicativeExpression', () =>
+    this.OR([
+      { ALT: () => this.SUBRULE(this.AssociativityExpression) },
       {
         ALT: () => ({
           type: 'MultiplicativeExpression',
@@ -377,7 +395,22 @@ export default class TwigParser extends EmbeddedActionsParser {
             { ALT: () => this.CONSUME(t.SlashToken).image },
             { ALT: () => this.CONSUME(t.PercentToken).image },
           ]),
-          right: this.SUBRULE2(this.ExponentiationExpression),
+          right: this.SUBRULE2(this.AssociativityExpression),
+        }),
+      },
+    ])
+  );
+
+  // Ok
+  ConcatExpression = this.RULE('ConcatExpression', () =>
+    this.OR([
+      { ALT: () => this.SUBRULE(this.MultiplicativeExpression) },
+      {
+        ALT: () => ({
+          type: 'ConcatExpression',
+          left: this.SUBRULE1(this.ConcatExpression),
+          operator: this.CONSUME(t.TildeToken).image,
+          right: this.SUBRULE2(this.MultiplicativeExpression),
         }),
       },
     ])
