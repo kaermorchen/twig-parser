@@ -646,238 +646,251 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  FilterExpression = this.RULE('FilterExpression', () => {
-    let expression = this.SUBRULE(this.AssignmentExpression);
-
-    this.MANY(() => {
-      this.CONSUME(t.BarToken);
-      const filter = this.SUBRULE(this.Filter);
-
-      expression = {
-        type: 'FilterExpression',
-        expression,
-        filter,
-      };
-    });
-
-    return expression;
-  });
-
-  Filter = this.RULE('Filter', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.CallExpression) },
-      { ALT: () => this.SUBRULE(this.Identifier) },
-    ]);
-  });
-
   Expression = this.RULE('Expression', () => {
-    return this.SUBRULE(this.FilterExpression);
-  });
+    const arr = [];
 
-  Text = this.RULE('Text', () => {
-    return {
-      type: 'Text',
-      value: this.CONSUME(t.TextToken).image,
-    };
-  });
-
-  Comment = this.RULE('Comment', () => {
-    let value = null;
-
-    this.CONSUME(t.LCommentToken);
-    this.OPTION(() => {
-      value = this.CONSUME(t.CommentToken).image;
-    });
-    this.CONSUME(t.RCommentToken);
-
-    return {
-      type: 'Comment',
-      value,
-    };
-  });
-
-  VariableStatement = this.RULE('VariableStatement', () => {
-    this.CONSUME(t.LVariableToken);
-    const value = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RVariableToken);
-
-    return {
-      type: 'VariableStatement',
-      value,
-    };
-  });
-
-  VariableDeclaration = this.RULE('VariableDeclaration', () => {
-    return this.SUBRULE(this.Identifier);
-  });
-
-  ExpressionList = this.RULE('ExpressionList', () => {
-    const arr = [this.SUBRULE(this.Expression)];
-
-    this.MANY(() => {
-      this.CONSUME(t.CommaToken);
-      arr.push(this.SUBRULE2(this.Expression));
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        arr.push(this.SUBRULE(this.AssignmentExpression));
+      },
     });
 
     return arr;
   });
 
-  VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
-    const arr = [this.SUBRULE(this.VariableDeclaration)];
+  // FilterExpression = this.RULE('FilterExpression', () => {
+  //   let expression = this.SUBRULE(this.AssignmentExpression);
 
-    this.MANY(() => {
-      this.CONSUME(t.CommaToken);
-      arr.push(this.SUBRULE2(this.VariableDeclaration));
-    });
+  //   this.MANY(() => {
+  //     this.CONSUME(t.BarToken);
+  //     const filter = this.SUBRULE(this.Filter);
 
-    return arr;
-  });
+  //     expression = {
+  //       type: 'FilterExpression',
+  //       expression,
+  //       filter,
+  //     };
+  //   });
 
-  SetInlineStatement = this.RULE('SetInlineStatement', () => {
-    this.CONSUME(t.LBlockToken);
-    this.CONSUME(t.SetToken);
+  //   return expression;
+  // });
 
-    const variables = this.SUBRULE(this.VariableDeclarationList);
+  // Filter = this.RULE('Filter', () => {
+  //   return this.OR([
+  //     { ALT: () => this.SUBRULE(this.CallExpression) },
+  //     { ALT: () => this.SUBRULE(this.Identifier) },
+  //   ]);
+  // });
 
-    this.CONSUME(t.EqualsToken);
+  // Expression = this.RULE('Expression', () => {
+  //   return this.SUBRULE(this.FilterExpression);
+  // });
 
-    const values = this.SUBRULE(this.ExpressionList);
+  // Text = this.RULE('Text', () => {
+  //   return {
+  //     type: 'Text',
+  //     value: this.CONSUME(t.TextToken).image,
+  //   };
+  // });
 
-    this.CONSUME(t.RBlockToken);
+  // Comment = this.RULE('Comment', () => {
+  //   let value = null;
 
-    const declarations = [];
+  //   this.CONSUME(t.LCommentToken);
+  //   this.OPTION(() => {
+  //     value = this.CONSUME(t.CommentToken).image;
+  //   });
+  //   this.CONSUME(t.RCommentToken);
 
-    for (let i = 0; i < variables.length; i++) {
-      declarations.push({
-        type: 'VariableDeclaration',
-        name: variables[i],
-        init: values[i],
-      });
-    }
+  //   return {
+  //     type: 'Comment',
+  //     value,
+  //   };
+  // });
 
-    return {
-      type: 'SetStatement',
-      declarations,
-    };
-  });
+  // VariableStatement = this.RULE('VariableStatement', () => {
+  //   this.CONSUME(t.LVariableToken);
+  //   const value = this.SUBRULE(this.Expression);
+  //   this.CONSUME(t.RVariableToken);
 
-  SetBlockStatement = this.RULE('SetBlockStatement', () => {
-    this.CONSUME(t.LBlockToken);
-    this.CONSUME(t.SetToken);
-    const name = this.SUBRULE(this.Identifier);
-    this.CONSUME(t.RBlockToken);
+  //   return {
+  //     type: 'VariableStatement',
+  //     value,
+  //   };
+  // });
 
-    const init = this.SUBRULE1(this.Text);
+  // VariableDeclaration = this.RULE('VariableDeclaration', () => {
+  //   return this.SUBRULE(this.Identifier);
+  // });
 
-    this.CONSUME1(t.LBlockToken);
-    this.CONSUME1(t.EndSetToken);
-    this.CONSUME1(t.RBlockToken);
+  // ExpressionList = this.RULE('ExpressionList', () => {
+  //   const arr = [this.SUBRULE(this.Expression)];
 
-    return {
-      type: 'SetStatement',
-      declarations: [
-        {
-          type: 'VariableDeclaration',
-          name,
-          init,
-        },
-      ],
-    };
-  });
+  //   this.MANY(() => {
+  //     this.CONSUME(t.CommaToken);
+  //     arr.push(this.SUBRULE2(this.Expression));
+  //   });
 
-  ApplyStatement = this.RULE('ApplyStatement', () => {
-    this.CONSUME(t.LBlockToken);
-    this.CONSUME(t.ApplyToken);
+  //   return arr;
+  // });
 
-    let filter = this.SUBRULE(this.Filter);
+  // VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
+  //   const arr = [this.SUBRULE(this.VariableDeclaration)];
 
-    this.MANY(() => {
-      this.CONSUME(t.BarToken);
-      const nextFilter = this.SUBRULE1(this.Filter);
+  //   this.MANY(() => {
+  //     this.CONSUME(t.CommaToken);
+  //     arr.push(this.SUBRULE2(this.VariableDeclaration));
+  //   });
 
-      filter = {
-        type: 'FilterExpression',
-        expression: filter,
-        filter: nextFilter,
-      };
-    });
+  //   return arr;
+  // });
 
-    this.CONSUME(t.RBlockToken);
+  // SetInlineStatement = this.RULE('SetInlineStatement', () => {
+  //   this.CONSUME(t.LBlockToken);
+  //   this.CONSUME(t.SetToken);
 
-    const text = this.SUBRULE(this.Text);
+  //   const variables = this.SUBRULE(this.VariableDeclarationList);
 
-    this.CONSUME1(t.LBlockToken);
-    this.CONSUME1(t.EndApplyToken);
-    this.CONSUME1(t.RBlockToken);
+  //   this.CONSUME(t.EqualsToken);
 
-    return {
-      type: 'ApplyStatement',
-      text,
-      filter,
-    };
-  });
+  //   const values = this.SUBRULE(this.ExpressionList);
 
-  ForInStatement = this.RULE('ForInStatement', () => {
-    this.CONSUME(t.LBlockToken);
-    this.CONSUME(t.ForToken);
-    const variables = this.SUBRULE(this.VariableDeclarationList);
-    this.CONSUME(t.InToken);
-    const expression = this.SUBRULE(this.Expression);
-    this.CONSUME(t.RBlockToken);
+  //   this.CONSUME(t.RBlockToken);
 
-    let body = [];
+  //   const declarations = [];
 
-    this.MANY(() => {
-      body.push(this.SUBRULE(this.SourceElement));
-    });
+  //   for (let i = 0; i < variables.length; i++) {
+  //     declarations.push({
+  //       type: 'VariableDeclaration',
+  //       name: variables[i],
+  //       init: values[i],
+  //     });
+  //   }
 
-    this.CONSUME1(t.LBlockToken);
-    this.CONSUME1(t.EndForToken);
-    this.CONSUME1(t.RBlockToken);
+  //   return {
+  //     type: 'SetStatement',
+  //     declarations,
+  //   };
+  // });
 
-    return {
-      type: 'ForInStatement',
-      body,
-      variables,
-      expression,
-    };
-  });
+  // SetBlockStatement = this.RULE('SetBlockStatement', () => {
+  //   this.CONSUME(t.LBlockToken);
+  //   this.CONSUME(t.SetToken);
+  //   const name = this.SUBRULE(this.Identifier);
+  //   this.CONSUME(t.RBlockToken);
 
-  Statement = this.RULE('Statement', () => {
-    return this.OR({
-      MAX_LOOKAHEAD: 4,
-      DEF: [
-        { ALT: () => this.SUBRULE(this.SetInlineStatement) },
-        { ALT: () => this.SUBRULE(this.SetBlockStatement) },
-        { ALT: () => this.SUBRULE(this.ApplyStatement) },
-        { ALT: () => this.SUBRULE(this.ForInStatement) },
-      ],
-    });
-  });
+  //   const init = this.SUBRULE1(this.Text);
 
-  SourceElement = this.RULE('SourceElement', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.Text) },
-      { ALT: () => this.SUBRULE(this.Comment) },
-      { ALT: () => this.SUBRULE(this.VariableStatement) },
-      { ALT: () => this.SUBRULE(this.Statement) },
-    ]);
-  });
+  //   this.CONSUME1(t.LBlockToken);
+  //   this.CONSUME1(t.EndSetToken);
+  //   this.CONSUME1(t.RBlockToken);
 
-  SourceElementList = this.RULE('SourceElementList', () => {
-    let body = [];
+  //   return {
+  //     type: 'SetStatement',
+  //     declarations: [
+  //       {
+  //         type: 'VariableDeclaration',
+  //         name,
+  //         init,
+  //       },
+  //     ],
+  //   };
+  // });
 
-    this.MANY(() => {
-      body.push(this.SUBRULE(this.SourceElement));
-    });
+  // ApplyStatement = this.RULE('ApplyStatement', () => {
+  //   this.CONSUME(t.LBlockToken);
+  //   this.CONSUME(t.ApplyToken);
 
-    return body;
-  });
+  //   let filter = this.SUBRULE(this.Filter);
 
-  Program = this.RULE('Program', () => {
-    return {
-      type: 'Program',
-      body: this.SUBRULE(this.SourceElementList),
-    };
-  });
+  //   this.MANY(() => {
+  //     this.CONSUME(t.BarToken);
+  //     const nextFilter = this.SUBRULE1(this.Filter);
+
+  //     filter = {
+  //       type: 'FilterExpression',
+  //       expression: filter,
+  //       filter: nextFilter,
+  //     };
+  //   });
+
+  //   this.CONSUME(t.RBlockToken);
+
+  //   const text = this.SUBRULE(this.Text);
+
+  //   this.CONSUME1(t.LBlockToken);
+  //   this.CONSUME1(t.EndApplyToken);
+  //   this.CONSUME1(t.RBlockToken);
+
+  //   return {
+  //     type: 'ApplyStatement',
+  //     text,
+  //     filter,
+  //   };
+  // });
+
+  // ForInStatement = this.RULE('ForInStatement', () => {
+  //   this.CONSUME(t.LBlockToken);
+  //   this.CONSUME(t.ForToken);
+  //   const variables = this.SUBRULE(this.VariableDeclarationList);
+  //   this.CONSUME(t.InToken);
+  //   const expression = this.SUBRULE(this.Expression);
+  //   this.CONSUME(t.RBlockToken);
+
+  //   let body = [];
+
+  //   this.MANY(() => {
+  //     body.push(this.SUBRULE(this.SourceElement));
+  //   });
+
+  //   this.CONSUME1(t.LBlockToken);
+  //   this.CONSUME1(t.EndForToken);
+  //   this.CONSUME1(t.RBlockToken);
+
+  //   return {
+  //     type: 'ForInStatement',
+  //     body,
+  //     variables,
+  //     expression,
+  //   };
+  // });
+
+  // Statement = this.RULE('Statement', () => {
+  //   return this.OR({
+  //     MAX_LOOKAHEAD: 4,
+  //     DEF: [
+  //       { ALT: () => this.SUBRULE(this.SetInlineStatement) },
+  //       { ALT: () => this.SUBRULE(this.SetBlockStatement) },
+  //       { ALT: () => this.SUBRULE(this.ApplyStatement) },
+  //       { ALT: () => this.SUBRULE(this.ForInStatement) },
+  //     ],
+  //   });
+  // });
+
+  // SourceElement = this.RULE('SourceElement', () => {
+  //   return this.OR([
+  //     { ALT: () => this.SUBRULE(this.Text) },
+  //     { ALT: () => this.SUBRULE(this.Comment) },
+  //     { ALT: () => this.SUBRULE(this.VariableStatement) },
+  //     { ALT: () => this.SUBRULE(this.Statement) },
+  //   ]);
+  // });
+
+  // SourceElementList = this.RULE('SourceElementList', () => {
+  //   let body = [];
+
+  //   this.MANY(() => {
+  //     body.push(this.SUBRULE(this.SourceElement));
+  //   });
+
+  //   return body;
+  // });
+
+  // Program = this.RULE('Program', () => {
+  //   return {
+  //     type: 'Program',
+  //     body: this.SUBRULE(this.SourceElementList),
+  //   };
+  // });
 }
