@@ -358,194 +358,230 @@ export default class TwigParser extends EmbeddedActionsParser {
   );
 
   // Ok
-  AssociativityExpression = this.RULE('AssociativityExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.ExponentiationExpression) },
-      {
-        ALT: () => ({
-          type: 'AssociativityExpression',
-          left: this.SUBRULE1(this.AssociativityExpression),
-          operator: this.OR1([
-            { ALT: () => this.CONSUME(t.IsNotToken).image },
-            { ALT: () => this.CONSUME(t.IsToken).image },
-          ]),
-          right: this.SUBRULE2(this.ExponentiationExpression),
-        }),
-      },
-    ])
-  );
+  AssociativityExpression = this.RULE('AssociativityExpression', () => {
+    let result = this.SUBRULE(this.ExponentiationExpression);
+
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.IsNotToken).image },
+        { ALT: () => this.CONSUME(t.IsToken).image },
+      ]);
+
+      result = {
+        type: 'AssociativityExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.ExponentiationExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  MultiplicativeExpression = this.RULE('MultiplicativeExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.AssociativityExpression) },
-      {
-        ALT: () => ({
-          type: 'MultiplicativeExpression',
-          left: this.SUBRULE1(this.MultiplicativeExpression),
-          operator: this.OR1([
-            { ALT: () => this.CONSUME(t.AsteriskToken).image },
-            { ALT: () => this.CONSUME(t.SlashSlashToken).image },
-            { ALT: () => this.CONSUME(t.SlashToken).image },
-            { ALT: () => this.CONSUME(t.PercentToken).image },
-          ]),
-          right: this.SUBRULE2(this.AssociativityExpression),
-        }),
-      },
-    ])
-  );
+  MultiplicativeExpression = this.RULE('MultiplicativeExpression', () => {
+    let result = this.SUBRULE(this.AssociativityExpression);
+
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.AsteriskToken).image },
+        { ALT: () => this.CONSUME(t.SlashSlashToken).image },
+        { ALT: () => this.CONSUME(t.SlashToken).image },
+        { ALT: () => this.CONSUME(t.PercentToken).image },
+      ]);
+
+      result = {
+        type: 'MultiplicativeExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.AssociativityExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  ConcatExpression = this.RULE('ConcatExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.MultiplicativeExpression) },
-      {
-        ALT: () => ({
-          type: 'ConcatExpression',
-          left: this.SUBRULE1(this.ConcatExpression),
-          operator: this.CONSUME(t.TildeToken).image,
-          right: this.SUBRULE2(this.MultiplicativeExpression),
-        }),
-      },
-    ])
-  );
+  ConcatExpression = this.RULE('ConcatExpression', () => {
+    let result = this.SUBRULE(this.MultiplicativeExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.TildeToken).image;
+
+      result = {
+        type: 'ConcatExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.MultiplicativeExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  AdditiveExpression = this.RULE('AdditiveExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.ConcatExpression) },
-      {
-        ALT: () => ({
-          type: 'AdditiveExpression',
-          left: this.SUBRULE1(this.AdditiveExpression),
-          operator: this.OR1([
-            { ALT: () => this.CONSUME(t.PlusToken).image },
-            { ALT: () => this.CONSUME(t.MinusToken).image },
-          ]),
-          right: this.SUBRULE2(this.ConcatExpression),
-        }),
-      },
-    ])
-  );
+  AdditiveExpression = this.RULE('AdditiveExpression', () => {
+    let result = this.SUBRULE(this.ConcatExpression);
 
-  RangeExpression = this.RULE('RangeExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.AdditiveExpression) },
-      {
-        ALT: () => ({
-          type: 'RangeExpression',
-          left: this.SUBRULE1(this.RangeExpression),
-          operator: this.CONSUME(t.DotDotToken).image,
-          right: this.SUBRULE2(this.AdditiveExpression),
-        }),
-      },
-    ])
-  );
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.PlusToken).image },
+        { ALT: () => this.CONSUME(t.MinusToken).image },
+      ]);
+
+      result = {
+        type: 'AdditiveExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.ConcatExpression),
+      };
+    });
+
+    return result;
+  });
+
+  RangeExpression = this.RULE('RangeExpression', () => {
+    let result = this.SUBRULE(this.AdditiveExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.DotDotToken).image;
+
+      result = {
+        type: 'RangeExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.AdditiveExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  RelationalEqualityExpression = this.RULE('RelationalEqualityExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.RangeExpression) },
-      {
-        ALT: () => ({
+  RelationalEqualityExpression = this.RULE(
+    'RelationalEqualityExpression',
+    () => {
+      let result = this.SUBRULE(this.RangeExpression);
+
+      this.MANY(() => {
+        const operator = this.OR1([
+          { ALT: () => this.CONSUME(t.EqualEqualToken).image },
+          { ALT: () => this.CONSUME(t.ExclamationEqualsToken).image },
+          { ALT: () => this.CONSUME(t.SpaceshipToken).image },
+          { ALT: () => this.CONSUME(t.LessEqualToken).image },
+          { ALT: () => this.CONSUME(t.LessToken).image },
+          { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
+          { ALT: () => this.CONSUME(t.GreaterToken).image },
+          { ALT: () => this.CONSUME(t.NotInToken).image },
+          { ALT: () => this.CONSUME(t.InToken).image },
+          { ALT: () => this.CONSUME(t.MatchesToken).image },
+          { ALT: () => this.CONSUME(t.StartsWithToken).image },
+          { ALT: () => this.CONSUME(t.EndsWithToken).image },
+          { ALT: () => this.CONSUME(t.HasSomeToken).image },
+          { ALT: () => this.CONSUME(t.HasEveryToken).image },
+        ]);
+
+        result = {
           type: 'RelationalEqualityExpression',
-          left: this.SUBRULE1(this.RelationalEqualityExpression),
-          operator: this.OR1([
-            { ALT: () => this.CONSUME(t.EqualEqualToken).image },
-            { ALT: () => this.CONSUME(t.ExclamationEqualsToken).image },
-            { ALT: () => this.CONSUME(t.SpaceshipToken).image },
-            { ALT: () => this.CONSUME(t.LessEqualToken).image },
-            { ALT: () => this.CONSUME(t.LessToken).image },
-            { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
-            { ALT: () => this.CONSUME(t.GreaterToken).image },
-            { ALT: () => this.CONSUME(t.NotInToken).image },
-            { ALT: () => this.CONSUME(t.InToken).image },
-            { ALT: () => this.CONSUME(t.MatchesToken).image },
-            { ALT: () => this.CONSUME(t.StartsWithToken).image },
-            { ALT: () => this.CONSUME(t.EndsWithToken).image },
-            { ALT: () => this.CONSUME(t.HasSomeToken).image },
-            { ALT: () => this.CONSUME(t.HasEveryToken).image },
-          ]),
+          left: result,
+          operator,
           right: this.SUBRULE2(this.RangeExpression),
-        }),
-      },
-    ])
+        };
+      });
+
+      return result;
+    }
   );
 
   // Ok
-  BitwiseANDExpression = this.RULE('BitwiseANDExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.RelationalEqualityExpression) },
-      {
-        ALT: () => ({
-          type: 'BitwiseANDExpression',
-          left: this.SUBRULE1(this.BitwiseANDExpression),
-          operator: this.CONSUME(t.BitwiseAndToken).image,
-          right: this.SUBRULE2(this.RelationalEqualityExpression),
-        }),
-      },
-    ])
-  );
+  BitwiseANDExpression = this.RULE('BitwiseANDExpression', () => {
+    let result = this.SUBRULE(this.RelationalEqualityExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseAndToken).image;
+
+      result = {
+        type: 'BitwiseANDExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.RelationalEqualityExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  BitwiseXORExpression = this.RULE('BitwiseXORExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.BitwiseANDExpression) },
-      {
-        ALT: () => ({
-          type: 'BitwiseXORExpression',
-          left: this.SUBRULE1(this.BitwiseXORExpression),
-          operator: this.CONSUME(t.BitwiseXorToken).image,
-          right: this.SUBRULE1(this.BitwiseANDExpression),
-        }),
-      },
-    ])
-  );
+  BitwiseXORExpression = this.RULE('BitwiseXORExpression', () => {
+    let result = this.SUBRULE(this.BitwiseANDExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseXorToken).image;
+
+      result = {
+        type: 'BitwiseXORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseANDExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  BitwiseORExpression = this.RULE('BitwiseORExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.BitwiseXORExpression) },
-      {
-        ALT: () => ({
-          type: 'BitwiseORExpression',
-          left: this.SUBRULE1(this.BitwiseORExpression),
-          operator: this.CONSUME(t.BitwiseOrToken).image,
-          right: this.SUBRULE2(this.BitwiseXORExpression),
-        }),
-      },
-    ])
-  );
+  BitwiseORExpression = this.RULE('BitwiseORExpression', () => {
+    let result = this.SUBRULE(this.BitwiseXORExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseOrToken).image;
+
+      result = {
+        type: 'BitwiseORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseXORExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  LogicalANDExpression = this.RULE('LogicalANDExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.BitwiseORExpression) },
-      {
-        ALT: () => ({
-          type: 'LogicalANDExpression',
-          left: this.SUBRULE1(this.LogicalANDExpression),
-          operator: this.CONSUME(t.AndToken).image,
-          right: this.SUBRULE2(this.BitwiseORExpression),
-        }),
-      },
-    ])
-  );
+  LogicalANDExpression = this.RULE('LogicalANDExpression', () => {
+    let result = this.SUBRULE(this.BitwiseORExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.AndToken).image;
+
+      result = {
+        type: 'LogicalANDExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseORExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
-  LogicalORExpression = this.RULE('LogicalORExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.LogicalANDExpression) },
-      {
-        ALT: () => ({
-          type: 'LogicalORExpression',
-          left: this.SUBRULE1(this.LogicalORExpression),
-          operator: this.CONSUME(t.OrToken).image,
-          right: this.SUBRULE2(this.LogicalANDExpression),
-        }),
-      },
-    ])
-  );
+  LogicalORExpression = this.RULE('LogicalORExpression', () => {
+    let result = this.SUBRULE(this.LogicalANDExpression);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.QuestionQuestionToken).image;
+
+      result = {
+        type: 'LogicalORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.LogicalANDExpression),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
   CoalesceExpression = this.RULE('CoalesceExpression', () => {
