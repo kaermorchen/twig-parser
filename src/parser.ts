@@ -60,20 +60,11 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
       // TODO: FunctionExpression
-      { ALT: () => this.SUBRULE(this.ParenthesisExpression) },
+      { ALT: () => this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList) },
     ]);
   });
 
-  ParenthesisExpression = this.RULE('ParenthesisExpression', () => {
-    let expression;
-
-    this.CONSUME(t.OpenParenToken);
-    expression = this.SUBRULE(this.Expression);
-    this.CONSUME(t.CloseParenToken);
-
-    return expression;
-  });
-
+  // ok
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
     const elements = [];
 
@@ -99,7 +90,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
-        properties.push(this.SUBRULE(this.PropertyAssignment));
+        properties.push(this.SUBRULE(this.PropertyDefinition));
       },
     });
     this.CONSUME(t.CloseBraceToken);
@@ -110,7 +101,8 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  PropertyAssignment = this.RULE('PropertyAssignment', () => {
+  // ok
+  PropertyDefinition = this.RULE('PropertyDefinition', () => {
     let key, value, shorthand;
 
     this.OR([
@@ -139,29 +131,19 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  // ok
   PropertyName = this.RULE('PropertyName', () => {
     return this.OR([
+      { ALT: () => this.SUBRULE(this.Identifier) },
+      { ALT: () => this.SUBRULE(this.StringLiteral) },
+      { ALT: () => this.SUBRULE(this.NumericLiteral) },
       {
-        // (foo)
         ALT: () => {
-          let expr;
           this.CONSUME(t.OpenParenToken);
-          expr = this.SUBRULE(this.Expression);
+          const expr = this.SUBRULE(this.AssignmentExpression);
           this.CONSUME(t.CloseParenToken);
           return expr;
         },
-      },
-      {
-        // 'foo'
-        ALT: () => this.SUBRULE(this.StringLiteral),
-      },
-      {
-        // foo
-        ALT: () => this.SUBRULE(this.Identifier),
-      },
-      {
-        // 42
-        ALT: () => this.SUBRULE(this.NumericLiteral),
       },
     ]);
   });
@@ -253,30 +235,71 @@ export default class TwigParser extends EmbeddedActionsParser {
     return this.SUBRULE(this.Identifier);
   });
 
+  // ok
   CallExpression = this.RULE('CallExpression', () => {
-    let args = [];
-    const callee = this.SUBRULE(this.Identifier);
-
-    this.CONSUME(t.OpenParenToken);
-    this.OPTION(() => {
-      args = this.SUBRULE(this.FormalParameterList);
-    });
-    this.CONSUME(t.CloseParenToken);
-
-    return {
+    let object = {
       type: 'CallExpression',
-      callee,
-      arguments: args,
+      callee: this.SUBRULE(this.MemberExpression),
+      arguments: this.SUBRULE1(this.Arguments),
     };
+
+    this.MANY(() => {
+      const property = this.OR([
+        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
+        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
+      ]);
+
+      if (property) {
+        object = {
+          type: 'MemberExpression',
+          object,
+          property,
+        };
+      }
+    });
+
+    return object;
   });
 
-  FormalParameterList = this.RULE('FormalParameterList', () => {
-    const list = [];
+  // FormalParameterList = this.RULE('FormalParameterList', () => {
+  //   const list = [];
 
+  //   this.MANY_SEP({
+  //     SEP: t.CommaToken,
+  //     DEF: () => {
+  //       const param = this.OR([
+  //         {
+  //           ALT: () => {
+  //             const key = this.SUBRULE(this.Identifier);
+  //             this.CONSUME(t.EqualsToken);
+  //             const value = this.SUBRULE1(this.AssignmentExpression);
+
+  //             return {
+  //               type: 'NamedArgument',
+  //               key,
+  //               value,
+  //             };
+  //           },
+  //         },
+  //         { ALT: () => this.SUBRULE(this.Expression) },
+  //       ]);
+
+  //       list.push(param);
+  //     },
+  //   });
+
+  //   return list;
+  // });
+
+  // ok
+  Arguments = this.RULE('Arguments', () => {
+    const args = [];
+
+    this.CONSUME(t.OpenParenToken);
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
-        const param = this.OR([
+        const arg = this.OR([
           {
             ALT: () => {
               const key = this.SUBRULE(this.Identifier);
@@ -290,26 +313,11 @@ export default class TwigParser extends EmbeddedActionsParser {
               };
             },
           },
-          { ALT: () => this.SUBRULE(this.Expression) },
+          { ALT: () => this.SUBRULE(this.AssignmentExpression) },
         ]);
 
-        list.push(param);
+        args.push(arg);
       },
-    });
-
-    return list;
-  });
-
-  Arguments = this.RULE('Arguments', () => {
-    const args = [];
-
-    this.CONSUME(t.OpenParenToken);
-    this.OPTION(() => {
-      args.push(this.SUBRULE(this.AssignmentExpression));
-      this.MANY(() => {
-        this.CONSUME(t.CommaToken);
-        args.push(this.SUBRULE2(this.AssignmentExpression));
-      });
     });
     this.CONSUME(t.CloseParenToken);
 

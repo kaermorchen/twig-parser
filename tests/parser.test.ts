@@ -128,7 +128,7 @@ test('PropertyName', () => {
 
 test('PropertyAssignment', () => {
   expect(
-    parse(`"key": 42`, ModeKind.Statement).PropertyAssignment()
+    parse(`"key": 42`, ModeKind.Statement).PropertyDefinition()
   ).toStrictEqual({
     type: 'PropertyAssignment',
     key: {
@@ -143,7 +143,7 @@ test('PropertyAssignment', () => {
   });
 
   expect(
-    parse(`(name): "Anna"`, ModeKind.Statement).PropertyAssignment()
+    parse(`(name): "Anna"`, ModeKind.Statement).PropertyDefinition()
   ).toStrictEqual({
     type: 'PropertyAssignment',
     key: {
@@ -157,7 +157,7 @@ test('PropertyAssignment', () => {
     shorthand: false,
   });
 
-  expect(parse(`foo`, ModeKind.Statement).PropertyAssignment()).toStrictEqual({
+  expect(parse(`foo`, ModeKind.Statement).PropertyDefinition()).toStrictEqual({
     type: 'PropertyAssignment',
     key: {
       type: 'StringLiteral',
