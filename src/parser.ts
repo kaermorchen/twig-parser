@@ -50,10 +50,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
       // TODO: FunctionExpression
-      {
-        ALT: () =>
-          this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList),
-      },
+      { ALT: () => this.SUBRULE(this.ParenthesizedExpression) },
     ])
   );
 
@@ -143,82 +140,19 @@ export default class TwigParser extends EmbeddedActionsParser {
   );
 
   // ok
-  LeftHandSideExpression = this.RULE('LeftHandSideExpression', () =>
-    this.OR({
-      // MAX_LOOKAHEAD: 3,
-      // IGNORE_AMBIGUITIES: true,
-      DEF: [
-        // TODO: MemberExpression should be first
-        { ALT: () => this.SUBRULE(this.MemberExpression) },
-        {
-          IGNORE_AMBIGUITIES: true,
-          ALT: () => this.SUBRULE(this.CallExpression),
-        },
-      ],
-    })
-  );
-
-  CoverParenthesizedExpressionAndArrowParameterList = this.RULE(
-    'CoverParenthesizedExpressionAndArrowParameterList',
-    () => {
-      this.CONSUME(t.OpenParenToken);
-      const args = this.SUBRULE(this.ExpressionList_In);
-      this.CONSUME(t.CloseParenToken);
-
-      return args;
-    }
-  );
-
-  // Ok
-  ArrowFunction = this.RULE('ArrowFunction', () => {
-    const params = this.OR([
-      { ALT: () => this.SUBRULE(this.Identifier) },
-      {
-        ALT: () =>
-          this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList),
-      },
-    ]);
-    this.CONSUME(t.EqualsGreaterToken);
-    const body = this.SUBRULE(this.AssignmentExpression);
-
-    return {
-      type: 'ArrowFunction',
-      body,
-      params,
-    };
-  });
-
-  ArrowFunction_In = this.RULE('ArrowFunction_In', () => {
-    const params = this.OR([
-      { ALT: () => this.SUBRULE(this.Identifier) },
-      {
-        ALT: () =>
-          this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList),
-      },
-    ]);
-    this.CONSUME(t.EqualsGreaterToken);
-    const body = this.SUBRULE(this.AssignmentExpression_In);
-
-    return {
-      type: 'ArrowFunction',
-      body,
-      params,
-    };
-  });
-
-  // ok
-  MemberExpression = this.RULE('MemberExpression', () => {
+  LeftHandSideExpression = this.RULE('LeftHandSideExpression', () => {
     let object = this.SUBRULE(this.PrimaryExpression);
 
     this.MANY(() => {
       const property = this.OR([
         { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
         { ALT: () => this.SUBRULE(this.DotMemberExpression) },
+        { ALT: () => this.SUBRULE(this.Arguments) },
       ]);
 
       if (property) {
         object = {
-          type: 'MemberExpression',
+          type: 'LeftHandSideExpression',
           object,
           property,
         };
@@ -244,32 +178,6 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   // ok
-  CallExpression = this.RULE('CallExpression', () => {
-    let object = {
-      type: 'CallExpression',
-      callee: this.SUBRULE(this.MemberExpression),
-      arguments: this.SUBRULE1(this.Arguments),
-    };
-
-    this.MANY(() => {
-      const property = this.OR([
-        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
-        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
-      ]);
-
-      if (property) {
-        object = {
-          type: 'MemberExpression',
-          object,
-          property,
-        };
-      }
-    });
-
-    return object;
-  });
-
-  // ok
   Arguments = this.RULE('Arguments', () => {
     const args = [];
 
@@ -279,7 +187,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       DEF: () => {
         const arg = this.OR([
           {
-            IGNORE_AMBIGUITIES: true,
+            // IGNORE_AMBIGUITIES: true,
             ALT: () => {
               const key = this.SUBRULE(this.Identifier);
               this.CONSUME(t.EqualsToken);
@@ -301,6 +209,60 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.CONSUME(t.CloseParenToken);
 
     return args;
+  });
+
+  ParenthesizedExpression = this.RULE('ParenthesizedExpression', () => {
+    this.CONSUME(t.OpenParenToken);
+    const expr = this.SUBRULE(this.Expression_In);
+    this.CONSUME(t.CloseParenToken);
+
+    return expr;
+  });
+
+  ArrowFormalParameters = this.RULE('ArrowFormalParameters', () => {
+    const params = [];
+
+    this.CONSUME(t.OpenParenToken);
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        params.push(this.SUBRULE(this.Identifier));
+      },
+    });
+    this.CONSUME(t.CloseParenToken);
+
+    return params;
+  });
+
+  // Ok
+  ArrowFunction = this.RULE('ArrowFunction', () => {
+    const params = this.OR([
+      { ALT: () => this.SUBRULE(this.ArrowFormalParameters) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+    ]);
+    this.CONSUME(t.EqualsGreaterToken);
+    const body = this.SUBRULE(this.AssignmentExpression);
+
+    return {
+      type: 'ArrowFunction',
+      body,
+      params,
+    };
+  });
+
+  ArrowFunction_In = this.RULE('ArrowFunction_In', () => {
+    const params = this.OR([
+      { ALT: () => this.SUBRULE(this.ArrowFormalParameters) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+    ]);
+    this.CONSUME(t.EqualsGreaterToken);
+    const body = this.SUBRULE(this.AssignmentExpression_In);
+
+    return {
+      type: 'ArrowFunction',
+      body,
+      params,
+    };
   });
 
   // Ok
@@ -818,41 +780,39 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   // Ok
   AssignmentExpression = this.RULE('AssignmentExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.ConditionalExpression) },
-      { IGNORE_AMBIGUITIES: true, ALT: () => this.SUBRULE(this.ArrowFunction) },
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => ({
-          type: 'AssignmentExpression',
-          left: this.SUBRULE(this.LeftHandSideExpression),
-          operator: this.CONSUME(t.EqualsToken).image,
-          right: this.SUBRULE(this.AssignmentExpression),
-        }),
-      },
-    ])
+    this.OR({
+      MAX_LOOKAHEAD: 4,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.ArrowFunction) },
+        { ALT: () => this.SUBRULE(this.ConditionalExpression) },
+        // {
+        //   ALT: () => ({
+        //     type: 'AssignmentExpression',
+        //     left: this.SUBRULE(this.LeftHandSideExpression),
+        //     operator: this.CONSUME(t.EqualsToken).image,
+        //     right: this.SUBRULE(this.AssignmentExpression),
+        //   }),
+        // },
+      ],
+    })
   );
 
   AssignmentExpression_In = this.RULE('AssignmentExpression_In', () =>
-    this.OR([
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => ({
-          type: 'AssignmentExpression',
-          left: this.SUBRULE(this.LeftHandSideExpression),
-          operator: this.CONSUME(t.EqualsToken).image,
-          right: this.SUBRULE(this.AssignmentExpression_In),
-        }),
-      },
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => this.SUBRULE(this.ConditionalExpression_In),
-      },
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => this.SUBRULE(this.ArrowFunction_In),
-      },
-    ])
+    this.OR({
+      MAX_LOOKAHEAD: 4,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.ArrowFunction_In) },
+        { ALT: () => this.SUBRULE(this.ConditionalExpression_In) },
+        // {
+        //   ALT: () => ({
+        //     type: 'AssignmentExpression',
+        //     left: this.SUBRULE(this.LeftHandSideExpression),
+        //     operator: this.CONSUME(t.EqualsToken).image,
+        //     right: this.SUBRULE(this.AssignmentExpression_In),
+        //   }),
+        // },
+      ],
+    })
   );
 
   Expression = this.RULE('Expression', () => {
@@ -907,10 +867,27 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   Filter = this.RULE('Filter', () => {
-    return this.OR([
-      { ALT: () => this.SUBRULE(this.CallExpression) },
-      { ALT: () => this.SUBRULE(this.Identifier) },
-    ]);
+    let result = this.SUBRULE(this.Identifier);
+
+    this.OPTION(() => {
+      const args = this.SUBRULE(this.Arguments);
+
+      result = {
+        type: 'CallExpression',
+        callee: result,
+        arguments: args,
+      }
+    });
+
+    return result;
+  });
+
+  CallExpression = this.RULE('CallExpression', () => {
+    return {
+      type: 'CallExpression',
+      callee: this.SUBRULE(this.Identifier),
+      arguments: this.SUBRULE(this.Arguments),
+    };
   });
 
   Text = this.RULE('Text', () => {

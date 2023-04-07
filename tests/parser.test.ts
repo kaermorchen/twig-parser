@@ -99,23 +99,30 @@ test('ArrayLiteral', () => {
     elements: [],
   });
 
-  expect(parse(`[1, 2, 3]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual({
-    type: 'ArrayLiteral',
-    elements: [
-      {
-        type: 'NumericLiteral',
-        value: 1,
-      },
-      {
-        type: 'NumericLiteral',
-        value: 2,
-      },
-      {
-        type: 'NumericLiteral',
-        value: 3,
-      },
-    ],
-  });
+  expect(parse(`[1, [2, 3]]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual(
+    {
+      type: 'ArrayLiteral',
+      elements: [
+        {
+          type: 'NumericLiteral',
+          value: 1,
+        },
+        {
+          type: 'ArrayLiteral',
+          elements: [
+            {
+              type: 'NumericLiteral',
+              value: 2,
+            },
+            {
+              type: 'NumericLiteral',
+              value: 3,
+            },
+          ],
+        },
+      ],
+    }
+  );
 });
 
 test('PropertyName', () => {
@@ -231,18 +238,13 @@ test('ObjectLiteral', () => {
   });
 });
 
-test('CoverParenthesizedExpressionAndArrowParameterList', () => {
+test('ParenthesizedExpression', () => {
   expect(
-    parse(
-      `(4)`,
-      ModeKind.Statement
-    ).CoverParenthesizedExpressionAndArrowParameterList()
-  ).toStrictEqual([
-    {
-      type: 'NumericLiteral',
-      value: 4,
-    },
-  ]);
+    parse(`(4)`, ModeKind.Statement).ParenthesizedExpression()
+  ).toStrictEqual({
+    type: 'NumericLiteral',
+    value: 4,
+  });
 });
 
 test('BinaryExpression', () => {
@@ -348,9 +350,9 @@ test('AssignmentExpression', () => {
   });
 });
 
-test('MemberExpression', () => {
+test('LeftHandSideExpression', () => {
   expect(
-    parse(`user.firstName`, ModeKind.Statement).MemberExpression()
+    parse(`user.firstName`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
     object: {
       type: 'Identifier',
@@ -360,11 +362,11 @@ test('MemberExpression', () => {
       type: 'Identifier',
       value: 'firstName',
     },
-    type: 'MemberExpression',
+    type: 'LeftHandSideExpression',
   });
 
   expect(
-    parse(`user['name']`, ModeKind.Statement).MemberExpression()
+    parse(`user['name']`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
     object: {
       type: 'Identifier',
@@ -374,15 +376,15 @@ test('MemberExpression', () => {
       type: 'StringLiteral',
       value: 'name',
     },
-    type: 'MemberExpression',
+    type: 'LeftHandSideExpression',
   });
 
   expect(
-    parse(`user.a.b`, ModeKind.Statement).MemberExpression()
+    parse(`user.a.b`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
-    type: 'MemberExpression',
+    type: 'LeftHandSideExpression',
     object: {
-      type: 'MemberExpression',
+      type: 'LeftHandSideExpression',
       object: {
         type: 'Identifier',
         value: 'user',
@@ -707,7 +709,7 @@ test('ForInStatement', () => {
             type: 'Identifier',
             value: 'name',
           },
-          type: 'MemberExpression',
+          type: 'LeftHandSideExpression',
         },
       },
       {
