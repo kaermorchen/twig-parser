@@ -162,7 +162,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     'CoverParenthesizedExpressionAndArrowParameterList',
     () => {
       this.CONSUME(t.OpenParenToken);
-      const args = this.SUBRULE(this.Expression_In);
+      const args = this.SUBRULE(this.ExpressionList_In);
       this.CONSUME(t.CloseParenToken);
 
       return args;
@@ -231,7 +231,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   // ok
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
     this.CONSUME(t.OpenBracketToken);
-    const expr = this.SUBRULE(this.Expression_In)[0];
+    const expr = this.SUBRULE(this.Expression_In);
     this.CONSUME(t.CloseBracketToken);
 
     return expr;
@@ -268,36 +268,6 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     return object;
   });
-
-  // FormalParameterList = this.RULE('FormalParameterList', () => {
-  //   const list = [];
-
-  //   this.MANY_SEP({
-  //     SEP: t.CommaToken,
-  //     DEF: () => {
-  //       const param = this.OR([
-  //         {
-  //           ALT: () => {
-  //             const key = this.SUBRULE(this.Identifier);
-  //             this.CONSUME(t.EqualsToken);
-  //             const value = this.SUBRULE1(this.AssignmentExpression);
-
-  //             return {
-  //               type: 'NamedArgument',
-  //               key,
-  //               value,
-  //             };
-  //           },
-  //         },
-  //         { ALT: () => this.SUBRULE(this.Expression) },
-  //       ]);
-
-  //       list.push(param);
-  //     },
-  //   });
-
-  //   return list;
-  // });
 
   // ok
   Arguments = this.RULE('Arguments', () => {
@@ -886,25 +856,33 @@ export default class TwigParser extends EmbeddedActionsParser {
   );
 
   Expression = this.RULE('Expression', () => {
+    return this.SUBRULE(this.AssignmentExpression);
+  });
+
+  Expression_In = this.RULE('Expression_In', () => {
+    return this.SUBRULE(this.AssignmentExpression_In);
+  });
+
+  ExpressionList = this.RULE('ExpressionList', () => {
     const arr = [];
 
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
-        arr.push(this.SUBRULE(this.AssignmentExpression));
+        arr.push(this.SUBRULE(this.Expression));
       },
     });
 
     return arr;
   });
 
-  Expression_In = this.RULE('Expression_In', () => {
+  ExpressionList_In = this.RULE('ExpressionList_In', () => {
     const arr = [];
 
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
-        arr.push(this.SUBRULE(this.AssignmentExpression_In));
+        arr.push(this.SUBRULE(this.Expression_In));
       },
     });
 
@@ -935,210 +913,199 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
   });
 
-  // Text = this.RULE('Text', () => {
-  //   return {
-  //     type: 'Text',
-  //     value: this.CONSUME(t.TextToken).image,
-  //   };
-  // });
+  Text = this.RULE('Text', () => {
+    return {
+      type: 'Text',
+      value: this.CONSUME(t.TextToken).image,
+    };
+  });
 
-  // Comment = this.RULE('Comment', () => {
-  //   let value = null;
+  Comment = this.RULE('Comment', () => {
+    let value = null;
 
-  //   this.CONSUME(t.LCommentToken);
-  //   this.OPTION(() => {
-  //     value = this.CONSUME(t.CommentToken).image;
-  //   });
-  //   this.CONSUME(t.RCommentToken);
+    this.CONSUME(t.LCommentToken);
+    this.OPTION(() => {
+      value = this.CONSUME(t.CommentToken).image;
+    });
+    this.CONSUME(t.RCommentToken);
 
-  //   return {
-  //     type: 'Comment',
-  //     value,
-  //   };
-  // });
+    return {
+      type: 'Comment',
+      value,
+    };
+  });
 
-  // VariableStatement = this.RULE('VariableStatement', () => {
-  //   this.CONSUME(t.LVariableToken);
-  //   const value = this.SUBRULE(this.Expression);
-  //   this.CONSUME(t.RVariableToken);
+  VariableStatement = this.RULE('VariableStatement', () => {
+    this.CONSUME(t.LVariableToken);
+    const value = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RVariableToken);
 
-  //   return {
-  //     type: 'VariableStatement',
-  //     value,
-  //   };
-  // });
+    return {
+      type: 'VariableStatement',
+      value,
+    };
+  });
 
-  // VariableDeclaration = this.RULE('VariableDeclaration', () => {
-  //   return this.SUBRULE(this.Identifier);
-  // });
+  VariableDeclaration = this.RULE('VariableDeclaration', () => {
+    return this.SUBRULE(this.Identifier);
+  });
 
-  // ExpressionList = this.RULE('ExpressionList', () => {
-  //   const arr = [this.SUBRULE(this.Expression)];
+  VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
+    const arr = [this.SUBRULE(this.VariableDeclaration)];
 
-  //   this.MANY(() => {
-  //     this.CONSUME(t.CommaToken);
-  //     arr.push(this.SUBRULE2(this.Expression));
-  //   });
+    this.MANY(() => {
+      this.CONSUME(t.CommaToken);
+      arr.push(this.SUBRULE2(this.VariableDeclaration));
+    });
 
-  //   return arr;
-  // });
+    return arr;
+  });
 
-  // VariableDeclarationList = this.RULE('VariableDeclarationList', () => {
-  //   const arr = [this.SUBRULE(this.VariableDeclaration)];
+  SetInlineStatement = this.RULE('SetInlineStatement', () => {
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.SetToken);
 
-  //   this.MANY(() => {
-  //     this.CONSUME(t.CommaToken);
-  //     arr.push(this.SUBRULE2(this.VariableDeclaration));
-  //   });
+    const variables = this.SUBRULE(this.VariableDeclarationList);
 
-  //   return arr;
-  // });
+    this.CONSUME(t.EqualsToken);
 
-  // SetInlineStatement = this.RULE('SetInlineStatement', () => {
-  //   this.CONSUME(t.LBlockToken);
-  //   this.CONSUME(t.SetToken);
+    const values = this.SUBRULE(this.ExpressionList);
 
-  //   const variables = this.SUBRULE(this.VariableDeclarationList);
+    this.CONSUME(t.RBlockToken);
 
-  //   this.CONSUME(t.EqualsToken);
+    const declarations = [];
 
-  //   const values = this.SUBRULE(this.ExpressionList);
+    for (let i = 0; i < variables.length; i++) {
+      declarations.push({
+        type: 'VariableDeclaration',
+        name: variables[i],
+        init: values[i],
+      });
+    }
 
-  //   this.CONSUME(t.RBlockToken);
+    return {
+      type: 'SetStatement',
+      declarations,
+    };
+  });
 
-  //   const declarations = [];
+  SetBlockStatement = this.RULE('SetBlockStatement', () => {
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.SetToken);
+    const name = this.SUBRULE(this.Identifier);
+    this.CONSUME(t.RBlockToken);
 
-  //   for (let i = 0; i < variables.length; i++) {
-  //     declarations.push({
-  //       type: 'VariableDeclaration',
-  //       name: variables[i],
-  //       init: values[i],
-  //     });
-  //   }
+    const init = this.SUBRULE1(this.Text);
 
-  //   return {
-  //     type: 'SetStatement',
-  //     declarations,
-  //   };
-  // });
+    this.CONSUME1(t.LBlockToken);
+    this.CONSUME1(t.EndSetToken);
+    this.CONSUME1(t.RBlockToken);
 
-  // SetBlockStatement = this.RULE('SetBlockStatement', () => {
-  //   this.CONSUME(t.LBlockToken);
-  //   this.CONSUME(t.SetToken);
-  //   const name = this.SUBRULE(this.Identifier);
-  //   this.CONSUME(t.RBlockToken);
+    return {
+      type: 'SetStatement',
+      declarations: [
+        {
+          type: 'VariableDeclaration',
+          name,
+          init,
+        },
+      ],
+    };
+  });
 
-  //   const init = this.SUBRULE1(this.Text);
+  ApplyStatement = this.RULE('ApplyStatement', () => {
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.ApplyToken);
 
-  //   this.CONSUME1(t.LBlockToken);
-  //   this.CONSUME1(t.EndSetToken);
-  //   this.CONSUME1(t.RBlockToken);
+    let filter = this.SUBRULE(this.Filter);
 
-  //   return {
-  //     type: 'SetStatement',
-  //     declarations: [
-  //       {
-  //         type: 'VariableDeclaration',
-  //         name,
-  //         init,
-  //       },
-  //     ],
-  //   };
-  // });
+    this.MANY(() => {
+      this.CONSUME(t.BarToken);
+      const nextFilter = this.SUBRULE1(this.Filter);
 
-  // ApplyStatement = this.RULE('ApplyStatement', () => {
-  //   this.CONSUME(t.LBlockToken);
-  //   this.CONSUME(t.ApplyToken);
+      filter = {
+        type: 'FilterExpression',
+        expression: filter,
+        filter: nextFilter,
+      };
+    });
 
-  //   let filter = this.SUBRULE(this.Filter);
+    this.CONSUME(t.RBlockToken);
 
-  //   this.MANY(() => {
-  //     this.CONSUME(t.BarToken);
-  //     const nextFilter = this.SUBRULE1(this.Filter);
+    const text = this.SUBRULE(this.Text);
 
-  //     filter = {
-  //       type: 'FilterExpression',
-  //       expression: filter,
-  //       filter: nextFilter,
-  //     };
-  //   });
+    this.CONSUME1(t.LBlockToken);
+    this.CONSUME1(t.EndApplyToken);
+    this.CONSUME1(t.RBlockToken);
 
-  //   this.CONSUME(t.RBlockToken);
+    return {
+      type: 'ApplyStatement',
+      text,
+      filter,
+    };
+  });
 
-  //   const text = this.SUBRULE(this.Text);
+  ForInStatement = this.RULE('ForInStatement', () => {
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.ForToken);
+    const variables = this.SUBRULE(this.VariableDeclarationList);
+    this.CONSUME(t.InToken);
+    const expression = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RBlockToken);
 
-  //   this.CONSUME1(t.LBlockToken);
-  //   this.CONSUME1(t.EndApplyToken);
-  //   this.CONSUME1(t.RBlockToken);
+    let body = [];
 
-  //   return {
-  //     type: 'ApplyStatement',
-  //     text,
-  //     filter,
-  //   };
-  // });
+    this.MANY(() => {
+      body.push(this.SUBRULE(this.SourceElement));
+    });
 
-  // ForInStatement = this.RULE('ForInStatement', () => {
-  //   this.CONSUME(t.LBlockToken);
-  //   this.CONSUME(t.ForToken);
-  //   const variables = this.SUBRULE(this.VariableDeclarationList);
-  //   this.CONSUME(t.InToken);
-  //   const expression = this.SUBRULE(this.Expression);
-  //   this.CONSUME(t.RBlockToken);
+    this.CONSUME1(t.LBlockToken);
+    this.CONSUME1(t.EndForToken);
+    this.CONSUME1(t.RBlockToken);
 
-  //   let body = [];
+    return {
+      type: 'ForInStatement',
+      body,
+      variables,
+      expression,
+    };
+  });
 
-  //   this.MANY(() => {
-  //     body.push(this.SUBRULE(this.SourceElement));
-  //   });
+  Statement = this.RULE('Statement', () => {
+    return this.OR({
+      MAX_LOOKAHEAD: 4,
+      DEF: [
+        { ALT: () => this.SUBRULE(this.SetInlineStatement) },
+        { ALT: () => this.SUBRULE(this.SetBlockStatement) },
+        { ALT: () => this.SUBRULE(this.ApplyStatement) },
+        { ALT: () => this.SUBRULE(this.ForInStatement) },
+      ],
+    });
+  });
 
-  //   this.CONSUME1(t.LBlockToken);
-  //   this.CONSUME1(t.EndForToken);
-  //   this.CONSUME1(t.RBlockToken);
+  SourceElement = this.RULE('SourceElement', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.Text) },
+      { ALT: () => this.SUBRULE(this.Comment) },
+      { ALT: () => this.SUBRULE(this.VariableStatement) },
+      { ALT: () => this.SUBRULE(this.Statement) },
+    ]);
+  });
 
-  //   return {
-  //     type: 'ForInStatement',
-  //     body,
-  //     variables,
-  //     expression,
-  //   };
-  // });
+  SourceElementList = this.RULE('SourceElementList', () => {
+    let body = [];
 
-  // Statement = this.RULE('Statement', () => {
-  //   return this.OR({
-  //     MAX_LOOKAHEAD: 4,
-  //     DEF: [
-  //       { ALT: () => this.SUBRULE(this.SetInlineStatement) },
-  //       { ALT: () => this.SUBRULE(this.SetBlockStatement) },
-  //       { ALT: () => this.SUBRULE(this.ApplyStatement) },
-  //       { ALT: () => this.SUBRULE(this.ForInStatement) },
-  //     ],
-  //   });
-  // });
+    this.MANY(() => {
+      body.push(this.SUBRULE(this.SourceElement));
+    });
 
-  // SourceElement = this.RULE('SourceElement', () => {
-  //   return this.OR([
-  //     { ALT: () => this.SUBRULE(this.Text) },
-  //     { ALT: () => this.SUBRULE(this.Comment) },
-  //     { ALT: () => this.SUBRULE(this.VariableStatement) },
-  //     { ALT: () => this.SUBRULE(this.Statement) },
-  //   ]);
-  // });
+    return body;
+  });
 
-  // SourceElementList = this.RULE('SourceElementList', () => {
-  //   let body = [];
-
-  //   this.MANY(() => {
-  //     body.push(this.SUBRULE(this.SourceElement));
-  //   });
-
-  //   return body;
-  // });
-
-  // Program = this.RULE('Program', () => {
-  //   return {
-  //     type: 'Program',
-  //     body: this.SUBRULE(this.SourceElementList),
-  //   };
-  // });
+  Program = this.RULE('Program', () => {
+    return {
+      type: 'Program',
+      body: this.SUBRULE(this.SourceElementList),
+    };
+  });
 }
