@@ -104,7 +104,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         ALT: () => {
           key = this.SUBRULE(this.PropertyName);
           this.CONSUME(t.ColonToken);
-          value = this.SUBRULE(this.AssignmentExpression);
+          value = this.SUBRULE(this.AssignmentExpression_In);
           shorthand = false;
         },
       },
@@ -164,7 +164,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       this.MANY_SEP({
         SEP: t.CommaToken,
         DEF: () => {
-          args.push(this.SUBRULE(this.Expression));
+          args.push(this.SUBRULE(this.Expression_In));
         },
       });
       this.CONSUME(t.CloseParenToken);
@@ -184,6 +184,24 @@ export default class TwigParser extends EmbeddedActionsParser {
     ]);
     this.CONSUME(t.EqualsGreaterToken);
     const body = this.SUBRULE(this.AssignmentExpression);
+
+    return {
+      type: 'ArrowFunction',
+      body,
+      params,
+    };
+  });
+
+  ArrowFunction_In = this.RULE('ArrowFunction_In', () => {
+    const params = this.OR([
+      { ALT: () => this.SUBRULE(this.Identifier) },
+      {
+        ALT: () =>
+          this.SUBRULE(this.CoverParenthesizedExpressionAndArrowParameterList),
+      },
+    ]);
+    this.CONSUME(t.EqualsGreaterToken);
+    const body = this.SUBRULE(this.AssignmentExpression_In);
 
     return {
       type: 'ArrowFunction',
@@ -217,7 +235,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   // ok
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
     this.CONSUME(t.OpenBracketToken);
-    const expr = this.SUBRULE(this.Expression);
+    const expr = this.SUBRULE(this.Expression_In);
     this.CONSUME(t.CloseBracketToken);
 
     return expr;
@@ -298,7 +316,7 @@ export default class TwigParser extends EmbeddedActionsParser {
             ALT: () => {
               const key = this.SUBRULE(this.Identifier);
               this.CONSUME(t.EqualsToken);
-              const value = this.SUBRULE1(this.AssignmentExpression);
+              const value = this.SUBRULE1(this.AssignmentExpression_In);
 
               return {
                 type: 'NamedArgument',
@@ -307,7 +325,7 @@ export default class TwigParser extends EmbeddedActionsParser {
               };
             },
           },
-          { ALT: () => this.SUBRULE(this.AssignmentExpression) },
+          { ALT: () => this.SUBRULE(this.AssignmentExpression_In) },
         ]);
 
         args.push(arg);
@@ -440,14 +458,61 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  RangeExpression = this.RULE('RangeExpression', () => {
+  // RangeExpression = this.RULE('RangeExpression', () => {
+  //   let result = this.SUBRULE(this.AdditiveExpression);
+
+  //   this.MANY(() => {
+  //     const operator = this.CONSUME(t.DotDotToken).image;
+
+  //     result = {
+  //       type: 'RangeExpression',
+  //       left: result,
+  //       operator,
+  //       right: this.SUBRULE2(this.AdditiveExpression),
+  //     };
+  //   });
+
+  //   return result;
+  // });
+
+  // RangeExpression_In = this.RULE('RangeExpression_In', () => {
+  //   let result = this.SUBRULE(this.AdditiveExpression_In);
+
+  //   this.MANY(() => {
+  //     const operator = this.CONSUME(t.DotDotToken).image;
+
+  //     result = {
+  //       type: 'RangeExpression',
+  //       left: result,
+  //       operator,
+  //       right: this.SUBRULE2(this.AdditiveExpression_In),
+  //     };
+  //   });
+
+  //   return result;
+  // });
+
+  // Ok
+  RelationalExpression = this.RULE('RelationalExpression', () => {
     let result = this.SUBRULE(this.AdditiveExpression);
 
     this.MANY(() => {
-      const operator = this.CONSUME(t.DotDotToken).image;
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.LessEqualToken).image },
+        { ALT: () => this.CONSUME(t.LessToken).image },
+        { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
+        { ALT: () => this.CONSUME(t.GreaterToken).image },
+        { ALT: () => this.CONSUME(t.NotInToken).image },
+        { ALT: () => this.CONSUME(t.InToken).image },
+        { ALT: () => this.CONSUME(t.MatchesToken).image },
+        { ALT: () => this.CONSUME(t.StartsWithToken).image },
+        { ALT: () => this.CONSUME(t.EndsWithToken).image },
+        { ALT: () => this.CONSUME(t.HasSomeToken).image },
+        { ALT: () => this.CONSUME(t.HasEveryToken).image },
+      ]);
 
       result = {
-        type: 'RangeExpression',
+        type: 'RelationalExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.AdditiveExpression),
@@ -457,45 +522,80 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
-  RelationalEqualityExpression = this.RULE(
-    'RelationalEqualityExpression',
-    () => {
-      let result = this.SUBRULE(this.RangeExpression);
+  RelationalExpression_In = this.RULE('RelationalExpression_In', () => {
+    let result = this.SUBRULE(this.AdditiveExpression);
 
-      this.MANY(() => {
-        const operator = this.OR1([
-          { ALT: () => this.CONSUME(t.EqualEqualToken).image },
-          { ALT: () => this.CONSUME(t.ExclamationEqualsToken).image },
-          { ALT: () => this.CONSUME(t.SpaceshipToken).image },
-          { ALT: () => this.CONSUME(t.LessEqualToken).image },
-          { ALT: () => this.CONSUME(t.LessToken).image },
-          { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
-          { ALT: () => this.CONSUME(t.GreaterToken).image },
-          { ALT: () => this.CONSUME(t.NotInToken).image },
-          { ALT: () => this.CONSUME(t.InToken).image },
-          { ALT: () => this.CONSUME(t.MatchesToken).image },
-          { ALT: () => this.CONSUME(t.StartsWithToken).image },
-          { ALT: () => this.CONSUME(t.EndsWithToken).image },
-          { ALT: () => this.CONSUME(t.HasSomeToken).image },
-          { ALT: () => this.CONSUME(t.HasEveryToken).image },
-        ]);
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.LessEqualToken).image },
+        { ALT: () => this.CONSUME(t.LessToken).image },
+        { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
+        { ALT: () => this.CONSUME(t.GreaterToken).image },
+        { ALT: () => this.CONSUME(t.NotInToken).image },
+        { ALT: () => this.CONSUME(t.InToken).image },
+        { ALT: () => this.CONSUME(t.MatchesToken).image },
+        { ALT: () => this.CONSUME(t.StartsWithToken).image },
+        { ALT: () => this.CONSUME(t.EndsWithToken).image },
+        { ALT: () => this.CONSUME(t.HasSomeToken).image },
+        { ALT: () => this.CONSUME(t.HasEveryToken).image },
+      ]);
 
-        result = {
-          type: 'RelationalEqualityExpression',
-          left: result,
-          operator,
-          right: this.SUBRULE2(this.RangeExpression),
-        };
-      });
+      result = {
+        type: 'RelationalExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.AdditiveExpression),
+      };
+    });
 
-      return result;
-    }
-  );
+    return result;
+  });
+
+  EqualityExpression = this.RULE('EqualityExpression', () => {
+    let result = this.SUBRULE(this.RelationalExpression);
+
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.EqualEqualToken).image },
+        { ALT: () => this.CONSUME(t.ExclamationEqualsToken).image },
+        { ALT: () => this.CONSUME(t.SpaceshipToken).image },
+      ]);
+
+      result = {
+        type: 'EqualityExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.RelationalExpression),
+      };
+    });
+
+    return result;
+  });
+
+  EqualityExpression_In = this.RULE('EqualityExpression', () => {
+    let result = this.SUBRULE(this.RelationalExpression_In);
+
+    this.MANY(() => {
+      const operator = this.OR1([
+        { ALT: () => this.CONSUME(t.EqualEqualToken).image },
+        { ALT: () => this.CONSUME(t.ExclamationEqualsToken).image },
+        { ALT: () => this.CONSUME(t.SpaceshipToken).image },
+      ]);
+
+      result = {
+        type: 'EqualityExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.RelationalExpression_In),
+      };
+    });
+
+    return result;
+  });
 
   // Ok
   BitwiseANDExpression = this.RULE('BitwiseANDExpression', () => {
-    let result = this.SUBRULE(this.RelationalEqualityExpression);
+    let result = this.SUBRULE(this.EqualityExpression);
 
     this.MANY(() => {
       const operator = this.CONSUME(t.BitwiseAndToken).image;
@@ -504,7 +604,24 @@ export default class TwigParser extends EmbeddedActionsParser {
         type: 'BitwiseANDExpression',
         left: result,
         operator,
-        right: this.SUBRULE2(this.RelationalEqualityExpression),
+        right: this.SUBRULE2(this.EqualityExpression),
+      };
+    });
+
+    return result;
+  });
+
+  BitwiseANDExpression_In = this.RULE('BitwiseANDExpression_In', () => {
+    let result = this.SUBRULE(this.EqualityExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseAndToken).image;
+
+      result = {
+        type: 'BitwiseANDExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.EqualityExpression_In),
       };
     });
 
@@ -529,6 +646,23 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  BitwiseXORExpression_In = this.RULE('BitwiseXORExpression_In', () => {
+    let result = this.SUBRULE(this.BitwiseANDExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseXorToken).image;
+
+      result = {
+        type: 'BitwiseXORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseANDExpression_In),
+      };
+    });
+
+    return result;
+  });
+
   // Ok
   BitwiseORExpression = this.RULE('BitwiseORExpression', () => {
     let result = this.SUBRULE(this.BitwiseXORExpression);
@@ -541,6 +675,23 @@ export default class TwigParser extends EmbeddedActionsParser {
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseXORExpression),
+      };
+    });
+
+    return result;
+  });
+
+  BitwiseORExpression_In = this.RULE('BitwiseORExpression_In', () => {
+    let result = this.SUBRULE(this.BitwiseXORExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.BitwiseOrToken).image;
+
+      result = {
+        type: 'BitwiseORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseXORExpression_In),
       };
     });
 
@@ -565,18 +716,52 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  LogicalANDExpression_In = this.RULE('LogicalANDExpression_In', () => {
+    let result = this.SUBRULE(this.BitwiseORExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.AndToken).image;
+
+      result = {
+        type: 'LogicalANDExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.BitwiseORExpression_In),
+      };
+    });
+
+    return result;
+  });
+
   // Ok
   LogicalORExpression = this.RULE('LogicalORExpression', () => {
     let result = this.SUBRULE(this.LogicalANDExpression);
 
     this.MANY(() => {
-      const operator = this.CONSUME(t.QuestionQuestionToken).image;
+      const operator = this.CONSUME(t.OrToken).image;
 
       result = {
         type: 'LogicalORExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.LogicalANDExpression),
+      };
+    });
+
+    return result;
+  });
+
+  LogicalORExpression_In = this.RULE('LogicalORExpression_In', () => {
+    let result = this.SUBRULE(this.LogicalANDExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.OrToken).image;
+
+      result = {
+        type: 'LogicalORExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE2(this.LogicalANDExpression_In),
       };
     });
 
@@ -601,11 +786,35 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  CoalesceExpression_In = this.RULE('CoalesceExpression_In', () => {
+    let result = this.SUBRULE(this.BitwiseORExpression_In);
+
+    this.MANY(() => {
+      const operator = this.CONSUME(t.QuestionQuestionToken).image;
+
+      result = {
+        type: 'CoalesceExpression',
+        left: result,
+        operator,
+        right: this.SUBRULE1(this.BitwiseORExpression_In),
+      };
+    });
+
+    return result;
+  });
+
   // Ok
   ShortCircuitExpression = this.RULE('ShortCircuitExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.LogicalORExpression) },
       { ALT: () => this.SUBRULE(this.CoalesceExpression) },
+    ])
+  );
+
+  ShortCircuitExpression_In = this.RULE('ShortCircuitExpression_In', () =>
+    this.OR([
+      { ALT: () => this.SUBRULE(this.LogicalORExpression_In) },
+      { ALT: () => this.SUBRULE(this.CoalesceExpression_In) },
     ])
   );
 
@@ -615,9 +824,29 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
-      const consequent = this.SUBRULE1(this.AssignmentExpression);
+      const consequent = this.SUBRULE1(this.AssignmentExpression_In);
       this.CONSUME(t.ColonToken);
       const alternate = this.SUBRULE2(this.AssignmentExpression);
+
+      result = {
+        type: 'ConditionalExpression',
+        test: result,
+        consequent,
+        alternate,
+      };
+    });
+
+    return result;
+  });
+
+  ConditionalExpression_In = this.RULE('ConditionalExpression_In', () => {
+    let result = this.SUBRULE(this.ShortCircuitExpression_In);
+
+    this.OPTION(() => {
+      this.CONSUME(t.QuestionToken);
+      const consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      this.CONSUME(t.ColonToken);
+      const alternate = this.SUBRULE2(this.AssignmentExpression_In);
 
       result = {
         type: 'ConditionalExpression',
@@ -646,6 +875,21 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
+  AssignmentExpression_In = this.RULE('AssignmentExpression_In', () =>
+    this.OR([
+      { ALT: () => this.SUBRULE(this.ConditionalExpression_In) },
+      { ALT: () => this.SUBRULE(this.ArrowFunction_In) },
+      {
+        ALT: () => ({
+          type: 'AssignmentExpression',
+          left: this.SUBRULE(this.LeftHandSideExpression),
+          operator: this.CONSUME(t.EqualsToken).image,
+          right: this.SUBRULE(this.AssignmentExpression_In),
+        }),
+      },
+    ])
+  );
+
   Expression = this.RULE('Expression', () => {
     const arr = [];
 
@@ -653,6 +897,19 @@ export default class TwigParser extends EmbeddedActionsParser {
       SEP: t.CommaToken,
       DEF: () => {
         arr.push(this.SUBRULE(this.AssignmentExpression));
+      },
+    });
+
+    return arr;
+  });
+
+  Expression_In = this.RULE('Expression_In', () => {
+    const arr = [];
+
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        arr.push(this.SUBRULE(this.AssignmentExpression_In));
       },
     });
 
