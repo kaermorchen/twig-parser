@@ -65,7 +65,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
-        elements.push(this.SUBRULE(this.AssignmentExpression));
+        elements.push(this.SUBRULE(this.AssignmentExpression_In));
       },
     });
     this.CONSUME(t.CloseBracketToken);
@@ -1102,9 +1102,9 @@ export default class TwigParser extends EmbeddedActionsParser {
     return body;
   });
 
-  Program = this.RULE('Program', () => {
+  Template = this.RULE('Template', () => {
     return {
-      type: 'Program',
+      type: 'Template',
       body: this.SUBRULE(this.SourceElementList),
     };
   });

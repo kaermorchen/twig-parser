@@ -99,15 +99,23 @@ test('ArrayLiteral', () => {
     elements: [],
   });
 
-  expect(parse(`[1, [2, 3]]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual(
-    {
-      type: 'ArrayLiteral',
-      elements: [
-        parse('1', ModeKind.Statement).NumericLiteral(),
-        parse('[2, 3]', ModeKind.Statement).ArrayLiteral(),
-      ],
-    }
-  );
+  expect(parse(`[1, 2, 3]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual({
+    type: 'ArrayLiteral',
+    elements: [
+      {
+        type: 'NumericLiteral',
+        value: 1,
+      },
+      {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      {
+        type: 'NumericLiteral',
+        value: 3,
+      },
+    ],
+  });
 });
 
 test('PropertyName', () => {
@@ -284,7 +292,9 @@ test('BinaryExpression', () => {
 });
 
 test('ExpressionList', () => {
-  expect(parse(`"Hello", 42`, ModeKind.Statement).ExpressionList()).toStrictEqual([
+  expect(
+    parse(`"Hello", 42`, ModeKind.Statement).ExpressionList()
+  ).toStrictEqual([
     {
       type: 'StringLiteral',
       value: 'Hello',
@@ -456,11 +466,11 @@ test('Comment', () => {
   });
 });
 
-test('Program', () => {
+test('Template', () => {
   expect(
-    parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`).Program()
+    parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`).Template()
   ).toStrictEqual({
-    type: 'Program',
+    type: 'Template',
     body: [
       {
         type: 'Comment',
@@ -720,27 +730,27 @@ test('ForInStatement', () => {
 });
 
 test('ArrowFunction', () => {
-  expect(
-    parse(`v => v * 2`, ModeKind.Statement).ArrowFunction()
-  ).toStrictEqual({
-    params: {
-      type: 'Identifier',
-      value: 'v',
-    },
-    body: {
-      left: {
+  expect(parse(`v => v * 2`, ModeKind.Statement).ArrowFunction()).toStrictEqual(
+    {
+      params: {
         type: 'Identifier',
         value: 'v',
       },
-      operator: '*',
-      right: {
-        type: 'NumericLiteral',
-        value: 2,
+      body: {
+        left: {
+          type: 'Identifier',
+          value: 'v',
+        },
+        operator: '*',
+        right: {
+          type: 'NumericLiteral',
+          value: 2,
+        },
+        type: 'BinaryExpression',
       },
-      type: 'BinaryExpression',
-    },
-    type: 'ArrowFunction',
-  });
+      type: 'ArrowFunction',
+    }
+  );
 
   expect(
     parse(
