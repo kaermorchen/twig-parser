@@ -7,13 +7,11 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.performSelfAnalysis();
   }
 
-  // ok
   Identifier = this.RULE('Identifier', () => ({
     type: 'Identifier',
     value: this.CONSUME(t.IdentifierToken).image,
   }));
 
-  // ok
   Literal = this.RULE('Literal', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.NullLiteral) },
@@ -49,12 +47,10 @@ export default class TwigParser extends EmbeddedActionsParser {
       { ALT: () => this.SUBRULE(this.Literal) },
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
-      // TODO: FunctionExpression
       { ALT: () => this.SUBRULE(this.ParenthesizedExpression) },
     ])
   );
 
-  // ok
   ArrayLiteral = this.RULE('ArrayLiteral', () => {
     const elements = [];
 
@@ -73,7 +69,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  // ok
   ObjectLiteral = this.RULE('ObjectLiteral', () => {
     const properties = [];
 
@@ -92,7 +87,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  // ok
   PropertyDefinition = this.RULE('PropertyDefinition', () => {
     let key, value, shorthand;
 
@@ -122,7 +116,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  // ok
   PropertyName = this.RULE('PropertyName', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.Identifier) },
@@ -139,7 +132,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  // ok
   LeftHandSideExpression = this.RULE('LeftHandSideExpression', () => {
     let object = this.SUBRULE(this.PrimaryExpression);
 
@@ -162,7 +154,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return object;
   });
 
-  // ok
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
     this.CONSUME(t.OpenBracketToken);
     const expr = this.SUBRULE(this.Expression_In);
@@ -171,13 +162,11 @@ export default class TwigParser extends EmbeddedActionsParser {
     return expr;
   });
 
-  // ok
   DotMemberExpression = this.RULE('DotMemberExpression', () => {
     this.CONSUME(t.DotToken);
     return this.SUBRULE(this.Identifier);
   });
 
-  // ok
   Arguments = this.RULE('Arguments', () => {
     const args = [];
 
@@ -187,7 +176,6 @@ export default class TwigParser extends EmbeddedActionsParser {
       DEF: () => {
         const arg = this.OR([
           {
-            // IGNORE_AMBIGUITIES: true,
             ALT: () => {
               const key = this.SUBRULE(this.Identifier);
               this.CONSUME(t.EqualsToken);
@@ -234,7 +222,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return params;
   });
 
-  // Ok
   ArrowFunction = this.RULE('ArrowFunction', () => {
     const params = this.OR([
       { ALT: () => this.SUBRULE(this.ArrowFormalParameters) },
@@ -265,13 +252,11 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
-  // Ok
   // Twig don't have increment and decrement operators
   UpdateExpression = this.RULE('UpdateExpression', () =>
     this.SUBRULE(this.LeftHandSideExpression)
   );
 
-  // Ok
   UnaryExpression = this.RULE('UnaryExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.UpdateExpression) },
@@ -289,7 +274,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  // Ok
   ExponentiationExpression = this.RULE('ExponentiationExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.UnaryExpression) },
@@ -305,7 +289,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  // Ok
   AssociativityExpression = this.RULE('AssociativityExpression', () => {
     let result = this.SUBRULE(this.ExponentiationExpression);
 
@@ -326,7 +309,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   MultiplicativeExpression = this.RULE('MultiplicativeExpression', () => {
     let result = this.SUBRULE(this.AssociativityExpression);
 
@@ -349,7 +331,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   ConcatExpression = this.RULE('ConcatExpression', () => {
     let result = this.SUBRULE(this.MultiplicativeExpression);
 
@@ -367,7 +348,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   AdditiveExpression = this.RULE('AdditiveExpression', () => {
     let result = this.SUBRULE(this.ConcatExpression);
 
@@ -405,7 +385,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   RelationalExpression = this.RULE('RelationalExpression', () => {
     let result = this.SUBRULE(this.RangeExpression);
 
@@ -506,7 +485,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   BitwiseANDExpression = this.RULE('BitwiseANDExpression', () => {
     let result = this.SUBRULE(this.EqualityExpression);
 
@@ -541,7 +519,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   BitwiseXORExpression = this.RULE('BitwiseXORExpression', () => {
     let result = this.SUBRULE(this.BitwiseANDExpression);
 
@@ -576,7 +553,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   BitwiseORExpression = this.RULE('BitwiseORExpression', () => {
     let result = this.SUBRULE(this.BitwiseXORExpression);
 
@@ -611,7 +587,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   LogicalANDExpression = this.RULE('LogicalANDExpression', () => {
     let result = this.SUBRULE(this.BitwiseORExpression);
 
@@ -646,7 +621,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   LogicalORExpression = this.RULE('LogicalORExpression', () => {
     let result = this.SUBRULE(this.LogicalANDExpression);
 
@@ -681,7 +655,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   CoalesceExpression = this.RULE('CoalesceExpression', () => {
     let result = this.SUBRULE(this.BitwiseORExpression);
 
@@ -716,7 +689,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   ShortCircuitExpression = this.RULE('ShortCircuitExpression', () =>
     this.OR([
       {
@@ -737,7 +709,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  // Ok
   ConditionalExpression = this.RULE('ConditionalExpression', () => {
     let result = this.SUBRULE(this.ShortCircuitExpression);
 
@@ -778,7 +749,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // Ok
   AssignmentExpression = this.RULE('AssignmentExpression', () =>
     this.OR({
       MAX_LOOKAHEAD: 4,
@@ -876,7 +846,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         type: 'CallExpression',
         callee: result,
         arguments: args,
-      }
+      };
     });
 
     return result;
