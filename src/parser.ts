@@ -134,7 +134,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           this.CONSUME(t.OpenParenToken);
-          const expr = this.SUBRULE(this.AssignmentExpression);
+          const expr = this.SUBRULE(this.AssignmentExpression_In);
           this.CONSUME(t.CloseParenToken);
           return expr;
         },
@@ -161,15 +161,8 @@ export default class TwigParser extends EmbeddedActionsParser {
   CoverParenthesizedExpressionAndArrowParameterList = this.RULE(
     'CoverParenthesizedExpressionAndArrowParameterList',
     () => {
-      const args = [];
-
       this.CONSUME(t.OpenParenToken);
-      this.MANY_SEP({
-        SEP: t.CommaToken,
-        DEF: () => {
-          args.push(this.SUBRULE(this.Expression_In));
-        },
-      });
+      const args = this.SUBRULE(this.Expression_In);
       this.CONSUME(t.CloseParenToken);
 
       return args;
@@ -238,7 +231,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   // ok
   BoxMemberExpression = this.RULE('BoxMemberExpression', () => {
     this.CONSUME(t.OpenBracketToken);
-    const expr = this.SUBRULE(this.Expression_In);
+    const expr = this.SUBRULE(this.Expression_In)[0];
     this.CONSUME(t.CloseBracketToken);
 
     return expr;
@@ -371,7 +364,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         IGNORE_AMBIGUITIES: true,
         ALT: () => ({
-          type: 'ExponentiationExpression',
+          type: 'BinaryExpression',
           left: this.SUBRULE1(this.UpdateExpression),
           operator: this.CONSUME(t.AsteriskAsteriskToken).image,
           right: this.SUBRULE2(this.ExponentiationExpression),
@@ -391,7 +384,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'AssociativityExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.ExponentiationExpression),
@@ -414,7 +407,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'MultiplicativeExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.AssociativityExpression),
@@ -432,7 +425,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.TildeToken).image;
 
       result = {
-        type: 'ConcatExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.MultiplicativeExpression),
@@ -453,7 +446,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'AdditiveExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.ConcatExpression),
@@ -470,7 +463,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.DotDotToken).image;
 
       result = {
-        type: 'RangeExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.AdditiveExpression),
@@ -500,7 +493,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'RelationalExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.RangeExpression),
@@ -529,7 +522,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'RelationalExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.UnaryExpression),
@@ -550,7 +543,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'EqualityExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.RelationalExpression),
@@ -571,7 +564,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       ]);
 
       result = {
-        type: 'EqualityExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.RelationalExpression_In),
@@ -589,7 +582,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseAndToken).image;
 
       result = {
-        type: 'BitwiseANDExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.EqualityExpression),
@@ -606,7 +599,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseAndToken).image;
 
       result = {
-        type: 'BitwiseANDExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.EqualityExpression_In),
@@ -624,7 +617,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseXorToken).image;
 
       result = {
-        type: 'BitwiseXORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseANDExpression),
@@ -641,7 +634,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseXorToken).image;
 
       result = {
-        type: 'BitwiseXORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseANDExpression_In),
@@ -659,7 +652,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseOrToken).image;
 
       result = {
-        type: 'BitwiseORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseXORExpression),
@@ -676,7 +669,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.BitwiseOrToken).image;
 
       result = {
-        type: 'BitwiseORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseXORExpression_In),
@@ -694,7 +687,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.AndToken).image;
 
       result = {
-        type: 'LogicalANDExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseORExpression),
@@ -711,7 +704,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.AndToken).image;
 
       result = {
-        type: 'LogicalANDExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.BitwiseORExpression_In),
@@ -729,7 +722,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.OrToken).image;
 
       result = {
-        type: 'LogicalORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.LogicalANDExpression),
@@ -746,7 +739,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       const operator = this.CONSUME(t.OrToken).image;
 
       result = {
-        type: 'LogicalORExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
         right: this.SUBRULE2(this.LogicalANDExpression_In),
@@ -856,7 +849,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   // Ok
   AssignmentExpression = this.RULE('AssignmentExpression', () =>
     this.OR([
-      { ALT: () => this.SUBRULE(this.UnaryExpression) },
+      { ALT: () => this.SUBRULE(this.ConditionalExpression) },
       { IGNORE_AMBIGUITIES: true, ALT: () => this.SUBRULE(this.ArrowFunction) },
       {
         IGNORE_AMBIGUITIES: true,
@@ -872,11 +865,6 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   AssignmentExpression_In = this.RULE('AssignmentExpression_In', () =>
     this.OR([
-      { ALT: () => this.SUBRULE(this.UnaryExpression) },
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => this.SUBRULE(this.ArrowFunction_In),
-      },
       {
         IGNORE_AMBIGUITIES: true,
         ALT: () => ({
@@ -885,6 +873,14 @@ export default class TwigParser extends EmbeddedActionsParser {
           operator: this.CONSUME(t.EqualsToken).image,
           right: this.SUBRULE(this.AssignmentExpression_In),
         }),
+      },
+      {
+        IGNORE_AMBIGUITIES: true,
+        ALT: () => this.SUBRULE(this.ConditionalExpression_In),
+      },
+      {
+        IGNORE_AMBIGUITIES: true,
+        ALT: () => this.SUBRULE(this.ArrowFunction_In),
       },
     ])
   );
@@ -915,33 +911,29 @@ export default class TwigParser extends EmbeddedActionsParser {
     return arr;
   });
 
-  // FilterExpression = this.RULE('FilterExpression', () => {
-  //   let expression = this.SUBRULE(this.AssignmentExpression);
+  FilterExpression = this.RULE('FilterExpression', () => {
+    let expression = this.SUBRULE(this.AssignmentExpression);
 
-  //   this.MANY(() => {
-  //     this.CONSUME(t.BarToken);
-  //     const filter = this.SUBRULE(this.Filter);
+    this.MANY(() => {
+      this.CONSUME(t.BarToken);
+      const filter = this.SUBRULE(this.Filter);
 
-  //     expression = {
-  //       type: 'FilterExpression',
-  //       expression,
-  //       filter,
-  //     };
-  //   });
+      expression = {
+        type: 'FilterExpression',
+        expression,
+        filter,
+      };
+    });
 
-  //   return expression;
-  // });
+    return expression;
+  });
 
-  // Filter = this.RULE('Filter', () => {
-  //   return this.OR([
-  //     { ALT: () => this.SUBRULE(this.CallExpression) },
-  //     { ALT: () => this.SUBRULE(this.Identifier) },
-  //   ]);
-  // });
-
-  // Expression = this.RULE('Expression', () => {
-  //   return this.SUBRULE(this.FilterExpression);
-  // });
+  Filter = this.RULE('Filter', () => {
+    return this.OR([
+      { ALT: () => this.SUBRULE(this.CallExpression) },
+      { ALT: () => this.SUBRULE(this.Identifier) },
+    ]);
+  });
 
   // Text = this.RULE('Text', () => {
   //   return {
