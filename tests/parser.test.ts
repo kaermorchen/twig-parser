@@ -348,6 +348,24 @@ test('AssignmentExpression', () => {
     },
     type: 'ConditionalExpression',
   });
+
+  expect(
+    parse(`1 ?: 2`, ModeKind.Statement).AssignmentExpression()
+  ).toStrictEqual({
+    alternate: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    consequent: {
+      type: 'NumericLiteral',
+      value: 1,
+    },
+    test: {
+      type: 'NumericLiteral',
+      value: 1,
+    },
+    type: 'ConditionalExpression',
+  });
 });
 
 test('LeftHandSideExpression', () => {

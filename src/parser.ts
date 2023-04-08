@@ -694,7 +694,10 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
-      const consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      let consequent = result;
+      this.OPTION1(() => {
+        consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      });
       this.CONSUME(t.ColonToken);
       const alternate = this.SUBRULE2(this.AssignmentExpression);
 
@@ -714,7 +717,10 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
-      const consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      let consequent = result;
+      this.OPTION1(() => {
+        consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      });
       this.CONSUME(t.ColonToken);
       const alternate = this.SUBRULE2(this.AssignmentExpression_In);
 
