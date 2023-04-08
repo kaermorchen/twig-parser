@@ -825,3 +825,51 @@ test('ExponentiationExpression', () => {
     type: 'BinaryExpression',
   });
 });
+
+test('CoalesceExpression', () => {
+  expect(
+    parse(`2 ?? 2`, ModeKind.Statement).CoalesceExpression()
+  ).toStrictEqual({
+    left: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    operator: '??',
+    right: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    type: 'BinaryExpression',
+  });
+
+  expect(
+    parse(`a and b ?? c or d`, ModeKind.Statement).CoalesceExpression()
+  ).toStrictEqual({
+    left: {
+      left: {
+        type: 'Identifier',
+        value: 'a',
+      },
+      operator: 'and',
+      right: {
+        type: 'Identifier',
+        value: 'b',
+      },
+      type: 'BinaryExpression',
+    },
+    operator: '??',
+    right: {
+      left: {
+        type: 'Identifier',
+        value: 'c',
+      },
+      operator: 'or',
+      right: {
+        type: 'Identifier',
+        value: 'd',
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'BinaryExpression',
+  });
+});

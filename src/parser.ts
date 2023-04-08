@@ -656,16 +656,16 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   CoalesceExpression = this.RULE('CoalesceExpression', () => {
-    let result = this.SUBRULE(this.BitwiseORExpression);
+    let result = this.SUBRULE(this.LogicalORExpression);
 
     this.MANY(() => {
       const operator = this.CONSUME(t.QuestionQuestionToken).image;
 
       result = {
-        type: 'CoalesceExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
-        right: this.SUBRULE1(this.BitwiseORExpression),
+        right: this.SUBRULE1(this.LogicalORExpression),
       };
     });
 
@@ -673,44 +673,24 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   CoalesceExpression_In = this.RULE('CoalesceExpression_In', () => {
-    let result = this.SUBRULE(this.BitwiseORExpression_In);
+    let result = this.SUBRULE(this.LogicalORExpression_In);
 
     this.MANY(() => {
       const operator = this.CONSUME(t.QuestionQuestionToken).image;
 
       result = {
-        type: 'CoalesceExpression',
+        type: 'BinaryExpression',
         left: result,
         operator,
-        right: this.SUBRULE1(this.BitwiseORExpression_In),
+        right: this.SUBRULE1(this.LogicalORExpression_In),
       };
     });
 
     return result;
   });
 
-  ShortCircuitExpression = this.RULE('ShortCircuitExpression', () =>
-    this.OR([
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => this.SUBRULE(this.LogicalORExpression),
-      },
-      { ALT: () => this.SUBRULE(this.CoalesceExpression) },
-    ])
-  );
-
-  ShortCircuitExpression_In = this.RULE('ShortCircuitExpression_In', () =>
-    this.OR([
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => this.SUBRULE(this.LogicalORExpression_In),
-      },
-      { ALT: () => this.SUBRULE(this.CoalesceExpression_In) },
-    ])
-  );
-
   ConditionalExpression = this.RULE('ConditionalExpression', () => {
-    let result = this.SUBRULE(this.ShortCircuitExpression);
+    let result = this.SUBRULE(this.CoalesceExpression);
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
@@ -730,7 +710,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ConditionalExpression_In = this.RULE('ConditionalExpression_In', () => {
-    let result = this.SUBRULE(this.ShortCircuitExpression_In);
+    let result = this.SUBRULE(this.CoalesceExpression_In);
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
