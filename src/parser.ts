@@ -1040,7 +1040,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         test: this.SUBRULE2(this.Expression),
         consequent: [],
         alternate: null,
-      }
+      };
 
       this.CONSUME2(t.RBlockToken);
 
@@ -1077,7 +1077,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       result.strategy = this.OR([
         { ALT: () => this.SUBRULE(this.StringLiteral) },
         { ALT: () => this.SUBRULE(this.BooleanLiteral) },
-      ])
+      ]);
     });
 
     this.CONSUME5(t.RBlockToken);
@@ -1092,6 +1092,31 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  CacheStatement = this.RULE('CacheStatement', () => {
+    const result = {
+      type: 'CacheStatement',
+      key: null,
+      expiration: null,
+      value: [],
+    };
+
+    this.CONSUME(t.CacheToken);
+    result.key = this.SUBRULE(this.Expression);
+    this.OPTION(() => {
+      result.expiration = this.SUBRULE1(this.Expression);
+    });
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.value.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME1(t.LBlockToken);
+    this.CONSUME2(t.EndCacheToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1102,6 +1127,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.ForInStatement) },
         { ALT: () => this.SUBRULE(this.IfStatement) },
         { ALT: () => this.SUBRULE(this.AutoescapeStatement) },
+        { ALT: () => this.SUBRULE(this.CacheStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

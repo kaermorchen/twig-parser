@@ -1170,3 +1170,58 @@ test('AutoescapeStatement', () => {
     ],
   });
 });
+
+test('CacheStatement', () => {
+  expect(
+    parse(`{% cache "cache key" %}Cached forever{% endcache %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    expiration: null,
+    key: {
+      type: 'StringLiteral',
+      value: 'cache key',
+    },
+    type: 'CacheStatement',
+    value: [
+      {
+        type: 'Text',
+        value: 'Cached forever',
+      },
+    ],
+  });
+
+  expect(
+    parse(
+      `{% cache "cache key" ttl(300) %}Cached for 300 seconds{% endcache %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expiration: {
+      object: {
+        type: 'Identifier',
+        value: 'ttl',
+      },
+      property: [
+        {
+          type: 'NumericLiteral',
+          value: 300,
+        },
+      ],
+      type: 'LeftHandSideExpression',
+    },
+    key: {
+      type: 'StringLiteral',
+      value: 'cache key',
+    },
+    type: 'CacheStatement',
+    value: [
+      {
+        type: 'Text',
+        value: 'Cached for 300 seconds',
+      },
+    ],
+  });
+});
+
+// test('Boilerplate', () => {
+//   expect(parse(``).Template().body[0]).toStrictEqual();
+// });

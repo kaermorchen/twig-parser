@@ -472,6 +472,14 @@ export const EndAutoescapeToken = createToken(
   [ModeKind.Statement]
 );
 
+export const CacheToken = createToken({ name: 'CacheToken', pattern: /cache/ }, [
+  ModeKind.Statement,
+]);
+export const EndCacheToken = createToken(
+  { name: 'EndCacheToken', pattern: /endcache/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {
