@@ -1029,7 +1029,6 @@ export default class TwigParser extends EmbeddedActionsParser {
       this.CONSUME2(t.LBlockToken);
       this.CONSUME2(t.ElseIfToken);
 
-
       elseIfStatement = elseIfStatement.alternate = {
         type: 'IfStatement',
         test: this.SUBRULE2(this.Expression),

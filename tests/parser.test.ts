@@ -479,6 +479,10 @@ test('Template', () => {
         value: 'Lorem Ipsum',
       },
       {
+        type: 'Text',
+        value: ' ',
+      },
+      {
         type: 'VariableStatement',
         value: {
           type: 'StringLiteral',
@@ -487,7 +491,7 @@ test('Template', () => {
       },
       {
         type: 'Text',
-        value: `<div></div>`,
+        value: ` <div></div>`,
       },
     ],
   });
@@ -1036,7 +1040,7 @@ test('IfStatement', () => {
             },
             {
               type: 'Text',
-              value: 'left!',
+              value: ' left!',
             },
           ],
           test: {

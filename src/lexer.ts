@@ -41,7 +41,7 @@ function createToken(
 
 export const WhiteSpaceToken = createToken(
   { name: 'WhiteSpaceToken', pattern: /\s+/, group: Lexer.SKIPPED },
-  [ModeKind.Statement, ModeKind.Template, ModeKind.Comment]
+  [ModeKind.Statement, ModeKind.Comment]
 );
 
 export const NumberToken = createToken(
@@ -496,9 +496,14 @@ export const TextToken = createToken(
       const allText = text.substring(startOffset);
       const execResult = startBlockPattern.exec(allText);
 
-      return execResult === null
+
+      const result = execResult === null
         ? [allText]
         : [allText.substring(0, execResult.index)];
+
+      console.log(allText, result);
+
+      return result;
     },
   },
   [ModeKind.Template]
