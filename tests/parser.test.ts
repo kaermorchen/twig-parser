@@ -695,6 +695,7 @@ test('ForInStatement', () => {
     body: [
       {
         type: 'ForInStatement',
+        alternate: null,
         variables: [
           {
             type: 'Identifier',
@@ -714,6 +715,42 @@ test('ForInStatement', () => {
             },
           },
         ],
+      },
+    ],
+  });
+
+  expect(
+    parse(
+      `{% for user in users %}{{ user }}{% else %}<em>no user found</em>{% endfor %}`
+    ).Template()
+  ).toStrictEqual({
+    type: 'Template',
+    body: [
+      {
+        type: 'ForInStatement',
+        variables: [
+          {
+            type: 'Identifier',
+            value: 'user',
+          },
+        ],
+        expression: {
+          type: 'Identifier',
+          value: 'users',
+        },
+        body: [
+          {
+            type: 'VariableStatement',
+            value: {
+              type: 'Identifier',
+              value: 'user',
+            },
+          },
+        ],
+        alternate: {
+          type: 'Text',
+          value: '<em>no user found</em>',
+        },
       },
     ],
   });

@@ -972,20 +972,28 @@ export default class TwigParser extends EmbeddedActionsParser {
     const expression = this.SUBRULE(this.Expression);
     this.CONSUME(t.RBlockToken);
 
-    let body = [];
+    let body = [], alternate = null;
 
     this.MANY(() => {
       body.push(this.SUBRULE(this.SourceElement));
     });
 
-    this.CONSUME1(t.LBlockToken);
-    this.CONSUME1(t.EndForToken);
+    this.OPTION(() => {
+      this.CONSUME1(t.LBlockToken);
+      this.CONSUME(t.ElseToken);
+      this.CONSUME1(t.RBlockToken);
+      alternate = this.SUBRULE2(this.SourceElement);
+    });
+
+    this.CONSUME2(t.LBlockToken);
+    this.CONSUME2(t.EndForToken);
 
     return {
       type: 'ForInStatement',
       body,
       variables,
       expression,
+      alternate,
     };
   });
 
