@@ -898,3 +898,196 @@ test('CoalesceExpression', () => {
     type: 'BinaryExpression',
   });
 });
+
+test('IfStatement', () => {
+  expect(
+    parse(
+      `{% if online == false %}<p>Our website is in maintenance mode. Please, come back later.</p>{% endif %}`
+    ).Template()
+  ).toStrictEqual({
+    body: [
+      {
+        alternate: null,
+        consequent: [
+          {
+            type: 'Text',
+            value:
+              '<p>Our website is in maintenance mode. Please, come back later.</p>',
+          },
+        ],
+        test: {
+          left: {
+            type: 'Identifier',
+            value: 'online',
+          },
+          operator: '==',
+          right: {
+            type: 'BooleanLiteral',
+            value: false,
+          },
+          type: 'BinaryExpression',
+        },
+        type: 'IfStatement',
+      },
+    ],
+    type: 'Template',
+  });
+
+  expect(
+    parse(`{% if not user.subscribed %}{% endif %}`).Template()
+  ).toStrictEqual({
+    body: [
+      {
+        alternate: null,
+        consequent: [],
+        test: {
+          argument: {
+            object: {
+              type: 'Identifier',
+              value: 'user',
+            },
+            property: {
+              type: 'Identifier',
+              value: 'subscribed',
+            },
+            type: 'LeftHandSideExpression',
+          },
+          operator: 'not',
+          type: 'UnaryExpression',
+        },
+        type: 'IfStatement',
+      },
+    ],
+    type: 'Template',
+  });
+
+  expect(
+    parse(
+      `{% if product.stock > 10 %}Available{% else %}Sold-out!{% endif %}`
+    ).Template()
+  ).toStrictEqual({
+    body: [
+      {
+        alternate: {
+          type: 'Text',
+          value: 'Sold-out!',
+        },
+        consequent: [
+          {
+            type: 'Text',
+            value: 'Available',
+          },
+        ],
+        test: {
+          left: {
+            object: {
+              type: 'Identifier',
+              value: 'product',
+            },
+            property: {
+              type: 'Identifier',
+              value: 'stock',
+            },
+            type: 'LeftHandSideExpression',
+          },
+          operator: '>',
+          type: 'BinaryExpression',
+          right: {
+            type: 'NumericLiteral',
+            value: 10,
+          },
+        },
+        type: 'IfStatement',
+      },
+    ],
+    type: 'Template',
+  });
+
+  expect(
+    parse(
+      `{% if product.stock > 10 %}Available{% elseif product.stock > 0 %}Only {{ product.stock }} left!{% else %}Sold-out!{% endif %}`
+    ).Template()
+  ).toStrictEqual({
+    body: [
+      {
+        alternate: {
+          alternate: {
+            type: 'Text',
+            value: 'Sold-out!',
+          },
+          consequent: [
+            {
+              type: 'Text',
+              value: 'Only ',
+            },
+            {
+              type: 'VariableStatement',
+              value: {
+                object: {
+                  type: 'Identifier',
+                  value: 'product',
+                },
+                property: {
+                  type: 'Identifier',
+                  value: 'stock',
+                },
+                type: 'LeftHandSideExpression',
+              },
+            },
+            {
+              type: 'Text',
+              value: 'left!',
+            },
+          ],
+          test: {
+            left: {
+              object: {
+                type: 'Identifier',
+                value: 'product',
+              },
+              property: {
+                type: 'Identifier',
+                value: 'stock',
+              },
+              type: 'LeftHandSideExpression',
+            },
+            operator: '>',
+            type: 'BinaryExpression',
+            right: {
+              type: 'NumericLiteral',
+              value: 0,
+            },
+          },
+          type: 'IfStatement',
+        },
+        consequent: [
+          {
+            type: 'Text',
+            value: 'Available',
+          },
+        ],
+        test: {
+          left: {
+            object: {
+              type: 'Identifier',
+              value: 'product',
+            },
+            property: {
+              type: 'Identifier',
+              value: 'stock',
+            },
+            type: 'LeftHandSideExpression',
+          },
+          operator: '>',
+          type: 'BinaryExpression',
+          right: {
+            type: 'NumericLiteral',
+            value: 10,
+          },
+        },
+        type: 'IfStatement',
+      },
+    ],
+    type: 'Template',
+  });
+});

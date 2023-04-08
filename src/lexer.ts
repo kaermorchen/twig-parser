@@ -444,13 +444,25 @@ export const EndApplyToken = createToken(
 export const ForToken = createToken({ name: 'ForToken', pattern: /for/ }, [
   ModeKind.Statement,
 ]);
-export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
-  ModeKind.Statement,
-]);
 export const EndForToken = createToken(
   { name: 'EndForToken', pattern: /endfor/ },
   [ModeKind.Statement]
 );
+
+export const IfToken = createToken({ name: 'IfToken', pattern: /if/ }, [
+  ModeKind.Statement,
+]);
+export const EndIfToken = createToken(
+  { name: 'EndIfToken', pattern: /endif/ },
+  [ModeKind.Statement]
+);
+
+export const ElseIfToken = createToken({ name: 'ElseIfToken', pattern: /elseif/ }, [
+  ModeKind.Statement,
+]);
+export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
+  ModeKind.Statement,
+]);
 
 export const IdentifierToken = createToken(
   {

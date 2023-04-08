@@ -972,7 +972,8 @@ export default class TwigParser extends EmbeddedActionsParser {
     const expression = this.SUBRULE(this.Expression);
     this.CONSUME(t.RBlockToken);
 
-    let body = [], alternate = null;
+    let body = [],
+      alternate = null;
 
     this.MANY(() => {
       body.push(this.SUBRULE(this.SourceElement));
@@ -997,6 +998,67 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  IfStatement = this.RULE('IfStatement', () => {
+    let result = {
+      type: 'IfStatement',
+      test: null,
+      consequent: [],
+      alternate: null,
+    };
+
+    this.CONSUME(t.IfToken);
+    result.test = this.SUBRULE(this.Expression);
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.consequent.push(this.SUBRULE(this.SourceElement));
+    });
+
+    // else
+    this.OPTION1(() => {
+      this.CONSUME1(t.LBlockToken);
+      this.CONSUME1(t.ElseToken);
+      this.CONSUME1(t.RBlockToken);
+
+      result.alternate = this.SUBRULE1(this.SourceElement);
+    });
+
+    // elseif
+    let elseIfStatement = result;
+    this.MANY2(() => {
+      this.CONSUME2(t.LBlockToken);
+      this.CONSUME2(t.ElseIfToken);
+
+
+      elseIfStatement = elseIfStatement.alternate = {
+        type: 'IfStatement',
+        test: this.SUBRULE2(this.Expression),
+        consequent: [],
+        alternate: null,
+      }
+
+      this.CONSUME2(t.RBlockToken);
+
+      this.MANY3(() => {
+        elseIfStatement.consequent.push(this.SUBRULE3(this.SourceElement));
+      });
+    });
+
+    // else
+    this.OPTION4(() => {
+      this.CONSUME4(t.LBlockToken);
+      this.CONSUME4(t.ElseToken);
+      this.CONSUME4(t.RBlockToken);
+
+      elseIfStatement.alternate = this.SUBRULE4(this.SourceElement);
+    });
+
+    this.CONSUME5(t.LBlockToken);
+    this.CONSUME5(t.EndIfToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1005,6 +1067,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.SetBlockStatement) },
         { ALT: () => this.SUBRULE(this.ApplyStatement) },
         { ALT: () => this.SUBRULE(this.ForInStatement) },
+        { ALT: () => this.SUBRULE(this.IfStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);
