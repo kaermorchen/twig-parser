@@ -274,20 +274,20 @@ export default class TwigParser extends EmbeddedActionsParser {
     ])
   );
 
-  ExponentiationExpression = this.RULE('ExponentiationExpression', () =>
-    this.OR([
-      { ALT: () => this.SUBRULE(this.UnaryExpression) },
-      {
-        IGNORE_AMBIGUITIES: true,
-        ALT: () => ({
-          type: 'BinaryExpression',
-          left: this.SUBRULE1(this.UpdateExpression),
-          operator: this.CONSUME(t.AsteriskAsteriskToken).image,
-          right: this.SUBRULE2(this.ExponentiationExpression),
-        }),
-      },
-    ])
-  );
+  ExponentiationExpression = this.RULE('ExponentiationExpression', () => {
+    let left = this.SUBRULE(this.UnaryExpression);
+
+    this.MANY(() => {
+      left = {
+        type: 'BinaryExpression',
+        left,
+        operator: this.CONSUME(t.AsteriskAsteriskToken).image,
+        right: this.SUBRULE1(this.UnaryExpression),
+      };
+    });
+
+    return left;
+  });
 
   AssociativityExpression = this.RULE('AssociativityExpression', () => {
     let result = this.SUBRULE(this.ExponentiationExpression);

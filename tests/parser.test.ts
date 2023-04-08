@@ -785,3 +785,43 @@ test('ArrowFunction', () => {
     type: 'ArrowFunction',
   });
 });
+
+test('ExponentiationExpression', () => {
+  expect(
+    parse(`2 ** 2`, ModeKind.Statement).ExponentiationExpression()
+  ).toStrictEqual({
+    left: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    operator: '**',
+    right: {
+      type: 'NumericLiteral',
+      value: 2,
+    },
+    type: 'BinaryExpression',
+  });
+
+  expect(
+    parse(`2 ** 2 ** PI`, ModeKind.Statement).ExponentiationExpression()
+  ).toStrictEqual({
+    left: {
+      left: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      operator: '**',
+      right: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      type: 'BinaryExpression',
+    },
+    operator: '**',
+    right: {
+      type: 'Identifier',
+      value: 'PI',
+    },
+    type: 'BinaryExpression',
+  });
+});
