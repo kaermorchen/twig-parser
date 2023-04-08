@@ -496,14 +496,9 @@ export const TextToken = createToken(
       const allText = text.substring(startOffset);
       const execResult = startBlockPattern.exec(allText);
 
-
-      const result = execResult === null
+      return execResult === null
         ? [allText]
         : [allText.substring(0, execResult.index)];
-
-      console.log(allText, result);
-
-      return result;
     },
   },
   [ModeKind.Template]
