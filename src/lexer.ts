@@ -464,6 +464,15 @@ export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
   ModeKind.Statement,
 ]);
 
+export const AutoescapeToken = createToken({ name: 'AutoescapeToken', pattern: /autoescape/ }, [
+  ModeKind.Statement,
+]);
+export const EndAutoescapeToken = createToken(
+  { name: 'EndAutoescapeToken', pattern: /endautoescape/ },
+  [ModeKind.Statement]
+);
+
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

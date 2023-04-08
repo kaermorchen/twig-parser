@@ -1113,3 +1113,60 @@ test('IfStatement', () => {
     type: 'Template',
   });
 });
+
+test('AutoescapeStatement', () => {
+  expect(
+    parse(`{% autoescape %}{% endautoescape %}`).Template().body[0]
+  ).toStrictEqual({
+    strategy: null,
+    type: 'AutoescapeStatement',
+    value: [],
+  });
+
+  expect(
+    parse(`{% autoescape %}Everything{% endautoescape %}`).Template().body[0]
+  ).toStrictEqual({
+    strategy: null,
+    type: 'AutoescapeStatement',
+    value: [
+      {
+        type: 'Text',
+        value: 'Everything',
+      },
+    ],
+  });
+
+  expect(
+    parse(`{% autoescape 'html' %}Everything{% endautoescape %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    strategy: {
+      type: 'StringLiteral',
+      value: 'html',
+    },
+    type: 'AutoescapeStatement',
+    value: [
+      {
+        type: 'Text',
+        value: 'Everything',
+      },
+    ],
+  });
+
+  expect(
+    parse(`{% autoescape false %}Everything{% endautoescape %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    strategy: {
+      type: 'BooleanLiteral',
+      value: false,
+    },
+    type: 'AutoescapeStatement',
+    value: [
+      {
+        type: 'Text',
+        value: 'Everything',
+      },
+    ],
+  });
+});

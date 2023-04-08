@@ -1064,6 +1064,34 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  AutoescapeStatement = this.RULE('AutoescapeStatement', () => {
+    const result = {
+      type: 'AutoescapeStatement',
+      value: [],
+      strategy: null,
+    };
+
+    this.CONSUME(t.AutoescapeToken);
+
+    this.OPTION(() => {
+      result.strategy = this.OR([
+        { ALT: () => this.SUBRULE(this.StringLiteral) },
+        { ALT: () => this.SUBRULE(this.BooleanLiteral) },
+      ])
+    });
+
+    this.CONSUME5(t.RBlockToken);
+
+    this.MANY(() => {
+      result.value.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME5(t.LBlockToken);
+    this.CONSUME5(t.EndAutoescapeToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1073,6 +1101,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.ApplyStatement) },
         { ALT: () => this.SUBRULE(this.ForInStatement) },
         { ALT: () => this.SUBRULE(this.IfStatement) },
+        { ALT: () => this.SUBRULE(this.AutoescapeStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);
