@@ -472,6 +472,14 @@ export const EndAutoescapeToken = createToken(
   [ModeKind.Statement]
 );
 
+export const DeprecatedToken = createToken({ name: 'DeprecatedToken', pattern: /deprecated/ }, [
+  ModeKind.Statement,
+]);
+export const EndDeprecatedToken = createToken(
+  { name: 'EndDeprecatedToken', pattern: /enddeprecated/ },
+  [ModeKind.Statement]
+);
+
 export const CacheToken = createToken({ name: 'CacheToken', pattern: /cache/ }, [
   ModeKind.Statement,
 ]);

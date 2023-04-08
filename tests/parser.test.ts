@@ -1222,6 +1222,21 @@ test('CacheStatement', () => {
   });
 });
 
+test('DeprecatedStatement', () => {
+  expect(
+    parse(
+      `{% deprecated 'The "base.twig" template is deprecated, use "layout.twig" instead.' %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value:
+        'The "base.twig" template is deprecated, use "layout.twig" instead.',
+    },
+    type: 'DeprecatedStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });

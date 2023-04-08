@@ -1117,6 +1117,18 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  DeprecatedStatement = this.RULE('DeprecatedStatement', () => {
+    const result = {
+      type: 'DeprecatedStatement',
+      expr: null,
+    };
+
+    this.CONSUME(t.DeprecatedToken);
+    result.expr = this.SUBRULE(this.Expression);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1128,6 +1140,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.IfStatement) },
         { ALT: () => this.SUBRULE(this.AutoescapeStatement) },
         { ALT: () => this.SUBRULE(this.CacheStatement) },
+        { ALT: () => this.SUBRULE(this.DeprecatedStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);
