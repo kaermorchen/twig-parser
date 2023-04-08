@@ -689,43 +689,31 @@ test('ApplyStatement', () => {
 
 test('ForInStatement', () => {
   expect(
-    parse(
-      `{% for user in users %}<li>{{user.name}}</li>{% endfor %}`
-    ).ForInStatement()
+    parse(`{% for i in arr %}{{ i }}{% endfor %}`).Template()
   ).toStrictEqual({
+    type: 'Template',
     body: [
       {
-        type: 'Text',
-        value: '<li>',
-      },
-      {
-        type: 'VariableStatement',
-        value: {
-          object: {
+        type: 'ForInStatement',
+        variables: [
+          {
             type: 'Identifier',
-            value: 'user',
+            value: 'i',
           },
-          property: {
-            type: 'Identifier',
-            value: 'name',
-          },
-          type: 'LeftHandSideExpression',
+        ],
+        expression: {
+          type: 'Identifier',
+          value: 'arr',
         },
-      },
-      {
-        type: 'Text',
-        value: '</li>',
-      },
-    ],
-    expression: {
-      type: 'Identifier',
-      value: 'users',
-    },
-    type: 'ForInStatement',
-    variables: [
-      {
-        type: 'Identifier',
-        value: 'user',
+        body: [
+          {
+            type: 'VariableStatement',
+            value: {
+              type: 'Identifier',
+              value: 'i',
+            },
+          },
+        ],
       },
     ],
   });
