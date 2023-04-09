@@ -1237,6 +1237,24 @@ test('DeprecatedStatement', () => {
   });
 });
 
+test('DoStatement', () => {
+  expect(parse(`{% do 1 + 2 %}`).Template().body[0]).toStrictEqual({
+    expr: {
+      left: {
+        type: 'NumericLiteral',
+        value: 1,
+      },
+      operator: '+',
+      right: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'DoStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });

@@ -1129,6 +1129,15 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  DoStatement = this.RULE('DoStatement', () => {
+    this.CONSUME(t.DoToken);
+
+    return {
+      type: 'DoStatement',
+      expr: this.SUBRULE(this.Expression),
+    };
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1141,6 +1150,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.AutoescapeStatement) },
         { ALT: () => this.SUBRULE(this.CacheStatement) },
         { ALT: () => this.SUBRULE(this.DeprecatedStatement) },
+        { ALT: () => this.SUBRULE(this.DoStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

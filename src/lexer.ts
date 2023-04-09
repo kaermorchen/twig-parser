@@ -488,6 +488,11 @@ export const EndCacheToken = createToken(
   [ModeKind.Statement]
 );
 
+export const DoToken = createToken(
+  { name: 'DoToken', pattern: /do/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {
