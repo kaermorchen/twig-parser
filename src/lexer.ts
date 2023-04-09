@@ -493,6 +493,10 @@ export const DoToken = createToken(
   [ModeKind.Statement]
 );
 
+export const FlushToken = createToken(
+  { name: 'FlushToken', pattern: /flush/ },
+  [ModeKind.Statement]
+);
 
 export const IdentifierToken = createToken(
   {

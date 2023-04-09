@@ -1138,6 +1138,12 @@ export default class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  FlushStatement = this.RULE('FlushStatement', () => {
+    this.CONSUME(t.FlushToken);
+
+    return { type: 'FlushStatement' };
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1151,6 +1157,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.CacheStatement) },
         { ALT: () => this.SUBRULE(this.DeprecatedStatement) },
         { ALT: () => this.SUBRULE(this.DoStatement) },
+        { ALT: () => this.SUBRULE(this.FlushStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

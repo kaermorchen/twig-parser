@@ -1255,6 +1255,10 @@ test('DoStatement', () => {
   });
 });
 
+test('FlushStatement', () => {
+  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({ type: 'FlushStatement' });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
