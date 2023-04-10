@@ -1256,7 +1256,30 @@ test('DoStatement', () => {
 });
 
 test('FlushStatement', () => {
-  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({ type: 'FlushStatement' });
+  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({
+    type: 'FlushStatement',
+  });
+});
+
+test('InterpolationString', () => {
+  expect(
+    parse(`{{ "Interpolation #" }}`).Template().body[0]
+  ).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      children: [
+        {
+          type: 'StringLiteral',
+          value: 'Interpolation ',
+        },
+        {
+          type: 'NumericLiteral',
+          value: 42,
+        },
+      ],
+      type: 'InterpolationString',
+    },
+  });
 });
 
 // test('Boilerplate', () => {

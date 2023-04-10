@@ -11,6 +11,7 @@ export enum ModeKind {
   Template = 'Template',
   Statement = 'Statement',
   Comment = 'Comment',
+  InterpolationString = 'InterpolationString',
 }
 
 export const tokens: Record<string, TokenType> = {};
@@ -20,6 +21,7 @@ const lexerDefinition: IMultiModeLexerDefinition = {
     [ModeKind.Template]: [],
     [ModeKind.Statement]: [],
     [ModeKind.Comment]: [],
+    [ModeKind.InterpolationString]: [],
   },
   defaultMode: ModeKind.Template,
 };
@@ -424,6 +426,32 @@ export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
   ModeKind.Statement,
 ]);
 
+export const DoubleQuoteToken = createToken(
+  {
+    name: 'DoubleQuoteToken',
+    pattern: /"/,
+    push_mode: 'InterpolationString'
+  },
+  [ModeKind.Statement]
+);
+
+export const DoubleQuoteAtEndInterpolationToken = createToken(
+  {
+    name: 'DoubleQuoteAtEndInterpolationToken',
+    pattern: /"/,
+    pop_mode: true
+  },
+  [ModeKind.InterpolationString]
+);
+
+export const HashToken = createToken(
+  {
+    name: 'HashToken',
+    pattern: /#/,
+  },
+  [ModeKind.Statement]
+);
+
 export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
   ModeKind.Statement,
 ]);
@@ -457,45 +485,56 @@ export const EndIfToken = createToken(
   [ModeKind.Statement]
 );
 
-export const ElseIfToken = createToken({ name: 'ElseIfToken', pattern: /elseif/ }, [
-  ModeKind.Statement,
-]);
+export const ElseIfToken = createToken(
+  { name: 'ElseIfToken', pattern: /elseif/ },
+  [ModeKind.Statement]
+);
 export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
   ModeKind.Statement,
 ]);
 
-export const AutoescapeToken = createToken({ name: 'AutoescapeToken', pattern: /autoescape/ }, [
-  ModeKind.Statement,
-]);
+export const AutoescapeToken = createToken(
+  { name: 'AutoescapeToken', pattern: /autoescape/ },
+  [ModeKind.Statement]
+);
 export const EndAutoescapeToken = createToken(
   { name: 'EndAutoescapeToken', pattern: /endautoescape/ },
   [ModeKind.Statement]
 );
 
-export const DeprecatedToken = createToken({ name: 'DeprecatedToken', pattern: /deprecated/ }, [
-  ModeKind.Statement,
-]);
+export const DeprecatedToken = createToken(
+  { name: 'DeprecatedToken', pattern: /deprecated/ },
+  [ModeKind.Statement]
+);
 export const EndDeprecatedToken = createToken(
   { name: 'EndDeprecatedToken', pattern: /enddeprecated/ },
   [ModeKind.Statement]
 );
 
-export const CacheToken = createToken({ name: 'CacheToken', pattern: /cache/ }, [
-  ModeKind.Statement,
-]);
+export const CacheToken = createToken(
+  { name: 'CacheToken', pattern: /cache/ },
+  [ModeKind.Statement]
+);
 export const EndCacheToken = createToken(
   { name: 'EndCacheToken', pattern: /endcache/ },
   [ModeKind.Statement]
 );
 
-export const DoToken = createToken(
-  { name: 'DoToken', pattern: /do/ },
-  [ModeKind.Statement]
-);
+export const DoToken = createToken({ name: 'DoToken', pattern: /do/ }, [
+  ModeKind.Statement,
+]);
 
 export const FlushToken = createToken(
   { name: 'FlushToken', pattern: /flush/ },
   [ModeKind.Statement]
+);
+
+export const DoubleQuoteStringPart = createToken(
+  {
+    name: 'DoubleQuoteStringPart',
+    pattern: /[^#"\\]+(?:(?:\\.|#(?!\{))[^#"\\]*)*/,
+  },
+  [ModeKind.InterpolationString]
 );
 
 export const IdentifierToken = createToken(
@@ -505,6 +544,8 @@ export const IdentifierToken = createToken(
   },
   [ModeKind.Statement]
 );
+
+
 
 // export const RawText = createToken({
 //   name: 'RawText',

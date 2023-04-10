@@ -41,12 +41,51 @@ export default class TwigParser extends EmbeddedActionsParser {
     value: this.CONSUME(t.NullToken) ? null : undefined,
   }));
 
+  InterpolationStringPart = this.RULE('InterpolationStringPart', () => {
+    return {
+      type: 'StringLiteral',
+      value: this.CONSUME(t.DoubleQuoteStringPart).image,
+    };
+  });
+
+  InterpolationString = this.RULE('InterpolationString', () => {
+    const children = [];
+
+    this.CONSUME(t.DoubleQuoteToken);
+    this.CONSUME(t.DoubleQuoteStringPart);
+    // this.SUBRULE(this.InterpolationStringPart);
+
+    // this.MANY(() => {
+    //   children.push(
+    //     this.OR([
+    //       // { ALT: () => {
+    //       //   this.CONSUME(t.HashToken);
+    //       //   this.CONSUME(t.OpenBraceToken);
+    //       //   const expr = this.SUBRULE(this.Expression);
+    //       //   this.CONSUME(t.CloseBraceToken);
+
+    //       //   return expr;
+    //       // } },
+    //       { ALT: () => this.SUBRULE(this.InterpolationStringPart) },
+    //     ])
+    //   );
+    // });
+
+    this.CONSUME1(t.DoubleQuoteToken);
+
+    return {
+      type: 'InterpolationString',
+      children,
+    };
+  });
+
   PrimaryExpression = this.RULE('PrimaryExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.Identifier) },
       { ALT: () => this.SUBRULE(this.Literal) },
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
+      { ALT: () => this.SUBRULE(this.InterpolationString) },
       { ALT: () => this.SUBRULE(this.ParenthesizedExpression) },
     ])
   );
