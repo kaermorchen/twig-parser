@@ -380,7 +380,7 @@ test('LeftHandSideExpression', () => {
       type: 'Identifier',
       value: 'firstName',
     },
-    type: 'LeftHandSideExpression',
+    type: 'MemberExpression',
   });
 
   expect(
@@ -394,15 +394,15 @@ test('LeftHandSideExpression', () => {
       type: 'StringLiteral',
       value: 'name',
     },
-    type: 'LeftHandSideExpression',
+    type: 'MemberExpression',
   });
 
   expect(
     parse(`user.a.b`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
-    type: 'LeftHandSideExpression',
+    type: 'MemberExpression',
     object: {
-      type: 'LeftHandSideExpression',
+      type: 'MemberExpression',
       object: {
         type: 'Identifier',
         value: 'user',
@@ -972,7 +972,7 @@ test('IfStatement', () => {
               type: 'Identifier',
               value: 'subscribed',
             },
-            type: 'LeftHandSideExpression',
+            type: 'MemberExpression',
           },
           operator: 'not',
           type: 'UnaryExpression',
@@ -1010,7 +1010,7 @@ test('IfStatement', () => {
               type: 'Identifier',
               value: 'stock',
             },
-            type: 'LeftHandSideExpression',
+            type: 'MemberExpression',
           },
           operator: '>',
           type: 'BinaryExpression',
@@ -1053,7 +1053,7 @@ test('IfStatement', () => {
                   type: 'Identifier',
                   value: 'stock',
                 },
-                type: 'LeftHandSideExpression',
+                type: 'MemberExpression',
               },
             },
             {
@@ -1071,7 +1071,7 @@ test('IfStatement', () => {
                 type: 'Identifier',
                 value: 'stock',
               },
-              type: 'LeftHandSideExpression',
+              type: 'MemberExpression',
             },
             operator: '>',
             type: 'BinaryExpression',
@@ -1098,7 +1098,7 @@ test('IfStatement', () => {
               type: 'Identifier',
               value: 'stock',
             },
-            type: 'LeftHandSideExpression',
+            type: 'MemberExpression',
           },
           operator: '>',
           type: 'BinaryExpression',
@@ -1196,17 +1196,17 @@ test('CacheStatement', () => {
     ).Template().body[0]
   ).toStrictEqual({
     expiration: {
-      object: {
+      callee: {
         type: 'Identifier',
         value: 'ttl',
       },
-      property: [
+      arguments: [
         {
           type: 'NumericLiteral',
           value: 300,
         },
       ],
-      type: 'LeftHandSideExpression',
+      type: 'CallExpression',
     },
     key: {
       type: 'StringLiteral',

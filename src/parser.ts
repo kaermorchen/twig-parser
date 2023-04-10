@@ -136,19 +136,35 @@ export default class TwigParser extends EmbeddedActionsParser {
     let object = this.SUBRULE(this.PrimaryExpression);
 
     this.MANY(() => {
-      const property = this.OR([
-        { ALT: () => this.SUBRULE(this.BoxMemberExpression) },
-        { ALT: () => this.SUBRULE(this.DotMemberExpression) },
-        { ALT: () => this.SUBRULE(this.Arguments) },
+      this.OR([
+        {
+          ALT: () => {
+            object = {
+              type: 'MemberExpression',
+              object,
+              property: this.SUBRULE(this.BoxMemberExpression),
+            };
+          },
+        },
+        {
+          ALT: () => {
+            object = {
+              type: 'MemberExpression',
+              object,
+              property: this.SUBRULE(this.DotMemberExpression),
+            };
+          },
+        },
+        {
+          ALT: () => {
+            object = {
+              type: 'CallExpression',
+              callee: object,
+              arguments: this.SUBRULE(this.Arguments),
+            };
+          },
+        },
       ]);
-
-      if (property) {
-        object = {
-          type: 'LeftHandSideExpression',
-          object,
-          property,
-        };
-      }
     });
 
     return object;
