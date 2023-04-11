@@ -1462,14 +1462,26 @@ test('UseStatement', () => {
   });
 });
 
-// test('SandboxStatement', () => {
-//   expect(
-//     parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template().body[0]
-//   ).toStrictEqual({
-//     body: [],
-//     type: 'SandboxStatement',
-//   });
-// });
+test('SandboxStatement', () => {
+  expect(
+    parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        expr: {
+          type: 'StringLiteral',
+          value: 'user.html',
+        },
+        ignoreMissing: false,
+        only: false,
+        type: 'IncludeStatement',
+        variables: null,
+      },
+    ],
+    type: 'SandboxStatement',
+  });
+});
 
 test('IncludeStatement', () => {
   expect(parse(`{% include 'header.html' %}`).Template().body[0]).toStrictEqual(
@@ -1528,7 +1540,9 @@ test('IncludeStatement', () => {
   });
 
   expect(
-    parse(`{% include 'header.html' ignore missing with {'foo': 'bar'} only %}`).Template().body[0]
+    parse(
+      `{% include 'header.html' ignore missing with {'foo': 'bar'} only %}`
+    ).Template().body[0]
   ).toStrictEqual({
     expr: {
       type: 'StringLiteral',
