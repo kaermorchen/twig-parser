@@ -563,6 +563,11 @@ export const EndMacroToken = createToken(
   [ModeKind.Statement]
 );
 
+export const ImportToken = createToken(
+  { name: 'ImportToken', pattern: /\bimport\b/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {

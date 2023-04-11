@@ -1573,8 +1573,7 @@ test('IncludeStatement', () => {
 
 test('MacroStatement', () => {
   expect(
-    parse(`{% macro input() %}{% endmacro %}`).Template()
-      .body[0]
+    parse(`{% macro input() %}{% endmacro %}`).Template().body[0]
   ).toStrictEqual({
     type: 'MacroStatement',
     body: [],
@@ -1617,6 +1616,22 @@ test('MacroStatement', () => {
       type: 'Identifier',
       value: 'input',
     },
+  });
+});
+
+test('ImportStatement', () => {
+  expect(
+    parse(`{% import "forms.html" as forms %}`).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'forms.html',
+    },
+    name: {
+      type: 'Identifier',
+      value: 'forms',
+    },
+    type: 'ImportStatement',
   });
 });
 
