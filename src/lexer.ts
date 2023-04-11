@@ -554,6 +554,15 @@ export const IgnoreMissingToken = createToken(
   [ModeKind.Statement]
 );
 
+export const MacroToken = createToken(
+  { name: 'MacroToken', pattern: /\bmacro\b/ },
+  [ModeKind.Statement]
+);
+export const EndMacroToken = createToken(
+  { name: 'EndMacroToken', pattern: /\bendmacro\b/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {

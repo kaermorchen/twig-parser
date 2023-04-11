@@ -837,13 +837,13 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  // CallExpression = this.RULE('CallExpression', () => {
-  //   return {
-  //     type: 'CallExpression',
-  //     callee: this.SUBRULE(this.Identifier),
-  //     arguments: this.SUBRULE(this.Arguments),
-  //   };
-  // });
+  CallExpression = this.RULE('CallExpression', () => {
+    return {
+      type: 'CallExpression',
+      callee: this.SUBRULE(this.Identifier),
+      arguments: this.SUBRULE(this.Arguments),
+    };
+  });
 
   Expression = this.RULE('Expression', () => {
     return this.SUBRULE(this.FilterExpression);
@@ -1219,8 +1219,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-
-
   ExtendsStatement = this.RULE('ExtendsStatement', () => {
     this.CONSUME(t.ExtendsToken);
 
@@ -1343,6 +1341,34 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  MacroStatement = this.RULE('MacroStatement', () => {
+    const result = {
+      type: 'MacroStatement',
+      name: null,
+      arguments: null,
+      body: [],
+    };
+
+    this.CONSUME(t.MacroToken);
+    result.name = this.SUBRULE(this.Identifier);
+    result.arguments = this.SUBRULE(this.Arguments);
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+
+    this.OPTION(() => {
+      this.SUBRULE1(this.Identifier);
+    });
+
+    this.CONSUME(t.EndMacroToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1364,6 +1390,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.UseStatement) },
         { ALT: () => this.SUBRULE(this.SandboxStatement) },
         { ALT: () => this.SUBRULE(this.IncludeStatement) },
+        { ALT: () => this.SUBRULE(this.MacroStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

@@ -1571,6 +1571,55 @@ test('IncludeStatement', () => {
   });
 });
 
+test('MacroStatement', () => {
+  expect(
+    parse(`{% macro input() %}{% endmacro %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    type: 'MacroStatement',
+    body: [],
+    arguments: [],
+    name: {
+      type: 'Identifier',
+      value: 'input',
+    },
+  });
+
+  expect(
+    parse(`{% macro input(name, age = 42) %}<input/>{% endmacro %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    type: 'MacroStatement',
+    body: [
+      {
+        type: 'Text',
+        value: '<input/>',
+      },
+    ],
+    arguments: [
+      {
+        type: 'Identifier',
+        value: 'name',
+      },
+      {
+        key: {
+          type: 'Identifier',
+          value: 'age',
+        },
+        type: 'NamedArgument',
+        value: {
+          type: 'NumericLiteral',
+          value: 42,
+        },
+      },
+    ],
+    name: {
+      type: 'Identifier',
+      value: 'input',
+    },
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
