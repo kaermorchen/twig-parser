@@ -586,40 +586,46 @@ test('SetBlockStatement', () => {
 });
 
 test('CallExpression', () => {
-  expect(parse(`hello()`, ModeKind.Statement).CallExpression()).toStrictEqual({
-    type: 'CallExpression',
-    callee: {
-      type: 'Identifier',
-      value: 'hello',
+  expect(parse(`{{ hello() }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      arguments: [],
+      callee: {
+        type: 'Identifier',
+        value: 'hello',
+      },
+      type: 'CallExpression',
     },
-    arguments: [],
   });
 
   expect(
-    parse(`hello(42, model="T800")`, ModeKind.Statement).CallExpression()
+    parse(`{{ hello(42, model="T800") }}`).Template().body[0]
   ).toStrictEqual({
-    type: 'CallExpression',
-    callee: {
-      type: 'Identifier',
-      value: 'hello',
+    type: 'VariableStatement',
+    value: {
+      arguments: [
+        {
+          type: 'NumericLiteral',
+          value: 42,
+        },
+        {
+          key: {
+            type: 'Identifier',
+            value: 'model',
+          },
+          type: 'NamedArgument',
+          value: {
+            type: 'StringLiteral',
+            value: 'T800',
+          },
+        },
+      ],
+      callee: {
+        type: 'Identifier',
+        value: 'hello',
+      },
+      type: 'CallExpression',
     },
-    arguments: [
-      {
-        type: 'NumericLiteral',
-        value: 42,
-      },
-      {
-        type: 'NamedArgument',
-        key: {
-          type: 'Identifier',
-          value: 'model',
-        },
-        value: {
-          type: 'StringLiteral',
-          value: 'T800',
-        },
-      },
-    ],
   });
 });
 

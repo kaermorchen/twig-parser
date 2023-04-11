@@ -787,8 +787,6 @@ export default class TwigParser extends EmbeddedActionsParser {
     })
   );
 
-
-
   FilterExpression = this.RULE('FilterExpression', () => {
     let expression = this.SUBRULE(this.AssignmentExpression);
 
@@ -839,13 +837,13 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
-  CallExpression = this.RULE('CallExpression', () => {
-    return {
-      type: 'CallExpression',
-      callee: this.SUBRULE(this.Identifier),
-      arguments: this.SUBRULE(this.Arguments),
-    };
-  });
+  // CallExpression = this.RULE('CallExpression', () => {
+  //   return {
+  //     type: 'CallExpression',
+  //     callee: this.SUBRULE(this.Identifier),
+  //     arguments: this.SUBRULE(this.Arguments),
+  //   };
+  // });
 
   Expression = this.RULE('Expression', () => {
     return this.SUBRULE(this.FilterExpression);
