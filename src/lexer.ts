@@ -461,9 +461,10 @@ export const ElseIfToken = createToken(
   { name: 'ElseIfToken', pattern: /\belseif\b/ },
   [ModeKind.Statement]
 );
-export const ElseToken = createToken({ name: 'ElseToken', pattern: /\belse\b/ }, [
-  ModeKind.Statement,
-]);
+export const ElseToken = createToken(
+  { name: 'ElseToken', pattern: /\belse\b/ },
+  [ModeKind.Statement]
+);
 
 export const AutoescapeToken = createToken(
   { name: 'AutoescapeToken', pattern: /\bautoescape\b/ },
@@ -527,14 +528,12 @@ export const OnlyToken = createToken(
   { name: 'OnlyToken', pattern: /\bonly\b/ },
   [ModeKind.Statement]
 );
-export const UseToken = createToken(
-  { name: 'UseToken', pattern: /\buse\b/ },
-  [ModeKind.Statement]
-);
-export const AsToken = createToken(
-  { name: 'AsToken', pattern: /\bas\b/ },
-  [ModeKind.Statement]
-);
+export const UseToken = createToken({ name: 'UseToken', pattern: /\buse\b/ }, [
+  ModeKind.Statement,
+]);
+export const AsToken = createToken({ name: 'AsToken', pattern: /\bas\b/ }, [
+  ModeKind.Statement,
+]);
 
 export const SandboxToken = createToken(
   { name: 'SandboxToken', pattern: /\bsandbox\b/ },
@@ -581,7 +580,6 @@ export const EndEmbedToken = createToken(
   { name: 'EndEmbedToken', pattern: /\bendembed\b/ },
   [ModeKind.Statement]
 );
-
 
 export const IdentifierToken = createToken(
   {
