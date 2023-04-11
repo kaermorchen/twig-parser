@@ -545,6 +545,16 @@ export const EndSandboxToken = createToken(
   [ModeKind.Statement]
 );
 
+export const IncludeToken = createToken(
+  { name: 'IncludeToken', pattern: /\binclude\b/ },
+  [ModeKind.Statement]
+);
+export const IgnoreMissingToken = createToken(
+  { name: 'IgnoreMissingToken', pattern: /\bignore missing\b/ },
+  [ModeKind.Statement]
+);
+
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

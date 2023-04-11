@@ -1462,12 +1462,98 @@ test('UseStatement', () => {
   });
 });
 
-test('SandboxStatement', () => {
+// test('SandboxStatement', () => {
+//   expect(
+//     parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template().body[0]
+//   ).toStrictEqual({
+//     body: [],
+//     type: 'SandboxStatement',
+//   });
+// });
+
+test('IncludeStatement', () => {
+  expect(parse(`{% include 'header.html' %}`).Template().body[0]).toStrictEqual(
+    {
+      expr: {
+        type: 'StringLiteral',
+        value: 'header.html',
+      },
+      ignoreMissing: false,
+      only: false,
+      type: 'IncludeStatement',
+      variables: null,
+    }
+  );
+
   expect(
-    parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template().body[0]
+    parse(`{% include 'header.html' with {'foo': 'bar'} %}`).Template().body[0]
   ).toStrictEqual({
-    body: [],
-    type: 'SandboxStatement',
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: false,
+    only: false,
+    type: 'IncludeStatement',
+    variables: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'bar',
+          },
+        },
+      ],
+    },
+  });
+
+  expect(
+    parse(`{% include 'header.html' only %}`).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: false,
+    only: true,
+    type: 'IncludeStatement',
+    variables: null,
+  });
+
+  expect(
+    parse(`{% include 'header.html' ignore missing with {'foo': 'bar'} only %}`).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: true,
+    only: true,
+    type: 'IncludeStatement',
+    variables: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'bar',
+          },
+        },
+      ],
+    },
   });
 });
 

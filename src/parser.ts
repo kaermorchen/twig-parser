@@ -1312,6 +1312,37 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  IncludeStatement = this.RULE('IncludeStatement', () => {
+    const result = {
+      type: 'IncludeStatement',
+      expr: null,
+      variables: null,
+      ignoreMissing: false,
+      only: false,
+    };
+
+    this.CONSUME(t.IncludeToken);
+
+    result.expr = this.SUBRULE(this.Expression);
+
+    this.OPTION(() => {
+      this.CONSUME(t.IgnoreMissingToken);
+      result.ignoreMissing = true;
+    });
+
+    this.OPTION1(() => {
+      this.CONSUME(t.WithToken);
+      result.variables = this.SUBRULE1(this.Expression);
+    });
+
+    this.OPTION2(() => {
+      this.CONSUME(t.OnlyToken);
+      result.only = true;
+    });
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1332,6 +1363,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.WithStatement) },
         { ALT: () => this.SUBRULE(this.UseStatement) },
         { ALT: () => this.SUBRULE(this.SandboxStatement) },
+        { ALT: () => this.SUBRULE(this.IncludeStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);
