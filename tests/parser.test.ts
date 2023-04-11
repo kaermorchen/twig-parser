@@ -1635,6 +1635,38 @@ test('ImportStatement', () => {
   });
 });
 
+test('FromStatement', () => {
+  expect(
+    parse(
+      `{% from 'forms.html' import input as input_field, textarea %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'forms.html',
+    },
+    type: 'FromStatement',
+    variables: [
+      {
+        left: {
+          type: 'Identifier',
+          value: 'input',
+        },
+        operator: 'as',
+        right: {
+          type: 'Identifier',
+          value: 'input_field',
+        },
+        type: 'BinaryExpression',
+      },
+      {
+        type: 'Identifier',
+        value: 'textarea',
+      },
+    ],
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });

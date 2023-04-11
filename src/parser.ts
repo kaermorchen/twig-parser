@@ -1387,6 +1387,34 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  FromStatement = this.RULE('FromStatement', () => {
+    const result = {
+      type: 'FromStatement',
+      expr: null,
+      variables: [],
+    };
+
+    this.CONSUME(t.FromToken);
+
+    result.expr = this.SUBRULE(this.Expression);
+
+    this.CONSUME(t.ImportToken);
+
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        const variable = this.OR([
+          { ALT: () => this.SUBRULE(this.AsOperator) },
+          { ALT: () => this.SUBRULE(this.Identifier) },
+        ]);
+
+        result.variables.push(variable);
+      },
+    });
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1410,6 +1438,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.IncludeStatement) },
         { ALT: () => this.SUBRULE(this.MacroStatement) },
         { ALT: () => this.SUBRULE(this.ImportStatement) },
+        { ALT: () => this.SUBRULE(this.FromStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

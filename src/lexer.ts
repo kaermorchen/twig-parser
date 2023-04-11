@@ -568,6 +568,11 @@ export const ImportToken = createToken(
   [ModeKind.Statement]
 );
 
+export const FromToken = createToken(
+  { name: 'FromToken', pattern: /\bfrom\b/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {
