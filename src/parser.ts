@@ -1160,6 +1160,48 @@ export default class TwigParser extends EmbeddedActionsParser {
     return { type: 'FlushStatement' };
   });
 
+  BlockInlineStatement = this.RULE('BlockInlineStatement', () => {
+    const result = {
+      type: 'BlockStatement',
+      name: null,
+      body: [],
+      shortcut: true,
+    };
+
+    this.CONSUME(t.BlockToken);
+    result.name = this.SUBRULE(this.Identifier);
+    result.body.push(this.SUBRULE(this.Expression));
+
+    return result;
+  });
+
+  BlockStatement = this.RULE('BlockStatement', () => {
+    const result = {
+      type: 'BlockStatement',
+      name: null,
+      body: [],
+      shortcut: false,
+    };
+
+    this.CONSUME(t.BlockToken);
+    result.name = this.SUBRULE(this.Identifier);
+
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.EndBlockToken);
+
+    this.OPTION(() => {
+      this.SUBRULE1(this.Identifier);
+    });
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1174,6 +1216,8 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.DeprecatedStatement) },
         { ALT: () => this.SUBRULE(this.DoStatement) },
         { ALT: () => this.SUBRULE(this.FlushStatement) },
+        { ALT: () => this.SUBRULE(this.BlockInlineStatement) },
+        { ALT: () => this.SUBRULE(this.BlockStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

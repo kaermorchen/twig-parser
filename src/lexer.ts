@@ -457,44 +457,56 @@ export const EndIfToken = createToken(
   [ModeKind.Statement]
 );
 
-export const ElseIfToken = createToken({ name: 'ElseIfToken', pattern: /elseif/ }, [
-  ModeKind.Statement,
-]);
+export const ElseIfToken = createToken(
+  { name: 'ElseIfToken', pattern: /elseif/ },
+  [ModeKind.Statement]
+);
 export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
   ModeKind.Statement,
 ]);
 
-export const AutoescapeToken = createToken({ name: 'AutoescapeToken', pattern: /autoescape/ }, [
-  ModeKind.Statement,
-]);
+export const AutoescapeToken = createToken(
+  { name: 'AutoescapeToken', pattern: /autoescape/ },
+  [ModeKind.Statement]
+);
 export const EndAutoescapeToken = createToken(
   { name: 'EndAutoescapeToken', pattern: /endautoescape/ },
   [ModeKind.Statement]
 );
 
-export const DeprecatedToken = createToken({ name: 'DeprecatedToken', pattern: /deprecated/ }, [
-  ModeKind.Statement,
-]);
+export const DeprecatedToken = createToken(
+  { name: 'DeprecatedToken', pattern: /deprecated/ },
+  [ModeKind.Statement]
+);
 export const EndDeprecatedToken = createToken(
   { name: 'EndDeprecatedToken', pattern: /enddeprecated/ },
   [ModeKind.Statement]
 );
 
-export const CacheToken = createToken({ name: 'CacheToken', pattern: /cache/ }, [
-  ModeKind.Statement,
-]);
+export const CacheToken = createToken(
+  { name: 'CacheToken', pattern: /cache/ },
+  [ModeKind.Statement]
+);
 export const EndCacheToken = createToken(
   { name: 'EndCacheToken', pattern: /endcache/ },
   [ModeKind.Statement]
 );
 
-export const DoToken = createToken(
-  { name: 'DoToken', pattern: /do/ },
-  [ModeKind.Statement]
-);
+export const DoToken = createToken({ name: 'DoToken', pattern: /do/ }, [
+  ModeKind.Statement,
+]);
 
 export const FlushToken = createToken(
   { name: 'FlushToken', pattern: /flush/ },
+  [ModeKind.Statement]
+);
+
+export const BlockToken = createToken(
+  { name: 'BlockToken', pattern: /block/ },
+  [ModeKind.Statement]
+);
+export const EndBlockToken = createToken(
+  { name: 'EndBlockToken', pattern: /endblock/ },
   [ModeKind.Statement]
 );
 

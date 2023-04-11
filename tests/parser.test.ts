@@ -1256,7 +1256,64 @@ test('DoStatement', () => {
 });
 
 test('FlushStatement', () => {
-  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({ type: 'FlushStatement' });
+  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({
+    type: 'FlushStatement',
+  });
+});
+
+test('BlockStatement', () => {
+  expect(
+    parse(`{% block title %}Index{% endblock %}`).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: 'Index',
+      },
+    ],
+    name: {
+      type: 'Identifier',
+      value: 'title',
+    },
+    type: 'BlockStatement',
+    shortcut: false,
+  });
+
+  expect(
+    parse(`{% block title %}Index{% endblock title %}`).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: 'Index',
+      },
+    ],
+    name: {
+      type: 'Identifier',
+      value: 'title',
+    },
+    type: 'BlockStatement',
+    shortcut: false,
+  });
+});
+
+test('BlockInlineStatement', () => {
+  expect(
+    parse(`{% block title "title" %}`).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'StringLiteral',
+        value: 'title',
+      },
+    ],
+    name: {
+      type: 'Identifier',
+      value: 'title',
+    },
+    type: 'BlockStatement',
+    shortcut: true,
+  });
 });
 
 // test('Boilerplate', () => {
