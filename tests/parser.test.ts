@@ -1299,12 +1299,19 @@ test('BlockStatement', () => {
 
 test('BlockInlineStatement', () => {
   expect(
-    parse(`{% block title "title" %}`).Template().body[0]
+    parse(`{% block title page_title|title %}`).Template().body[0]
   ).toStrictEqual({
     body: [
       {
-        type: 'StringLiteral',
-        value: 'title',
+        expression: {
+          type: 'Identifier',
+          value: 'page_title',
+        },
+        filter: {
+          type: 'Identifier',
+          value: 'title',
+        },
+        type: 'FilterExpression',
       },
     ],
     name: {

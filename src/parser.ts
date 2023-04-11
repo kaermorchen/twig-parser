@@ -787,42 +787,27 @@ export default class TwigParser extends EmbeddedActionsParser {
     })
   );
 
-  Expression = this.RULE('Expression', () => {
-    return this.SUBRULE(this.AssignmentExpression);
-  });
 
-  Expression_In = this.RULE('Expression_In', () => {
-    return this.SUBRULE(this.AssignmentExpression_In);
-  });
-
-  ExpressionList = this.RULE('ExpressionList', () => {
-    const arr = [];
-
-    this.MANY_SEP({
-      SEP: t.CommaToken,
-      DEF: () => {
-        arr.push(this.SUBRULE(this.Expression));
-      },
-    });
-
-    return arr;
-  });
-
-  ExpressionList_In = this.RULE('ExpressionList_In', () => {
-    const arr = [];
-
-    this.MANY_SEP({
-      SEP: t.CommaToken,
-      DEF: () => {
-        arr.push(this.SUBRULE(this.Expression_In));
-      },
-    });
-
-    return arr;
-  });
 
   FilterExpression = this.RULE('FilterExpression', () => {
     let expression = this.SUBRULE(this.AssignmentExpression);
+
+    this.MANY(() => {
+      this.CONSUME(t.BarToken);
+      const filter = this.SUBRULE(this.Filter);
+
+      expression = {
+        type: 'FilterExpression',
+        expression,
+        filter,
+      };
+    });
+
+    return expression;
+  });
+
+  FilterExpression_In = this.RULE('FilterExpression_In', () => {
+    let expression = this.SUBRULE(this.AssignmentExpression_In);
 
     this.MANY(() => {
       this.CONSUME(t.BarToken);
@@ -860,6 +845,40 @@ export default class TwigParser extends EmbeddedActionsParser {
       callee: this.SUBRULE(this.Identifier),
       arguments: this.SUBRULE(this.Arguments),
     };
+  });
+
+  Expression = this.RULE('Expression', () => {
+    return this.SUBRULE(this.FilterExpression);
+  });
+
+  Expression_In = this.RULE('Expression_In', () => {
+    return this.SUBRULE(this.FilterExpression_In);
+  });
+
+  ExpressionList = this.RULE('ExpressionList', () => {
+    const arr = [];
+
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        arr.push(this.SUBRULE(this.Expression));
+      },
+    });
+
+    return arr;
+  });
+
+  ExpressionList_In = this.RULE('ExpressionList_In', () => {
+    const arr = [];
+
+    this.MANY_SEP({
+      SEP: t.CommaToken,
+      DEF: () => {
+        arr.push(this.SUBRULE(this.Expression_In));
+      },
+    });
+
+    return arr;
   });
 
   Text = this.RULE('Text', () => {
