@@ -1219,6 +1219,12 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  ExtendsStatement = this.RULE('ExtendsStatement', () => {
+    this.CONSUME(t.ExtendsToken);
+
+    return { type: 'ExtendsStatement', expr: this.SUBRULE(this.Expression) };
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1235,6 +1241,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.FlushStatement) },
         { ALT: () => this.SUBRULE(this.BlockInlineStatement) },
         { ALT: () => this.SUBRULE(this.BlockStatement) },
+        { ALT: () => this.SUBRULE(this.ExtendsStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

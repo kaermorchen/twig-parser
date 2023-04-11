@@ -510,6 +510,11 @@ export const EndBlockToken = createToken(
   [ModeKind.Statement]
 );
 
+export const ExtendsToken = createToken(
+  { name: 'ExtendsToken', pattern: /extends/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

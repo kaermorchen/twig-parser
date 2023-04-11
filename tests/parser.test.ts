@@ -1329,6 +1329,16 @@ test('BlockInlineStatement', () => {
   });
 });
 
+test('ExtendsStatement', () => {
+  expect(parse(`{% extends "base.html" %}`).Template().body[0]).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'base.html',
+    },
+    type: 'ExtendsStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
