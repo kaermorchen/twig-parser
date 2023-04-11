@@ -573,6 +573,15 @@ export const FromToken = createToken(
   [ModeKind.Statement]
 );
 
+export const EmbedToken = createToken(
+  { name: 'EmbedToken', pattern: /\bembed\b/ },
+  [ModeKind.Statement]
+);
+export const EndEmbedToken = createToken(
+  { name: 'EndEmbedToken', pattern: /\bendembed\b/ },
+  [ModeKind.Statement]
+);
+
 
 export const IdentifierToken = createToken(
   {

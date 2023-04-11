@@ -1667,6 +1667,107 @@ test('FromStatement', () => {
   });
 });
 
+test('EmbedStatement', () => {
+  expect(
+    parse(
+      `{% embed 'teasers_skeleton.twig' %}{# These blocks are defined in "teasers_skeleton.twig" #}{% endembed %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'teasers_skeleton.twig',
+    },
+    ignoreMissing: false,
+    only: false,
+    type: 'EmbedStatement',
+    variables: null,
+    body: [
+      {
+        type: 'Comment',
+        value: 'These blocks are defined in "teasers_skeleton.twig"',
+      },
+    ],
+  });
+
+  expect(
+    parse(
+      `{% embed 'header.html' with {'foo': 'bar'} %}{% endembed %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: false,
+    only: false,
+    type: 'EmbedStatement',
+    variables: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'bar',
+          },
+        },
+      ],
+    },
+    body: [],
+  });
+
+  expect(
+    parse(`{% embed 'header.html' only %}{% endembed %}`).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: false,
+    only: true,
+    type: 'EmbedStatement',
+    variables: null,
+    body: [],
+  });
+
+  expect(
+    parse(
+      `{% embed 'header.html' ignore missing with {'foo': 'bar'} only %}{% endembed %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    expr: {
+      type: 'StringLiteral',
+      value: 'header.html',
+    },
+    ignoreMissing: true,
+    only: true,
+    type: 'EmbedStatement',
+    variables: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'bar',
+          },
+        },
+      ],
+    },
+    body: [],
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
