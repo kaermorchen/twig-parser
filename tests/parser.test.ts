@@ -1381,14 +1381,16 @@ test('WithStatement', () => {
   });
 
   expect(
-    parse(`{% with { foo: 42 } only %}{# only foo is defined #}{% endwith %}`).Template().body[0]
+    parse(
+      `{% with { foo: 42 } only %}{# only foo is defined #}{% endwith %}`
+    ).Template().body[0]
   ).toStrictEqual({
     accessToOuterScope: false,
     body: [
       {
         type: 'Comment',
         value: 'only foo is defined',
-      }
+      },
     ],
     expr: {
       properties: [
@@ -1408,6 +1410,64 @@ test('WithStatement', () => {
       type: 'ObjectLiteral',
     },
     type: 'WithStatement',
+  });
+});
+
+test('UseStatement', () => {
+  expect(parse(`{% use "blocks.html" %}`).Template().body[0]).toStrictEqual({
+    importedBlocks: [],
+    name: {
+      type: 'StringLiteral',
+      value: 'blocks.html',
+    },
+    type: 'UseStatement',
+  });
+
+  expect(
+    parse(
+      `{% use "blocks.html" with sidebar as base_sidebar, title as base_title %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    importedBlocks: [
+      {
+        left: {
+          type: 'Identifier',
+          value: 'sidebar',
+        },
+        operator: 'as',
+        right: {
+          type: 'Identifier',
+          value: 'base_sidebar',
+        },
+        type: 'BinaryExpression',
+      },
+      {
+        left: {
+          type: 'Identifier',
+          value: 'title',
+        },
+        operator: 'as',
+        right: {
+          type: 'Identifier',
+          value: 'base_title',
+        },
+        type: 'BinaryExpression',
+      },
+    ],
+    name: {
+      type: 'StringLiteral',
+      value: 'blocks.html',
+    },
+    type: 'UseStatement',
+  });
+});
+
+test('SandboxStatement', () => {
+  expect(
+    parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template().body[0]
+  ).toStrictEqual({
+    body: [],
+    type: 'SandboxStatement',
   });
 });
 

@@ -531,6 +531,19 @@ export const UseToken = createToken(
   { name: 'UseToken', pattern: /\buse\b/ },
   [ModeKind.Statement]
 );
+export const AsToken = createToken(
+  { name: 'AsToken', pattern: /\bas\b/ },
+  [ModeKind.Statement]
+);
+
+export const SandboxToken = createToken(
+  { name: 'SandboxToken', pattern: /\bsandbox\b/ },
+  [ModeKind.Statement]
+);
+export const EndSandboxToken = createToken(
+  { name: 'EndSandboxToken', pattern: /\bendsandbox\b/ },
+  [ModeKind.Statement]
+);
 
 export const IdentifierToken = createToken(
   {

@@ -1219,6 +1219,8 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+
+
   ExtendsStatement = this.RULE('ExtendsStatement', () => {
     this.CONSUME(t.ExtendsToken);
 
@@ -1253,6 +1255,63 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  AsOperator = this.RULE('AsOperator', () => {
+    const result = {
+      type: 'BinaryExpression',
+      operator: 'as',
+      left: null,
+      right: null,
+    };
+
+    result.left = this.SUBRULE(this.Identifier);
+    this.CONSUME(t.AsToken);
+    result.right = this.SUBRULE1(this.Identifier);
+
+    return result;
+  });
+
+  UseStatement = this.RULE('UseStatement', () => {
+    const result = {
+      type: 'UseStatement',
+      name: null,
+      importedBlocks: [],
+    };
+
+    this.CONSUME(t.UseToken);
+    result.name = this.SUBRULE(this.Expression);
+    this.OPTION(() => {
+      this.CONSUME(t.WithToken);
+
+      this.MANY_SEP({
+        SEP: t.CommaToken,
+        DEF: () => {
+          result.importedBlocks.push(this.SUBRULE(this.AsOperator));
+        },
+      });
+    });
+
+    return result;
+  });
+
+  SandboxStatement = this.RULE('SandboxStatement', () => {
+    const result = {
+      type: 'SandboxStatement',
+      body: [],
+    };
+
+    this.CONSUME(t.SandboxToken);
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.EndSandboxToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1271,6 +1330,8 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.BlockStatement) },
         { ALT: () => this.SUBRULE(this.ExtendsStatement) },
         { ALT: () => this.SUBRULE(this.WithStatement) },
+        { ALT: () => this.SUBRULE(this.UseStatement) },
+        { ALT: () => this.SUBRULE(this.SandboxStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);
