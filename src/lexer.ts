@@ -515,6 +515,19 @@ export const ExtendsToken = createToken(
   [ModeKind.Statement]
 );
 
+export const WithToken = createToken(
+  { name: 'WithToken', pattern: /with/ },
+  [ModeKind.Statement]
+);
+export const EndWithToken = createToken(
+  { name: 'EndWithToken', pattern: /endwith/ },
+  [ModeKind.Statement]
+);
+export const OnlyToken = createToken(
+  { name: 'OnlyToken', pattern: /only/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

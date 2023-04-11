@@ -1225,6 +1225,34 @@ export default class TwigParser extends EmbeddedActionsParser {
     return { type: 'ExtendsStatement', expr: this.SUBRULE(this.Expression) };
   });
 
+  WithStatement = this.RULE('WithStatement', () => {
+    const result = {
+      type: 'WithStatement',
+      expr: null,
+      body: [],
+      accessToOuterScope: true,
+    };
+
+    this.CONSUME(t.WithToken);
+    this.OPTION(() => {
+      result.expr = this.SUBRULE(this.Expression);
+    });
+    this.OPTION1(() => {
+      this.CONSUME(t.OnlyToken);
+      result.accessToOuterScope = false;
+    });
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.EndWithToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1242,6 +1270,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.BlockInlineStatement) },
         { ALT: () => this.SUBRULE(this.BlockStatement) },
         { ALT: () => this.SUBRULE(this.ExtendsStatement) },
+        { ALT: () => this.SUBRULE(this.WithStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

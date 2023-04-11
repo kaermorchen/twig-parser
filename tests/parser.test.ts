@@ -1339,6 +1339,78 @@ test('ExtendsStatement', () => {
   });
 });
 
+test('WithStatement', () => {
+  expect(parse(`{% with %}{% endwith %}`).Template().body[0]).toStrictEqual({
+    accessToOuterScope: true,
+    body: [],
+    expr: null,
+    type: 'WithStatement',
+  });
+
+  expect(
+    parse(`{% with { foo: 42 } %}{{ foo }}{% endwith %}`).Template().body[0]
+  ).toStrictEqual({
+    accessToOuterScope: true,
+    body: [
+      {
+        type: 'VariableStatement',
+        value: {
+          type: 'Identifier',
+          value: 'foo',
+        },
+      },
+    ],
+    expr: {
+      properties: [
+        {
+          key: {
+            type: 'Identifier',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'NumericLiteral',
+            value: 42,
+          },
+        },
+      ],
+      type: 'ObjectLiteral',
+    },
+    type: 'WithStatement',
+  });
+
+  expect(
+    parse(`{% with { foo: 42 } only %}{# only foo is defined #}{% endwith %}`).Template().body[0]
+  ).toStrictEqual({
+    accessToOuterScope: false,
+    body: [
+      {
+        type: 'Comment',
+        value: 'only foo is defined',
+      }
+    ],
+    expr: {
+      properties: [
+        {
+          key: {
+            type: 'Identifier',
+            value: 'foo',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'NumericLiteral',
+            value: 42,
+          },
+        },
+      ],
+      type: 'ObjectLiteral',
+    },
+    type: 'WithStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
