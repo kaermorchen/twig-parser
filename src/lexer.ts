@@ -123,17 +123,17 @@ export const BooleanToken = createToken(
 );
 
 export const TrueToken = createToken(
-  { name: 'TrueToken', pattern: /true/i, categories: BooleanToken },
+  { name: 'TrueToken', pattern: /\btrue\b/i, categories: BooleanToken },
   [ModeKind.Statement]
 );
 
 export const FalseToken = createToken(
-  { name: 'FalseToken', pattern: /false/i, categories: BooleanToken },
+  { name: 'FalseToken', pattern: /\bfalse\b/i, categories: BooleanToken },
   [ModeKind.Statement]
 );
 
 export const NullToken = createToken(
-  { name: 'NullToken', pattern: /null|none/i },
+  { name: 'NullToken', pattern: /\bnull\b|\bnone\b/i },
   [ModeKind.Statement]
 );
 
@@ -145,35 +145,35 @@ export const EqualsGreaterToken = createToken(
 export const OrToken = createToken(
   {
     name: 'OrToken',
-    pattern: /or/,
+    pattern: /\bor\b/,
   },
   [ModeKind.Statement]
 );
 export const AndToken = createToken(
   {
     name: 'AndToken',
-    pattern: /and/,
+    pattern: /\band\b/,
   },
   [ModeKind.Statement]
 );
 export const BitwiseOrToken = createToken(
   {
     name: 'BitwiseOrToken',
-    pattern: /b-or/,
+    pattern: /\bb-or\b/,
   },
   [ModeKind.Statement]
 );
 export const BitwiseXorToken = createToken(
   {
     name: 'BitwiseXorToken',
-    pattern: /b-xor/,
+    pattern: /\bb-xor\b/,
   },
   [ModeKind.Statement]
 );
 export const BitwiseAndToken = createToken(
   {
     name: 'BitwiseAndToken',
-    pattern: /b-and/,
+    pattern: /\bb-and\b/,
   },
   [ModeKind.Statement]
 );
@@ -229,49 +229,49 @@ export const GreaterToken = createToken(
 export const NotInToken = createToken(
   {
     name: 'NotInToken',
-    pattern: /not in/,
+    pattern: /\bnot in\b/,
   },
   [ModeKind.Statement]
 );
 export const InToken = createToken(
   {
     name: 'InToken',
-    pattern: /in/,
+    pattern: /\bin\b/,
   },
   [ModeKind.Statement]
 );
 export const MatchesToken = createToken(
   {
     name: 'MatchesToken',
-    pattern: /matches/,
+    pattern: /\bmatches\b/,
   },
   [ModeKind.Statement]
 );
 export const StartsWithToken = createToken(
   {
     name: 'StartsWithToken',
-    pattern: /starts with/,
+    pattern: /\bstarts with\b/,
   },
   [ModeKind.Statement]
 );
 export const EndsWithToken = createToken(
   {
     name: 'EndsWithToken',
-    pattern: /ends with/,
+    pattern: /\bends with\b/,
   },
   [ModeKind.Statement]
 );
 export const HasSomeToken = createToken(
   {
     name: 'HasSomeToken',
-    pattern: /has some/,
+    pattern: /\bhas some\b/,
   },
   [ModeKind.Statement]
 );
 export const HasEveryToken = createToken(
   {
     name: 'HasEveryToken',
-    pattern: /has every/,
+    pattern: /\bhas every\b/,
   },
   [ModeKind.Statement]
 );
@@ -341,14 +341,14 @@ export const PercentToken = createToken(
 export const IsNotToken = createToken(
   {
     name: 'IsNotToken',
-    pattern: /is not/,
+    pattern: /\bis not\b/,
   },
   [ModeKind.Statement]
 );
 export const IsToken = createToken(
   {
     name: 'IsToken',
-    pattern: /is/,
+    pattern: /\bis\b/,
   },
   [ModeKind.Statement]
 );
@@ -360,7 +360,7 @@ export const QuestionQuestionToken = createToken(
   [ModeKind.Statement]
 );
 
-export const NotToken = createToken({ name: 'NotToken', pattern: /not/ }, [
+export const NotToken = createToken({ name: 'NotToken', pattern: /\bnot\b/ }, [
   ModeKind.Statement,
 ]);
 export const ExclamationToken = createToken(
@@ -424,107 +424,111 @@ export const EqualsToken = createToken({ name: 'EqualsToken', pattern: /=/ }, [
   ModeKind.Statement,
 ]);
 
-export const SetToken = createToken({ name: 'SetToken', pattern: /set/ }, [
+export const SetToken = createToken({ name: 'SetToken', pattern: /\bset\b/ }, [
   ModeKind.Statement,
 ]);
 export const EndSetToken = createToken(
-  { name: 'EndSetToken', pattern: /endset/ },
+  { name: 'EndSetToken', pattern: /\bendset\b/ },
   [ModeKind.Statement]
 );
 
 export const ApplyToken = createToken(
-  { name: 'ApplyToken', pattern: /apply/ },
+  { name: 'ApplyToken', pattern: /\bapply\b/ },
   [ModeKind.Statement]
 );
 export const EndApplyToken = createToken(
-  { name: 'EndApplyToken', pattern: /endapply/ },
+  { name: 'EndApplyToken', pattern: /\bendapply\b/ },
   [ModeKind.Statement]
 );
 
-export const ForToken = createToken({ name: 'ForToken', pattern: /for/ }, [
+export const ForToken = createToken({ name: 'ForToken', pattern: /\bfor\b/ }, [
   ModeKind.Statement,
 ]);
 export const EndForToken = createToken(
-  { name: 'EndForToken', pattern: /endfor/ },
+  { name: 'EndForToken', pattern: /\bendfor\b/ },
   [ModeKind.Statement]
 );
 
-export const IfToken = createToken({ name: 'IfToken', pattern: /if/ }, [
+export const IfToken = createToken({ name: 'IfToken', pattern: /\bif\b/ }, [
   ModeKind.Statement,
 ]);
 export const EndIfToken = createToken(
-  { name: 'EndIfToken', pattern: /endif/ },
+  { name: 'EndIfToken', pattern: /\bendif\b/ },
   [ModeKind.Statement]
 );
 
 export const ElseIfToken = createToken(
-  { name: 'ElseIfToken', pattern: /elseif/ },
+  { name: 'ElseIfToken', pattern: /\belseif\b/ },
   [ModeKind.Statement]
 );
-export const ElseToken = createToken({ name: 'ElseToken', pattern: /else/ }, [
+export const ElseToken = createToken({ name: 'ElseToken', pattern: /\belse\b/ }, [
   ModeKind.Statement,
 ]);
 
 export const AutoescapeToken = createToken(
-  { name: 'AutoescapeToken', pattern: /autoescape/ },
+  { name: 'AutoescapeToken', pattern: /\bautoescape\b/ },
   [ModeKind.Statement]
 );
 export const EndAutoescapeToken = createToken(
-  { name: 'EndAutoescapeToken', pattern: /endautoescape/ },
+  { name: 'EndAutoescapeToken', pattern: /\bendautoescape\b/ },
   [ModeKind.Statement]
 );
 
 export const DeprecatedToken = createToken(
-  { name: 'DeprecatedToken', pattern: /deprecated/ },
+  { name: 'DeprecatedToken', pattern: /\bdeprecated\b/ },
   [ModeKind.Statement]
 );
 export const EndDeprecatedToken = createToken(
-  { name: 'EndDeprecatedToken', pattern: /enddeprecated/ },
+  { name: 'EndDeprecatedToken', pattern: /\benddeprecated\b/ },
   [ModeKind.Statement]
 );
 
 export const CacheToken = createToken(
-  { name: 'CacheToken', pattern: /cache/ },
+  { name: 'CacheToken', pattern: /\bcache\b/ },
   [ModeKind.Statement]
 );
 export const EndCacheToken = createToken(
-  { name: 'EndCacheToken', pattern: /endcache/ },
+  { name: 'EndCacheToken', pattern: /\bendcache\b/ },
   [ModeKind.Statement]
 );
 
-export const DoToken = createToken({ name: 'DoToken', pattern: /do/ }, [
+export const DoToken = createToken({ name: 'DoToken', pattern: /\bdo\b/ }, [
   ModeKind.Statement,
 ]);
 
 export const FlushToken = createToken(
-  { name: 'FlushToken', pattern: /flush/ },
+  { name: 'FlushToken', pattern: /\bflush\b/ },
   [ModeKind.Statement]
 );
 
 export const BlockToken = createToken(
-  { name: 'BlockToken', pattern: /block/ },
+  { name: 'BlockToken', pattern: /\bblock\b/ },
   [ModeKind.Statement]
 );
 export const EndBlockToken = createToken(
-  { name: 'EndBlockToken', pattern: /endblock/ },
+  { name: 'EndBlockToken', pattern: /\bendblock\b/ },
   [ModeKind.Statement]
 );
 
 export const ExtendsToken = createToken(
-  { name: 'ExtendsToken', pattern: /extends/ },
+  { name: 'ExtendsToken', pattern: /\bextends\b/ },
   [ModeKind.Statement]
 );
 
 export const WithToken = createToken(
-  { name: 'WithToken', pattern: /with/ },
+  { name: 'WithToken', pattern: /\bwith\b/ },
   [ModeKind.Statement]
 );
 export const EndWithToken = createToken(
-  { name: 'EndWithToken', pattern: /endwith/ },
+  { name: 'EndWithToken', pattern: /\bendwith\b/ },
   [ModeKind.Statement]
 );
 export const OnlyToken = createToken(
-  { name: 'OnlyToken', pattern: /only/ },
+  { name: 'OnlyToken', pattern: /\bonly\b/ },
+  [ModeKind.Statement]
+);
+export const UseToken = createToken(
+  { name: 'UseToken', pattern: /\buse\b/ },
   [ModeKind.Statement]
 );
 
