@@ -41,10 +41,51 @@ export default class TwigParser extends EmbeddedActionsParser {
     value: this.CONSUME(t.NullToken) ? null : undefined,
   }));
 
+  StringInterpolation = this.RULE('StringInterpolation', () => {
+    const result = {
+      type: 'StringInterpolation',
+      body: [],
+    };
+
+    this.CONSUME(t.OpenStringInterpolationToken);
+
+    this.MANY(() => {
+      const element = this.OR([
+        {
+          ALT: () => {
+            const result = {
+              type: 'InterpolationExpression',
+              expr: null,
+            }
+
+            this.CONSUME(t.StringInterpolationOpenStatementToken);
+            result.expr = this.SUBRULE(this.Expression);
+            this.CONSUME(t.StringInterpolationCloseStatementToken);
+
+            return result;
+          },
+        },
+        {
+          ALT: () => ({
+            type: "StringLiteral",
+            value: this.CONSUME(t.StringInterpolationStringPartToken).image
+          }),
+        },
+      ]);
+
+      result.body.push(element);
+    });
+
+    this.CONSUME(t.CloseStringInterpolationToken);
+
+    return result;
+  });
+
   PrimaryExpression = this.RULE('PrimaryExpression', () =>
     this.OR([
       { ALT: () => this.SUBRULE(this.Identifier) },
       { ALT: () => this.SUBRULE(this.Literal) },
+      { ALT: () => this.SUBRULE(this.StringInterpolation) },
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
       { ALT: () => this.SUBRULE(this.ParenthesizedExpression) },

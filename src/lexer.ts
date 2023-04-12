@@ -11,15 +11,19 @@ export enum ModeKind {
   Template = 'Template',
   Statement = 'Statement',
   Comment = 'Comment',
+  StringInterpolation = 'StringInterpolation',
 }
 
 export const tokens: Record<string, TokenType> = {};
+
+const brackets: string[] = [];
 
 const lexerDefinition: IMultiModeLexerDefinition = {
   modes: {
     [ModeKind.Template]: [],
     [ModeKind.Statement]: [],
     [ModeKind.Comment]: [],
+    [ModeKind.StringInterpolation]: [],
   },
   defaultMode: ModeKind.Template,
 };
@@ -58,6 +62,67 @@ export const StringToken = createToken(
   },
   [ModeKind.Statement]
 );
+export const OpenStringInterpolationToken = createToken(
+  {
+    name: 'OpenStringInterpolationToken',
+    pattern: /"/,
+    push_mode: ModeKind.StringInterpolation,
+  },
+  [ModeKind.Statement]
+);
+export const CloseStringInterpolationToken = createToken(
+  {
+    name: 'CloseStringInterpolationToken',
+    pattern: /"/,
+    pop_mode: true,
+  },
+  [ModeKind.StringInterpolation]
+);
+export const StringInterpolationStringPartToken = createToken(
+  {
+    name: 'StringInterpolationStringPartToken',
+    pattern: /[^#"\\]+(?:(?:\\.|#(?!\{))[^#"\\]*)*/,
+  },
+  [ModeKind.StringInterpolation]
+);
+export const StringInterpolationOpenStatementToken = createToken(
+  {
+    name: 'StringInterpolationOpenStatementToken',
+    line_breaks: false,
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
+      const pattern = '#{';
+
+      if (text.substring(offset, offset + pattern.length) === pattern) {
+        brackets.push(pattern);
+        return [pattern];
+      }
+
+      return null;
+    },
+    push_mode: ModeKind.Statement,
+  },
+  [ModeKind.StringInterpolation]
+);
+export const StringInterpolationCloseStatementToken = createToken(
+  {
+    name: 'StringInterpolationCloseStatementToken',
+    pop_mode: true,
+    line_breaks: false,
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
+      const pattern = '}';
+      if (
+        text.at(offset) === pattern &&
+        brackets[brackets.length - 1] === '#{'
+      ) {
+        brackets.pop();
+        return [pattern];
+      }
+
+      return null;
+    },
+  },
+  [ModeKind.Statement]
+);
 
 export const LCommentToken = createToken(
   { name: 'LCommentToken', pattern: /{#/, push_mode: ModeKind.Comment },
@@ -75,14 +140,11 @@ export const CommentToken = createToken(
   {
     name: 'CommentToken',
     line_breaks: true,
-    pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
       const startBlockPattern = /\s*\#\}/;
-
       const execResult = startBlockPattern.exec(text);
 
-      return execResult
-        ? [text.substring(startOffset, execResult.index)]
-        : null;
+      return execResult ? [text.substring(offset, execResult.index)] : null;
     },
   },
   [ModeKind.Comment]
@@ -387,11 +449,39 @@ export const DotToken = createToken({ name: 'DotToken', pattern: /\./ }, [
   ModeKind.Statement,
 ]);
 export const OpenBraceToken = createToken(
-  { name: 'OpenBraceToken', pattern: /{/ },
+  {
+    name: 'OpenBraceToken',
+    line_breaks: false,
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
+      const pattern = '{';
+      if (text.at(offset) === pattern) {
+        brackets.push(pattern);
+        return [pattern];
+      }
+      return null;
+    },
+  },
   [ModeKind.Statement]
 );
 export const CloseBraceToken = createToken(
-  { name: 'CloseBraceToken', pattern: /}/ },
+  {
+    name: 'CloseBraceToken',
+    line_breaks: false,
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
+      const pattern = '}';
+
+      if (text.at(offset) === pattern) {
+        if (brackets[brackets.length - 1] === '{') {
+          brackets.pop();
+        } else {
+          // TODO: throw error
+        }
+        return [pattern];
+      }
+
+      return null;
+    },
+  },
   [ModeKind.Statement]
 );
 export const OpenBracketToken = createToken(
@@ -609,9 +699,9 @@ export const TextToken = createToken(
   {
     name: 'TextToken',
     line_breaks: true,
-    pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
+    pattern: (text, offset): CustomPatternMatcherReturn | null => {
       const startBlockPattern = /\{[{%#]/;
-      const allText = text.substring(startOffset);
+      const allText = text.substring(offset);
       const execResult = startBlockPattern.exec(allText);
 
       return execResult === null

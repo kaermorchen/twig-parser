@@ -1794,6 +1794,94 @@ test('VerbatimStatement', () => {
   });
 });
 
+test('StringInterpolation', () => {
+  expect(parse(`{{ "#{ 32 } baz" }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      body: [
+        {
+          expr: {
+            type: 'NumericLiteral',
+            value: 32,
+          },
+          type: 'InterpolationExpression',
+        },
+        {
+          type: 'StringLiteral',
+          value: ' baz',
+        },
+      ],
+      type: 'StringInterpolation',
+    },
+  });
+
+  expect(parse(`{{ "foo #{ 32 }" }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      body: [
+        {
+          type: 'StringLiteral',
+          value: 'foo ',
+        },
+        {
+          expr: {
+            type: 'NumericLiteral',
+            value: 32,
+          },
+          type: 'InterpolationExpression',
+        },
+      ],
+      type: 'StringInterpolation',
+    },
+  });
+
+  expect(
+    parse(`{{ "foo #{ 32 } baz#{ { a: 32} }" }}`).Template().body[0]
+  ).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      body: [
+        {
+          type: 'StringLiteral',
+          value: 'foo ',
+        },
+        {
+          expr: {
+            type: 'NumericLiteral',
+            value: 32,
+          },
+          type: 'InterpolationExpression',
+        },
+        {
+          type: 'StringLiteral',
+          value: ' baz',
+        },
+        {
+          expr: {
+            type: 'ObjectLiteral',
+            properties: [
+              {
+                key: {
+                  type: 'Identifier',
+                  value: 'a',
+                },
+                shorthand: false,
+                type: 'PropertyAssignment',
+                value: {
+                  type: 'NumericLiteral',
+                  value: 32,
+                },
+              },
+            ],
+          },
+          type: 'InterpolationExpression',
+        },
+      ],
+      type: 'StringInterpolation',
+    },
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
