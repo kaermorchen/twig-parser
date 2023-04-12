@@ -417,6 +417,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.CONSUME(t.EndsWithToken).image },
         { ALT: () => this.CONSUME(t.HasSomeToken).image },
         { ALT: () => this.CONSUME(t.HasEveryToken).image },
+        { ALT: () => this.CONSUME(t.SameAsToken).image },
       ]);
 
       result = {

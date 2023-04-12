@@ -275,6 +275,13 @@ export const HasEveryToken = createToken(
   },
   [ModeKind.Statement]
 );
+export const SameAsToken = createToken(
+  {
+    name: 'SameAsToken',
+    pattern: /\bsame as\b/,
+  },
+  [ModeKind.Statement]
+);
 export const DotDotToken = createToken(
   {
     name: 'DotDotToken',
