@@ -1456,6 +1456,25 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  VerbatimStatement = this.RULE('VerbatimStatement', () => {
+    const result = {
+      type: 'EmbedStatement',
+      body: [],
+    };
+
+    this.CONSUME(t.VerbatimToken);
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.EndVerbatimToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1481,6 +1500,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.ImportStatement) },
         { ALT: () => this.SUBRULE(this.FromStatement) },
         { ALT: () => this.SUBRULE(this.EmbedStatement) },
+        { ALT: () => this.SUBRULE(this.VerbatimStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

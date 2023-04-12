@@ -1768,6 +1768,32 @@ test('EmbedStatement', () => {
   });
 });
 
+test('VerbatimStatement', () => {
+  expect(
+    parse(`{% verbatim %}<li>{{ item }}</li>{% endverbatim %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    type: 'EmbedStatement',
+    body: [
+      {
+        type: 'Text',
+        value: '<li>',
+      },
+      {
+        type: 'VariableStatement',
+        value: {
+          type: 'Identifier',
+          value: 'item',
+        },
+      },
+      {
+        type: 'Text',
+        value: '</li>',
+      },
+    ],
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });

@@ -581,6 +581,15 @@ export const EndEmbedToken = createToken(
   [ModeKind.Statement]
 );
 
+export const VerbatimToken = createToken(
+  { name: 'VerbatimToken', pattern: /\bverbatim\b/ },
+  [ModeKind.Statement]
+);
+export const EndVerbatimToken = createToken(
+  { name: 'EndVerbatimToken', pattern: /\bendverbatim\b/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',
@@ -588,21 +597,6 @@ export const IdentifierToken = createToken(
   },
   [ModeKind.Statement]
 );
-
-// export const RawText = createToken({
-//   name: 'RawText',
-//   line_breaks: true,
-//   pattern: (text, startOffset): CustomPatternMatcherReturn | null => {
-//     const startBlockPattern = /{%\s*endverbatim/;
-//     startBlockPattern.lastIndex = startOffset;
-
-//     const execResult = startBlockPattern.exec(text);
-
-//     return execResult === null
-//       ? null
-//       : [text.substring(startOffset, execResult.index)];
-//   },
-// });
 
 export const TextToken = createToken(
   {
