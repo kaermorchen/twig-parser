@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "esbuild-base": "esbuild ./src/main.ts --bundle --outfile=out/main.js --format=cjs --platform=node",
-    "esbuild": "npm run esbuild-base -- --sourcemap",
-    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "build": "npm run esbuild-base -- --sourcemap",
+    "watch": "npm run esbuild-base -- --sourcemap --watch",
     "test": "vitest"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",

@@ -1106,15 +1106,6 @@ export default class TwigParser extends EmbeddedActionsParser {
       result.consequent.push(this.SUBRULE(this.SourceElement));
     });
 
-    // else
-    this.OPTION1(() => {
-      this.CONSUME1(t.LBlockToken);
-      this.CONSUME1(t.ElseToken);
-      this.CONSUME1(t.RBlockToken);
-
-      result.alternate = this.SUBRULE1(this.SourceElement);
-    });
-
     // elseif
     let elseIfStatement = result;
     this.MANY2(() => {
@@ -1141,7 +1132,11 @@ export default class TwigParser extends EmbeddedActionsParser {
       this.CONSUME4(t.ElseToken);
       this.CONSUME4(t.RBlockToken);
 
-      elseIfStatement.alternate = this.SUBRULE4(this.SourceElement);
+      elseIfStatement.alternate = [];
+
+      this.MANY4(() => {
+        elseIfStatement.alternate.push(this.SUBRULE4(this.SourceElement));
+      });
     });
 
     this.CONSUME5(t.LBlockToken);

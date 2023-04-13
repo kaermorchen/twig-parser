@@ -1051,10 +1051,12 @@ test('IfStatement', () => {
   ).toStrictEqual({
     body: [
       {
-        alternate: {
-          type: 'Text',
-          value: 'Sold-out!',
-        },
+        alternate: [
+          {
+            type: 'Text',
+            value: 'Sold-out!',
+          },
+        ],
         consequent: [
           {
             type: 'Text',
@@ -1094,10 +1096,12 @@ test('IfStatement', () => {
     body: [
       {
         alternate: {
-          alternate: {
-            type: 'Text',
-            value: 'Sold-out!',
-          },
+          alternate: [
+            {
+              type: 'Text',
+              value: 'Sold-out!',
+            },
+          ],
           consequent: [
             {
               type: 'Text',
@@ -1167,6 +1171,57 @@ test('IfStatement', () => {
             type: 'NumericLiteral',
             value: 10,
           },
+        },
+        type: 'IfStatement',
+      },
+    ],
+    type: 'Template',
+  });
+
+  expect(
+    parse(
+      `{% if true %}111{{ text }}222{% else %}333{{ item }}444{% endif %}`
+    ).Template()
+  ).toStrictEqual({
+    body: [
+      {
+        alternate: [
+          {
+            type: 'Text',
+            value: '333',
+          },
+          {
+            type: 'VariableStatement',
+            value: {
+              value: 'item',
+              type: 'Identifier',
+            },
+          },
+          {
+            type: 'Text',
+            value: '444',
+          },
+        ],
+        consequent: [
+          {
+            type: 'Text',
+            value: '111',
+          },
+          {
+            type: 'VariableStatement',
+            value: {
+              value: 'text',
+              type: 'Identifier',
+            },
+          },
+          {
+            type: 'Text',
+            value: '222',
+          },
+        ],
+        test: {
+          type: 'BooleanLiteral',
+          value: true,
         },
         type: 'IfStatement',
       },
