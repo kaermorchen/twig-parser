@@ -266,7 +266,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   ParenthesizedExpression = this.RULE('ParenthesizedExpression', () => {
     this.CONSUME(t.OpenParenToken);
-    const expr = this.SUBRULE(this.Expression_In);
+    const expr = this.SUBRULE(this.Expression);
     this.CONSUME(t.CloseParenToken);
 
     return expr;

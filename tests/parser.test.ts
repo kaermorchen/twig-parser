@@ -245,6 +245,45 @@ test('ParenthesizedExpression', () => {
     type: 'NumericLiteral',
     value: 4,
   });
+
+  expect(
+    parse(`{{ not (post.status is constant('Post::PUBLISHED')) }}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      type: 'UnaryExpression',
+      operator: 'not',
+      argument: {
+        left: {
+          object: {
+            type: 'Identifier',
+            value: 'post',
+          },
+          property: {
+            type: 'Identifier',
+            value: 'status',
+          },
+          type: 'MemberExpression',
+        },
+        operator: 'is',
+        right: {
+          arguments: [
+            {
+              type: 'StringLiteral',
+              value: 'Post::PUBLISHED',
+            },
+          ],
+          callee: {
+            type: 'Identifier',
+            value: 'constant',
+          },
+          type: 'CallExpression',
+        },
+        type: 'BinaryExpression',
+      },
+    },
+  });
 });
 
 test('BinaryExpression', () => {
