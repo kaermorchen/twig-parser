@@ -692,6 +692,25 @@ export const FormThemeToken = createToken(
   [ModeKind.Statement]
 );
 
+export const TransToken = createToken(
+  { name: 'TransToken', pattern: /\btrans\b/ },
+  [ModeKind.Statement]
+);
+export const EndTransToken = createToken(
+  { name: 'EndTransToken', pattern: /\bendtrans\b/ },
+  [ModeKind.Statement]
+);
+
+export const IntoToken = createToken(
+  { name: 'IntoToken', pattern: /\binto\b/ },
+  [ModeKind.Statement]
+);
+
+export const TransDefaultDomainToken = createToken(
+  { name: 'TransDefaultDomainToken', pattern: /\btrans_default_domain\b/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

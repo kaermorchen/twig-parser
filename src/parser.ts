@@ -1554,6 +1554,59 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  TransStatement = this.RULE('TransStatement', () => {
+    const result = {
+      type: 'TransStatement',
+      vars: [],
+      domain: null,
+      locale: null,
+      body: [],
+    };
+
+    this.CONSUME(t.TransToken);
+
+    this.OPTION(() => {
+      this.CONSUME(t.WithToken);
+      result.vars = this.SUBRULE(this.Expression);
+    });
+
+    this.OPTION1(() => {
+      this.CONSUME(t.FromToken);
+      result.domain = this.SUBRULE1(this.Expression);
+    });
+
+    this.OPTION2(() => {
+      this.CONSUME(t.IntoToken);
+      result.locale = this.SUBRULE2(this.Expression);
+    });
+
+    this.OPTION3(() => {
+      this.CONSUME(t.RBlockToken);
+
+      this.MANY(() => {
+        result.body.push(this.SUBRULE3(this.SourceElement));
+      });
+
+      this.CONSUME(t.LBlockToken);
+      this.CONSUME(t.EndTransToken);
+    });
+
+    return result;
+  });
+
+  TransDefaultDomainStatement = this.RULE('TransDefaultDomainStatement', () => {
+    const result = {
+      type: 'TransDefaultDomainStatement',
+      domain: null,
+    };
+
+    this.CONSUME(t.TransDefaultDomainToken);
+
+    result.domain = this.SUBRULE1(this.Expression);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1583,6 +1636,8 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.VerbatimStatement) },
         // Symfony
         { ALT: () => this.SUBRULE(this.FormThemeStatement) },
+        { ALT: () => this.SUBRULE(this.TransStatement) },
+        { ALT: () => this.SUBRULE(this.TransDefaultDomainStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

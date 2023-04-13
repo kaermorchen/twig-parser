@@ -1946,6 +1946,110 @@ test('FormThemeStatement', () => {
   });
 });
 
+test('TransStatement', () => {
+  expect(
+    parse(`{% trans %}Hello %name%{% endtrans %}`).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: 'Hello %name%',
+      },
+    ],
+    domain: null,
+    locale: null,
+    type: 'TransStatement',
+    vars: [],
+  });
+
+  expect(
+    parse(
+      `{% trans with {'%name%': 'Fabien'} from 'app' %}Hello %name%{% endtrans %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: 'Hello %name%',
+      },
+    ],
+    domain: {
+      type: 'StringLiteral',
+      value: 'app',
+    },
+    locale: null,
+    type: 'TransStatement',
+    vars: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: '%name%',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'Fabien',
+          },
+        },
+      ],
+    },
+  });
+
+  expect(
+    parse(
+      `{% trans with {'%name%': 'Fabien'} from 'app' into 'fr' %}Hello %name%{% endtrans %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: 'Hello %name%',
+      },
+    ],
+    domain: {
+      type: 'StringLiteral',
+      value: 'app',
+    },
+    locale: {
+      type: 'StringLiteral',
+      value: 'fr',
+    },
+    type: 'TransStatement',
+    vars: {
+      type: 'ObjectLiteral',
+      properties: [
+        {
+          key: {
+            type: 'StringLiteral',
+            value: '%name%',
+          },
+          shorthand: false,
+          type: 'PropertyAssignment',
+          value: {
+            type: 'StringLiteral',
+            value: 'Fabien',
+          },
+        },
+      ],
+    },
+  });
+});
+
+test('TransDefaultDomainStatement', () => {
+  expect(
+    parse(`{% trans_default_domain domain %}`).Template().body[0]
+  ).toStrictEqual({
+    domain: {
+      type: 'Identifier',
+      value: 'domain',
+    },
+    type: 'TransDefaultDomainStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
