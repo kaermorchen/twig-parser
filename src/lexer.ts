@@ -719,6 +719,10 @@ export const EndStopwatchToken = createToken(
   { name: 'EndStopwatchToken', pattern: /\bendstopwatch\b/ },
   [ModeKind.Statement]
 );
+export const DivisibleByToken = createToken(
+  { name: 'DivisibleByToken', pattern: /\bdivisible by\b/ },
+  [ModeKind.Statement]
+);
 
 export const IdentifierToken = createToken(
   {

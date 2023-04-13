@@ -7,10 +7,17 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.performSelfAnalysis();
   }
 
-  Identifier = this.RULE('Identifier', () => ({
-    type: 'Identifier',
-    value: this.CONSUME(t.IdentifierToken).image,
-  }));
+  Identifier = this.RULE('Identifier', () => {
+    const value = this.OR([
+      { ALT: () => this.CONSUME(t.DivisibleByToken) },
+      { ALT: () => this.CONSUME(t.IdentifierToken) },
+    ]);
+
+    return {
+      type: 'Identifier',
+      value: value.image,
+    };
+  });
 
   Literal = this.RULE('Literal', () =>
     this.OR([
