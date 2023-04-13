@@ -711,6 +711,15 @@ export const TransDefaultDomainToken = createToken(
   [ModeKind.Statement]
 );
 
+export const StopwatchToken = createToken(
+  { name: 'StopwatchToken', pattern: /\bstopwatch\b/ },
+  [ModeKind.Statement]
+);
+export const EndStopwatchToken = createToken(
+  { name: 'EndStopwatchToken', pattern: /\bendstopwatch\b/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',

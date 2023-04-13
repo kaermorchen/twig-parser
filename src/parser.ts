@@ -1607,6 +1607,27 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  StopwatchStatement = this.RULE('StopwatchStatement', () => {
+    const result = {
+      type: 'StopwatchStatement',
+      event_name: null,
+      body: [],
+    };
+
+    this.CONSUME(t.StopwatchToken);
+    result.event_name = this.SUBRULE1(this.Expression);
+    this.CONSUME(t.RBlockToken);
+
+    this.MANY(() => {
+      result.body.push(this.SUBRULE3(this.SourceElement));
+    });
+
+    this.CONSUME(t.LBlockToken);
+    this.CONSUME(t.EndStopwatchToken);
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
@@ -1638,6 +1659,7 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.FormThemeStatement) },
         { ALT: () => this.SUBRULE(this.TransStatement) },
         { ALT: () => this.SUBRULE(this.TransDefaultDomainStatement) },
+        { ALT: () => this.SUBRULE(this.StopwatchStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

@@ -2050,6 +2050,25 @@ test('TransDefaultDomainStatement', () => {
   });
 });
 
+test('StopwatchStatement', () => {
+  expect(
+    parse(`{% stopwatch 'event_name' %}...{% endstopwatch %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    body: [
+      {
+        type: 'Text',
+        value: '...',
+      },
+    ],
+    event_name: {
+      type: 'StringLiteral',
+      value: 'event_name',
+    },
+    type: 'StopwatchStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
