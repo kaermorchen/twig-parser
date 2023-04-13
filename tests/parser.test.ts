@@ -239,11 +239,12 @@ test('ObjectLiteral', () => {
 });
 
 test('ParenthesizedExpression', () => {
-  expect(
-    parse(`(4)`, ModeKind.Statement).ParenthesizedExpression()
-  ).toStrictEqual({
-    type: 'NumericLiteral',
-    value: 4,
+  expect(parse(`{{ (4) }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      type: 'NumericLiteral',
+      value: 4,
+    },
   });
 
   expect(
@@ -824,12 +825,15 @@ test('ForInStatement', () => {
 });
 
 test('ArrowFunction', () => {
-  expect(parse(`v => v * 2`, ModeKind.Statement).ArrowFunction()).toStrictEqual(
-    {
-      params: {
-        type: 'Identifier',
-        value: 'v',
-      },
+  expect(parse(`{{ v => v * 2 }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      params: [
+        {
+          type: 'Identifier',
+          value: 'v',
+        },
+      ],
       body: {
         left: {
           type: 'Identifier',
@@ -843,38 +847,50 @@ test('ArrowFunction', () => {
         type: 'BinaryExpression',
       },
       type: 'ArrowFunction',
-    }
-  );
+    },
+  });
+
+  expect(parse(`{{ () => "Hello" }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      params: [],
+      body: {
+        type: 'StringLiteral',
+        value: 'Hello',
+      },
+      type: 'ArrowFunction',
+    },
+  });
 
   expect(
-    parse(
-      `(first, second) => first + second`,
-      ModeKind.Statement
-    ).ArrowFunction()
+    parse(`{{ (first, second) => first + second }}`).Template().body[0]
   ).toStrictEqual({
-    params: [
-      {
-        type: 'Identifier',
-        value: 'first',
+    type: 'VariableStatement',
+    value: {
+      params: [
+        {
+          type: 'Identifier',
+          value: 'first',
+        },
+        {
+          type: 'Identifier',
+          value: 'second',
+        },
+      ],
+      body: {
+        left: {
+          type: 'Identifier',
+          value: 'first',
+        },
+        operator: '+',
+        right: {
+          type: 'Identifier',
+          value: 'second',
+        },
+        type: 'BinaryExpression',
       },
-      {
-        type: 'Identifier',
-        value: 'second',
-      },
-    ],
-    body: {
-      left: {
-        type: 'Identifier',
-        value: 'first',
-      },
-      operator: '+',
-      right: {
-        type: 'Identifier',
-        value: 'second',
-      },
-      type: 'BinaryExpression',
+      type: 'ArrowFunction',
     },
-    type: 'ArrowFunction',
   });
 });
 
@@ -2183,6 +2199,52 @@ test('Same as', () => {
       type: 'BinaryExpression',
     },
     type: 'IfStatement',
+  });
+});
+
+test('Boilerplate', () => {
+  expect(
+    parse(`{% set sizes = sizes in v => v > 38 %}`).Template().body[0]
+  ).toStrictEqual({
+    declarations: [
+      {
+        init: {
+          left: {
+            type: 'Identifier',
+            value: 'sizes',
+          },
+          operator: 'in',
+          right: {
+            body: {
+              left: {
+                type: 'Identifier',
+                value: 'v',
+              },
+              operator: '>',
+              right: {
+                type: 'NumericLiteral',
+                value: 38,
+              },
+              type: 'BinaryExpression',
+            },
+            params: [
+              {
+                type: 'Identifier',
+                value: 'v',
+              },
+            ],
+            type: 'ArrowFunction',
+          },
+          type: 'BinaryExpression',
+        },
+        name: {
+          type: 'Identifier',
+          value: 'sizes',
+        },
+        type: 'VariableDeclaration',
+      },
+    ],
+    type: 'SetStatement',
   });
 });
 

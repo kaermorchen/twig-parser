@@ -91,12 +91,29 @@ export default class TwigParser extends EmbeddedActionsParser {
 
   PrimaryExpression = this.RULE('PrimaryExpression', () =>
     this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(t.OpenParenToken);
+
+          return this.OR1([
+            {
+              ALT: () =>
+                this.SUBRULE(this.ArrowFunctionBody, {
+                  ARGS: [this.SUBRULE(this.ArrowParameters)],
+                }),
+            },
+            {
+              ALT: () => this.SUBRULE(this.ParenthesizedExpression),
+            },
+          ]);
+        },
+      },
+      { ALT: () => this.SUBRULE(this.SingleParamArrowFunction) },
       { ALT: () => this.SUBRULE(this.Identifier) },
       { ALT: () => this.SUBRULE(this.Literal) },
       { ALT: () => this.SUBRULE(this.StringInterpolation) },
       { ALT: () => this.SUBRULE(this.ArrayLiteral) },
       { ALT: () => this.SUBRULE(this.ObjectLiteral) },
-      { ALT: () => this.SUBRULE(this.ParenthesizedExpression) },
     ])
   );
 
@@ -265,50 +282,36 @@ export default class TwigParser extends EmbeddedActionsParser {
   });
 
   ParenthesizedExpression = this.RULE('ParenthesizedExpression', () => {
-    this.CONSUME(t.OpenParenToken);
-    const expr = this.SUBRULE(this.Expression);
+    const result = this.SUBRULE(this.Expression);
     this.CONSUME(t.CloseParenToken);
 
-    return expr;
+    return result;
   });
 
-  ArrowFormalParameters = this.RULE('ArrowFormalParameters', () => {
+  ArrowParameters = this.RULE('ArrowParameters', () => {
     const params = [];
 
-    this.CONSUME(t.OpenParenToken);
     this.MANY_SEP({
       SEP: t.CommaToken,
       DEF: () => {
         params.push(this.SUBRULE(this.Identifier));
       },
     });
+
     this.CONSUME(t.CloseParenToken);
 
     return params;
   });
 
-  ArrowFunction = this.RULE('ArrowFunction', () => {
-    const params = this.OR([
-      { ALT: () => this.SUBRULE(this.ArrowFormalParameters) },
-      { ALT: () => this.SUBRULE(this.Identifier) },
-    ]);
-    this.CONSUME(t.EqualsGreaterToken);
-    const body = this.SUBRULE(this.AssignmentExpression);
-
-    return {
-      type: 'ArrowFunction',
-      body,
-      params,
-    };
+  // Short version has only one param: v => v + 1
+  SingleParamArrowFunction = this.RULE('SingleParamArrowFunction', () => {
+    const params = [this.SUBRULE(this.Identifier)];
+    return this.SUBRULE(this.ArrowFunctionBody, { ARGS: [params] });
   });
 
-  ArrowFunction_In = this.RULE('ArrowFunction_In', () => {
-    const params = this.OR([
-      { ALT: () => this.SUBRULE(this.ArrowFormalParameters) },
-      { ALT: () => this.SUBRULE(this.Identifier) },
-    ]);
+  ArrowFunctionBody = this.RULE('ArrowFunctionBody', (params) => {
     this.CONSUME(t.EqualsGreaterToken);
-    const body = this.SUBRULE(this.AssignmentExpression_In);
+    const body = this.SUBRULE(this.AssignmentExpression);
 
     return {
       type: 'ArrowFunction',
@@ -805,7 +808,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.OR({
       MAX_LOOKAHEAD: 4,
       DEF: [
-        { ALT: () => this.SUBRULE(this.ArrowFunction) },
+        // { ALT: () => this.SUBRULE(this.ArrowFunction) },
         { ALT: () => this.SUBRULE(this.ConditionalExpression) },
         // {
         //   ALT: () => ({
@@ -823,7 +826,7 @@ export default class TwigParser extends EmbeddedActionsParser {
     this.OR({
       MAX_LOOKAHEAD: 4,
       DEF: [
-        { ALT: () => this.SUBRULE(this.ArrowFunction_In) },
+        // { ALT: () => this.SUBRULE(this.ArrowFunction_In) },
         { ALT: () => this.SUBRULE(this.ConditionalExpression_In) },
         // {
         //   ALT: () => ({
