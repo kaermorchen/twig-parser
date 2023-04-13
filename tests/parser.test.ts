@@ -1882,6 +1882,70 @@ test('StringInterpolation', () => {
   });
 });
 
+test('FormThemeStatement', () => {
+  expect(
+    parse(`{% form_theme form 'form/fields.html.twig' %}`).Template().body[0]
+  ).toStrictEqual({
+    form: {
+      type: 'Identifier',
+      value: 'form',
+    },
+    resources: [
+      {
+        type: 'StringLiteral',
+        value: 'form/fields.html.twig',
+      },
+    ],
+    only: false,
+    type: 'FormThemeStatement',
+  });
+
+  expect(
+    parse(
+      `{% form_theme form 'form/fields.html.twig' 'form/fields2.html.twig' %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    form: {
+      type: 'Identifier',
+      value: 'form',
+    },
+    resources: [
+      {
+        type: 'StringLiteral',
+        value: 'form/fields.html.twig',
+      },
+      {
+        type: 'StringLiteral',
+        value: 'form/fields2.html.twig',
+      },
+    ],
+    only: false,
+    type: 'FormThemeStatement',
+  });
+
+  expect(
+    parse(
+      `{% form_theme form with ['foundation_5_layout.html.twig'] only %}`
+    ).Template().body[0]
+  ).toStrictEqual({
+    form: {
+      type: 'Identifier',
+      value: 'form',
+    },
+    resources: {
+      elements: [
+        {
+          type: 'StringLiteral',
+          value: 'foundation_5_layout.html.twig',
+        },
+      ],
+      type: 'ArrayLiteral',
+    },
+    only: true,
+    type: 'FormThemeStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });

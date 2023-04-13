@@ -56,7 +56,7 @@ export default class TwigParser extends EmbeddedActionsParser {
             const result = {
               type: 'InterpolationExpression',
               expr: null,
-            }
+            };
 
             this.CONSUME(t.StringInterpolationOpenStatementToken);
             result.expr = this.SUBRULE(this.Expression);
@@ -67,8 +67,8 @@ export default class TwigParser extends EmbeddedActionsParser {
         },
         {
           ALT: () => ({
-            type: "StringLiteral",
-            value: this.CONSUME(t.StringInterpolationStringPartToken).image
+            type: 'StringLiteral',
+            value: this.CONSUME(t.StringInterpolationStringPartToken).image,
           }),
         },
       ]);
@@ -1517,10 +1517,48 @@ export default class TwigParser extends EmbeddedActionsParser {
     return result;
   });
 
+  FormThemeStatement = this.RULE('FormThemeStatement', () => {
+    const result = {
+      type: 'FormThemeStatement',
+      form: null,
+      resources: [],
+      only: false,
+    };
+
+    this.CONSUME(t.FormThemeToken);
+
+    result.form = this.SUBRULE(this.Expression);
+
+    this.OR([
+      {
+        ALT: () => {
+          this.CONSUME(t.WithToken);
+          result.resources = this.SUBRULE1(this.Expression);
+        },
+      },
+      {
+        ALT: () => {
+          result.resources = [];
+          this.AT_LEAST_ONE(() => {
+            result.resources.push(this.SUBRULE2(this.Expression));
+          });
+        },
+      },
+    ]);
+
+    this.OPTION(() => {
+      this.CONSUME(t.OnlyToken);
+      result.only = true;
+    });
+
+    return result;
+  });
+
   Statement = this.RULE('Statement', () => {
     this.CONSUME(t.LBlockToken);
     const statement = this.OR({
       DEF: [
+        // Twig
         { ALT: () => this.SUBRULE(this.SetInlineStatement) },
         { ALT: () => this.SUBRULE(this.SetBlockStatement) },
         { ALT: () => this.SUBRULE(this.ApplyStatement) },
@@ -1543,6 +1581,8 @@ export default class TwigParser extends EmbeddedActionsParser {
         { ALT: () => this.SUBRULE(this.FromStatement) },
         { ALT: () => this.SUBRULE(this.EmbedStatement) },
         { ALT: () => this.SUBRULE(this.VerbatimStatement) },
+        // Symfony
+        { ALT: () => this.SUBRULE(this.FormThemeStatement) },
       ],
     });
     this.CONSUME1(t.RBlockToken);

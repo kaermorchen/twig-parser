@@ -687,6 +687,11 @@ export const EndVerbatimToken = createToken(
   [ModeKind.Statement]
 );
 
+export const FormThemeToken = createToken(
+  { name: 'FormThemeToken', pattern: /\bform_theme\b/ },
+  [ModeKind.Statement]
+);
+
 export const IdentifierToken = createToken(
   {
     name: 'IdentifierToken',
