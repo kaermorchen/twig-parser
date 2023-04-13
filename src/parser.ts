@@ -10,6 +10,7 @@ export default class TwigParser extends EmbeddedActionsParser {
   Identifier = this.RULE('Identifier', () => {
     const value = this.OR([
       { ALT: () => this.CONSUME(t.DivisibleByToken) },
+      { ALT: () => this.CONSUME(t.SameAsToken) },
       { ALT: () => this.CONSUME(t.IdentifierToken) },
     ]);
 

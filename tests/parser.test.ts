@@ -2069,6 +2069,84 @@ test('StopwatchStatement', () => {
   });
 });
 
+test('Divisible by', () => {
+  expect(
+    parse(`{% if loop.index is divisible by(3) %}{% endif %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    alternate: null,
+    consequent: [],
+    test: {
+      left: {
+        object: {
+          type: 'Identifier',
+          value: 'loop',
+        },
+        property: {
+          type: 'Identifier',
+          value: 'index',
+        },
+        type: 'MemberExpression',
+      },
+      operator: 'is',
+      right: {
+        arguments: [
+          {
+            type: 'NumericLiteral',
+            value: 3,
+          },
+        ],
+        callee: {
+          type: 'Identifier',
+          value: 'divisible by',
+        },
+        type: 'CallExpression',
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'IfStatement',
+  });
+});
+
+test('Same as', () => {
+  expect(
+    parse(`{% if foo.attribute is same as(false) %}{% endif %}`).Template()
+      .body[0]
+  ).toStrictEqual({
+    alternate: null,
+    consequent: [],
+    test: {
+      left: {
+        object: {
+          type: 'Identifier',
+          value: 'foo',
+        },
+        property: {
+          type: 'Identifier',
+          value: 'attribute',
+        },
+        type: 'MemberExpression',
+      },
+      operator: 'is',
+      right: {
+        arguments: [
+          {
+            type: 'BooleanLiteral',
+            value: false,
+          },
+        ],
+        callee: {
+          type: 'Identifier',
+          value: 'same as',
+        },
+        type: 'CallExpression',
+      },
+      type: 'BinaryExpression',
+    },
+    type: 'IfStatement',
+  });
+});
+
 // test('Boilerplate', () => {
 //   expect(parse(``).Template().body[0]).toStrictEqual();
 // });
