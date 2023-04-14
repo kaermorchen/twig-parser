@@ -1,5 +1,6 @@
 import { EmbeddedActionsParser } from 'chevrotain';
 import { tokens as t } from './lexer.js';
+import { Identifier, NodeKind } from './types.js';
 
 export class TwigParser extends EmbeddedActionsParser {
   constructor() {
@@ -7,18 +8,18 @@ export class TwigParser extends EmbeddedActionsParser {
     this.performSelfAnalysis();
   }
 
-  Identifier = this.RULE('Identifier', () => {
-    const value = this.OR([
-      { ALT: () => this.CONSUME(t.DivisibleByToken) },
-      { ALT: () => this.CONSUME(t.SameAsToken) },
-      { ALT: () => this.CONSUME(t.IdentifierToken) },
-    ]);
+  [NodeKind.Identifier] = this.RULE<() => Identifier>(
+    NodeKind.Identifier,
+    () => {
+      const name = this.OR([
+        { ALT: () => this.CONSUME(t.DivisibleByToken).image },
+        { ALT: () => this.CONSUME(t.SameAsToken).image },
+        { ALT: () => this.CONSUME(t.IdentifierToken).image },
+      ]);
 
-    return {
-      type: 'Identifier',
-      value: value.image,
-    };
-  });
+      return { type: NodeKind.Identifier, name };
+    }
+  );
 
   Literal = this.RULE('Literal', () =>
     this.OR([
