@@ -1,5 +1,5 @@
 import { TwigLexer } from './lexer.js';
-import TwigParser from './parser.js';
+import { TwigParser } from './parser.js';
 
 const lexer = new TwigLexer();
 const parser = new TwigParser();

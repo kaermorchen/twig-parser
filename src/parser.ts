@@ -1,7 +1,7 @@
 import { EmbeddedActionsParser } from 'chevrotain';
-import * as t from './lexer.js';
+import { tokens as t } from './lexer.js';
 
-export default class TwigParser extends EmbeddedActionsParser {
+export class TwigParser extends EmbeddedActionsParser {
   constructor() {
     super(t);
     this.performSelfAnalysis();
@@ -882,6 +882,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
       result = {
         type: 'CallExpression',
+        // @ts-ignore
         callee: result,
         arguments: args,
       };
@@ -1038,6 +1039,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
       filter = {
         type: 'FilterExpression',
+        // @ts-ignore
         expression: filter,
         filter: nextFilter,
       };
@@ -1539,6 +1541,7 @@ export default class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           this.CONSUME(t.WithToken);
+          // @ts-ignore
           result.resources = this.SUBRULE1(this.Expression);
         },
       },
@@ -1573,6 +1576,7 @@ export default class TwigParser extends EmbeddedActionsParser {
 
     this.OPTION(() => {
       this.CONSUME(t.WithToken);
+      // @ts-ignore
       result.vars = this.SUBRULE(this.Expression);
     });
 
