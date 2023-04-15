@@ -132,11 +132,6 @@ export interface NullLiteral extends Node {
 
 export type Literal = NullLiteral | BooleanLiteral | NumericLiteral | StringLiteral;
 
-// TODO
-export interface Expression extends Node {
-  type: NodeKind.Expression;
-}
-
 export interface InterpolationExpression extends Node {
   type: NodeKind.InterpolationExpression;
   expression: Expression
@@ -159,7 +154,76 @@ export interface ObjectLiteral extends Node {
   properties: PropertyDefinition[];
 }
 
-// export interface ArrayLiteral extends Node {
-//   type: NodeKind.ArrayLiteral;
-//   elements: PropertyDefinition[];
-// }
+export interface ArrayLiteral extends Node {
+  type: NodeKind.ArrayLiteral;
+  elements: AssignmentExpression_In[];
+}
+
+export type PrimaryExpression = ParenthesizedExpression | ArrowFunctionBody | SingleParamArrowFunction | Identifier | Literal | StringInterpolation | ArrayLiteral | ObjectLiteral;
+export type PropertyName = Identifier | StringLiteral | NumericLiteral | AssignmentExpression_In;
+export type LeftHandSideExpression = PrimaryExpression | MemberExpression | CallExpression;
+
+export type BoxMemberExpression = Expression_In;
+export type DotMemberExpression = Identifier;
+
+export interface NamedArgument extends Node {
+  type: NodeKind.ArrayLiteral;
+  key: Identifier;
+  value: AssignmentExpression_In;
+}
+
+export type Arguments = Array<NamedArgument | AssignmentExpression_In>;
+export type ParenthesizedExpression = Expression;
+export type ArrowParameters = Array<Identifier>;
+export type SingleParamArrowFunction = ArrowFunctionBody;
+
+export interface ArrowFunctionBody extends Node {
+  type: NodeKind.ArrowFunctionBody;
+  body: AssignmentExpression;
+  params: Identifier[];
+}
+
+export type UpdateExpression = LeftHandSideExpression;
+
+export interface UnaryExpression extends Node {
+  type: NodeKind.UnaryExpression;
+  operator: string;
+  argument: UnaryExpression | UpdateExpression;
+}
+
+export interface BinaryExpression extends Node {
+  type: NodeKind.BinaryExpression;
+  operator: string;
+  left: Expression;
+  right: Expression;
+}
+
+export interface ConditionalExpression extends Node {
+  type: NodeKind.ConditionalExpression;
+  test: BinaryExpression,
+  consequent: AssignmentExpression_In,
+  alternate: AssignmentExpression,
+}
+
+export interface Text extends Node {
+  type: NodeKind.Text;
+  value: string,
+}
+
+export interface Comment extends Node {
+  type: NodeKind.Comment;
+  value: string,
+}
+
+export interface VariableStatement extends Node {
+  type: NodeKind.VariableStatement;
+  value: Expression,
+}
+
+type SourceElement = Text | Comment | VariableStatement | Statement;
+type SourceElementList = SourceElement[];
+
+export interface Template extends Node {
+  type: NodeKind.Template;
+  body: SourceElementList,
+}
