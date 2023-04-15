@@ -107,5 +107,5 @@ export interface Node {
 
 export interface Identifier extends Node {
   type: NodeKind.Identifier;
-  value: string;
+  name: string;
 }

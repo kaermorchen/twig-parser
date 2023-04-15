@@ -8,14 +8,17 @@ export class TwigParser extends EmbeddedActionsParser {
     this.performSelfAnalysis();
   }
 
-  [NodeKind.Identifier] = this.RULE(NodeKind.Identifier, () => ({
-    type: NodeKind.Identifier,
-    value: this.OR([
-      { ALT: () => this.CONSUME(t.DivisibleByToken).image },
-      { ALT: () => this.CONSUME(t.SameAsToken).image },
-      { ALT: () => this.CONSUME(t.IdentifierToken).image },
-    ]),
-  }));
+  [NodeKind.Identifier] = this.RULE<() => Identifier>(
+    NodeKind.Identifier,
+    () => ({
+      type: NodeKind.Identifier,
+      name: this.OR([
+        { ALT: () => this.CONSUME(t.DivisibleByToken).image },
+        { ALT: () => this.CONSUME(t.SameAsToken).image },
+        { ALT: () => this.CONSUME(t.IdentifierToken).image },
+      ]),
+    })
+  );
 
   [NodeKind.Literal] = this.RULE(NodeKind.Literal, () =>
     this.OR([
@@ -168,7 +171,7 @@ export class TwigParser extends EmbeddedActionsParser {
       {
         ALT: () => {
           value = this.SUBRULE(this.Identifier);
-          key = Object.assign({}, value, { type: 'StringLiteral' });
+          key = { type: 'StringLiteral', value: value.name };
           shorthand = true;
         },
       },

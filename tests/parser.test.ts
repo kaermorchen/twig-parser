@@ -5,7 +5,7 @@ import { ModeKind } from '../src/lexer.js';
 test('Identifier', () => {
   expect(parse(`user`, ModeKind.Statement).Identifier()).toStrictEqual({
     type: 'Identifier',
-    value: `user`,
+    name: `user`,
   });
 });
 
@@ -137,7 +137,7 @@ test('PropertyName', () => {
   );
   expect(parse(`(name)`, ModeKind.Statement).PropertyName()).toStrictEqual({
     type: 'Identifier',
-    value: 'name',
+    name: 'name',
   });
   // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
 });
@@ -164,7 +164,7 @@ test('PropertyAssignment', () => {
     type: 'PropertyAssignment',
     key: {
       type: 'Identifier',
-      value: 'name',
+      name: 'name',
     },
     value: {
       type: 'StringLiteral',
@@ -175,12 +175,12 @@ test('PropertyAssignment', () => {
 
   expect(parse(`foo`, ModeKind.Statement).PropertyDefinition()).toStrictEqual({
     type: 'PropertyAssignment',
-    key: {
-      type: 'StringLiteral',
-      value: 'foo',
-    },
     value: {
       type: 'Identifier',
+      name: 'foo',
+    },
+    key: {
+      type: 'StringLiteral',
       value: 'foo',
     },
     shorthand: true,
@@ -214,11 +214,11 @@ test('ObjectLiteral', () => {
         type: 'PropertyAssignment',
         key: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
         value: {
           type: 'Identifier',
-          value: 'bar',
+          name: 'bar',
         },
         shorthand: false,
       },
@@ -230,7 +230,7 @@ test('ObjectLiteral', () => {
         },
         value: {
           type: 'Identifier',
-          value: 'val',
+          name: 'val',
         },
         shorthand: true,
       },
@@ -259,11 +259,11 @@ test('ParenthesizedExpression', () => {
         left: {
           object: {
             type: 'Identifier',
-            value: 'post',
+            name: 'post',
           },
           property: {
             type: 'Identifier',
-            value: 'status',
+            name: 'status',
           },
           type: 'MemberExpression',
         },
@@ -277,7 +277,7 @@ test('ParenthesizedExpression', () => {
           ],
           callee: {
             type: 'Identifier',
-            value: 'constant',
+            name: 'constant',
           },
           type: 'CallExpression',
         },
@@ -414,11 +414,11 @@ test('LeftHandSideExpression', () => {
   ).toStrictEqual({
     object: {
       type: 'Identifier',
-      value: 'user',
+      name: 'user',
     },
     property: {
       type: 'Identifier',
-      value: 'firstName',
+      name: 'firstName',
     },
     type: 'MemberExpression',
   });
@@ -428,7 +428,7 @@ test('LeftHandSideExpression', () => {
   ).toStrictEqual({
     object: {
       type: 'Identifier',
-      value: 'user',
+      name: 'user',
     },
     property: {
       type: 'StringLiteral',
@@ -445,16 +445,16 @@ test('LeftHandSideExpression', () => {
       type: 'MemberExpression',
       object: {
         type: 'Identifier',
-        value: 'user',
+        name: 'user',
       },
       property: {
         type: 'Identifier',
-        value: 'a',
+        name: 'a',
       },
     },
     property: {
       type: 'Identifier',
-      value: 'b',
+      name: 'b',
     },
   });
 });
@@ -497,7 +497,7 @@ test('VariableStatement', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'a',
+            name: 'a',
           },
           shorthand: false,
           type: 'PropertyAssignment',
@@ -566,7 +566,7 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'name',
+          name: 'name',
         },
         type: 'VariableDeclaration',
       },
@@ -585,7 +585,7 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'name',
+          name: 'name',
         },
         type: 'VariableDeclaration',
       },
@@ -596,7 +596,7 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'nick_name',
+          name: 'nick_name',
         },
         type: 'VariableDeclaration',
       },
@@ -617,7 +617,7 @@ test('SetBlockStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'greetings',
+          name: 'greetings',
         },
         type: 'VariableDeclaration',
       },
@@ -632,7 +632,7 @@ test('CallExpression', () => {
       arguments: [],
       callee: {
         type: 'Identifier',
-        value: 'hello',
+        name: 'hello',
       },
       type: 'CallExpression',
     },
@@ -651,7 +651,7 @@ test('CallExpression', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'model',
+            name: 'model',
           },
           type: 'NamedArgument',
           value: {
@@ -662,7 +662,7 @@ test('CallExpression', () => {
       ],
       callee: {
         type: 'Identifier',
-        value: 'hello',
+        name: 'hello',
       },
       type: 'CallExpression',
     },
@@ -678,13 +678,13 @@ test('FilterExpression', () => {
       type: 'FilterExpression',
       expression: {
         type: 'Identifier',
-        value: 'list',
+        name: 'list',
       },
       filter: {
         type: 'CallExpression',
         callee: {
           type: 'Identifier',
-          value: 'join',
+          name: 'join',
         },
         arguments: [
           {
@@ -696,7 +696,7 @@ test('FilterExpression', () => {
     },
     filter: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
   });
 });
@@ -715,7 +715,7 @@ test('ApplyStatement', () => {
       },
       filter: {
         type: 'Identifier',
-        value: 'upper',
+        name: 'upper',
       },
     },
   ]);
@@ -735,7 +735,7 @@ test('ApplyStatement', () => {
         type: 'FilterExpression',
         expression: {
           type: 'Identifier',
-          value: 'lower',
+          name: 'lower',
         },
         filter: {
           type: 'CallExpression',
@@ -747,7 +747,7 @@ test('ApplyStatement', () => {
           ],
           callee: {
             type: 'Identifier',
-            value: 'escape',
+            name: 'escape',
           },
         },
       },
@@ -767,19 +767,19 @@ test('ForInStatement', () => {
         variables: [
           {
             type: 'Identifier',
-            value: 'i',
+            name: 'i',
           },
         ],
         expression: {
           type: 'Identifier',
-          value: 'arr',
+          name: 'arr',
         },
         body: [
           {
             type: 'VariableStatement',
             value: {
               type: 'Identifier',
-              value: 'i',
+              name: 'i',
             },
           },
         ],
@@ -799,19 +799,19 @@ test('ForInStatement', () => {
         variables: [
           {
             type: 'Identifier',
-            value: 'user',
+            name: 'user',
           },
         ],
         expression: {
           type: 'Identifier',
-          value: 'users',
+          name: 'users',
         },
         body: [
           {
             type: 'VariableStatement',
             value: {
               type: 'Identifier',
-              value: 'user',
+              name: 'user',
             },
           },
         ],
@@ -831,13 +831,13 @@ test('ArrowFunction', () => {
       params: [
         {
           type: 'Identifier',
-          value: 'v',
+          name: 'v',
         },
       ],
       body: {
         left: {
           type: 'Identifier',
-          value: 'v',
+          name: 'v',
         },
         operator: '*',
         right: {
@@ -870,22 +870,22 @@ test('ArrowFunction', () => {
       params: [
         {
           type: 'Identifier',
-          value: 'first',
+          name: 'first',
         },
         {
           type: 'Identifier',
-          value: 'second',
+          name: 'second',
         },
       ],
       body: {
         left: {
           type: 'Identifier',
-          value: 'first',
+          name: 'first',
         },
         operator: '+',
         right: {
           type: 'Identifier',
-          value: 'second',
+          name: 'second',
         },
         type: 'BinaryExpression',
       },
@@ -928,7 +928,7 @@ test('ExponentiationExpression', () => {
     operator: '**',
     right: {
       type: 'Identifier',
-      value: 'PI',
+      name: 'PI',
     },
     type: 'BinaryExpression',
   });
@@ -956,12 +956,12 @@ test('CoalesceExpression', () => {
     left: {
       left: {
         type: 'Identifier',
-        value: 'a',
+        name: 'a',
       },
       operator: 'and',
       right: {
         type: 'Identifier',
-        value: 'b',
+        name: 'b',
       },
       type: 'BinaryExpression',
     },
@@ -969,12 +969,12 @@ test('CoalesceExpression', () => {
     right: {
       left: {
         type: 'Identifier',
-        value: 'c',
+        name: 'c',
       },
       operator: 'or',
       right: {
         type: 'Identifier',
-        value: 'd',
+        name: 'd',
       },
       type: 'BinaryExpression',
     },
@@ -1001,7 +1001,7 @@ test('IfStatement', () => {
         test: {
           left: {
             type: 'Identifier',
-            value: 'online',
+            name: 'online',
           },
           operator: '==',
           right: {
@@ -1027,11 +1027,11 @@ test('IfStatement', () => {
           argument: {
             object: {
               type: 'Identifier',
-              value: 'user',
+              name: 'user',
             },
             property: {
               type: 'Identifier',
-              value: 'subscribed',
+              name: 'subscribed',
             },
             type: 'MemberExpression',
           },
@@ -1067,11 +1067,11 @@ test('IfStatement', () => {
           left: {
             object: {
               type: 'Identifier',
-              value: 'product',
+              name: 'product',
             },
             property: {
               type: 'Identifier',
-              value: 'stock',
+              name: 'stock',
             },
             type: 'MemberExpression',
           },
@@ -1112,11 +1112,11 @@ test('IfStatement', () => {
               value: {
                 object: {
                   type: 'Identifier',
-                  value: 'product',
+                  name: 'product',
                 },
                 property: {
                   type: 'Identifier',
-                  value: 'stock',
+                  name: 'stock',
                 },
                 type: 'MemberExpression',
               },
@@ -1130,11 +1130,11 @@ test('IfStatement', () => {
             left: {
               object: {
                 type: 'Identifier',
-                value: 'product',
+                name: 'product',
               },
               property: {
                 type: 'Identifier',
-                value: 'stock',
+                name: 'stock',
               },
               type: 'MemberExpression',
             },
@@ -1157,11 +1157,11 @@ test('IfStatement', () => {
           left: {
             object: {
               type: 'Identifier',
-              value: 'product',
+              name: 'product',
             },
             property: {
               type: 'Identifier',
-              value: 'stock',
+              name: 'stock',
             },
             type: 'MemberExpression',
           },
@@ -1193,8 +1193,8 @@ test('IfStatement', () => {
           {
             type: 'VariableStatement',
             value: {
-              value: 'item',
               type: 'Identifier',
+              name: 'item',
             },
           },
           {
@@ -1210,8 +1210,8 @@ test('IfStatement', () => {
           {
             type: 'VariableStatement',
             value: {
-              value: 'text',
               type: 'Identifier',
+              name: 'text',
             },
           },
           {
@@ -1314,7 +1314,7 @@ test('CacheStatement', () => {
     expiration: {
       callee: {
         type: 'Identifier',
-        value: 'ttl',
+        name: 'ttl',
       },
       arguments: [
         {
@@ -1389,7 +1389,7 @@ test('BlockStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: false,
@@ -1406,7 +1406,7 @@ test('BlockStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: false,
@@ -1421,18 +1421,18 @@ test('BlockInlineStatement', () => {
       {
         expression: {
           type: 'Identifier',
-          value: 'page_title',
+          name: 'page_title',
         },
         filter: {
           type: 'Identifier',
-          value: 'title',
+          name: 'title',
         },
         type: 'FilterExpression',
       },
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: true,
@@ -1466,7 +1466,7 @@ test('WithStatement', () => {
         type: 'VariableStatement',
         value: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
       },
     ],
@@ -1475,7 +1475,7 @@ test('WithStatement', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'foo',
+            name: 'foo',
           },
           shorthand: false,
           type: 'PropertyAssignment',
@@ -1507,7 +1507,7 @@ test('WithStatement', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'foo',
+            name: 'foo',
           },
           shorthand: false,
           type: 'PropertyAssignment',
@@ -1542,24 +1542,24 @@ test('UseStatement', () => {
       {
         left: {
           type: 'Identifier',
-          value: 'sidebar',
+          name: 'sidebar',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'base_sidebar',
+          name: 'base_sidebar',
         },
         type: 'BinaryExpression',
       },
       {
         left: {
           type: 'Identifier',
-          value: 'title',
+          name: 'title',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'base_title',
+          name: 'base_title',
         },
         type: 'BinaryExpression',
       },
@@ -1690,7 +1690,7 @@ test('MacroStatement', () => {
     arguments: [],
     name: {
       type: 'Identifier',
-      value: 'input',
+      name: 'input',
     },
   });
 
@@ -1708,12 +1708,12 @@ test('MacroStatement', () => {
     arguments: [
       {
         type: 'Identifier',
-        value: 'name',
+        name: 'name',
       },
       {
         key: {
           type: 'Identifier',
-          value: 'age',
+          name: 'age',
         },
         type: 'NamedArgument',
         value: {
@@ -1724,7 +1724,7 @@ test('MacroStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'input',
+      name: 'input',
     },
   });
 });
@@ -1739,7 +1739,7 @@ test('ImportStatement', () => {
     },
     name: {
       type: 'Identifier',
-      value: 'forms',
+      name: 'forms',
     },
     type: 'ImportStatement',
   });
@@ -1760,18 +1760,18 @@ test('FromStatement', () => {
       {
         left: {
           type: 'Identifier',
-          value: 'input',
+          name: 'input',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'input_field',
+          name: 'input_field',
         },
         type: 'BinaryExpression',
       },
       {
         type: 'Identifier',
-        value: 'textarea',
+        name: 'textarea',
       },
     ],
   });
@@ -1893,7 +1893,7 @@ test('VerbatimStatement', () => {
         type: 'VariableStatement',
         value: {
           type: 'Identifier',
-          value: 'item',
+          name: 'item',
         },
       },
       {
@@ -1973,7 +1973,7 @@ test('StringInterpolation', () => {
               {
                 key: {
                   type: 'Identifier',
-                  value: 'a',
+                  name: 'a',
                 },
                 shorthand: false,
                 type: 'PropertyAssignment',
@@ -1998,7 +1998,7 @@ test('FormThemeStatement', () => {
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: [
       {
@@ -2017,7 +2017,7 @@ test('FormThemeStatement', () => {
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: [
       {
@@ -2040,7 +2040,7 @@ test('FormThemeStatement', () => {
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: {
       elements: [
@@ -2154,7 +2154,7 @@ test('TransDefaultDomainStatement', () => {
   ).toStrictEqual({
     domain: {
       type: 'Identifier',
-      value: 'domain',
+      name: 'domain',
     },
     type: 'TransDefaultDomainStatement',
   });
@@ -2190,11 +2190,11 @@ test('Divisible by', () => {
       left: {
         object: {
           type: 'Identifier',
-          value: 'loop',
+          name: 'loop',
         },
         property: {
           type: 'Identifier',
-          value: 'index',
+          name: 'index',
         },
         type: 'MemberExpression',
       },
@@ -2208,7 +2208,7 @@ test('Divisible by', () => {
         ],
         callee: {
           type: 'Identifier',
-          value: 'divisible by',
+          name: 'divisible by',
         },
         type: 'CallExpression',
       },
@@ -2229,11 +2229,11 @@ test('Same as', () => {
       left: {
         object: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
         property: {
           type: 'Identifier',
-          value: 'attribute',
+          name: 'attribute',
         },
         type: 'MemberExpression',
       },
@@ -2247,7 +2247,7 @@ test('Same as', () => {
         ],
         callee: {
           type: 'Identifier',
-          value: 'same as',
+          name: 'same as',
         },
         type: 'CallExpression',
       },
@@ -2266,14 +2266,14 @@ test('Boilerplate', () => {
         init: {
           left: {
             type: 'Identifier',
-            value: 'sizes',
+            name: 'sizes',
           },
           operator: 'in',
           right: {
             body: {
               left: {
                 type: 'Identifier',
-                value: 'v',
+                name: 'v',
               },
               operator: '>',
               right: {
@@ -2285,7 +2285,7 @@ test('Boilerplate', () => {
             params: [
               {
                 type: 'Identifier',
-                value: 'v',
+                name: 'v',
               },
             ],
             type: 'ArrowFunction',
@@ -2294,7 +2294,7 @@ test('Boilerplate', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'sizes',
+          name: 'sizes',
         },
         type: 'VariableDeclaration',
       },
