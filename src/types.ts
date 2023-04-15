@@ -109,3 +109,57 @@ export interface Identifier extends Node {
   type: NodeKind.Identifier;
   name: string;
 }
+
+export interface StringLiteral extends Node {
+  type: NodeKind.StringLiteral;
+  value: string;
+}
+
+export interface NumericLiteral extends Node {
+  type: NodeKind.NumericLiteral;
+  value: number;
+}
+
+export interface BooleanLiteral extends Node {
+  type: NodeKind.BooleanLiteral;
+  value: boolean;
+}
+
+export interface NullLiteral extends Node {
+  type: NodeKind.NullLiteral;
+  value: null;
+}
+
+export type Literal = NullLiteral | BooleanLiteral | NumericLiteral | StringLiteral;
+
+// TODO
+export interface Expression extends Node {
+  type: NodeKind.Expression;
+}
+
+export interface InterpolationExpression extends Node {
+  type: NodeKind.InterpolationExpression;
+  expression: Expression
+}
+
+export interface StringInterpolation extends Node {
+  type: NodeKind.StringInterpolation;
+  body: Array<InterpolationExpression | StringLiteral>
+}
+
+export interface PropertyDefinition extends Node {
+  type: NodeKind.PropertyDefinition;
+  key: Literal | Identifier,
+  value: Expression;
+  shorthand: boolean,
+}
+
+export interface ObjectLiteral extends Node {
+  type: NodeKind.ObjectLiteral;
+  properties: PropertyDefinition[];
+}
+
+// export interface ArrayLiteral extends Node {
+//   type: NodeKind.ArrayLiteral;
+//   elements: PropertyDefinition[];
+// }
