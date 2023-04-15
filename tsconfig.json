@@ -9,11 +9,11 @@
     "outDir": "out",
     "sourceMap": true,
     "strict": false,
+    "experimentalDecorators": true,
     "rootDir": "src"
   },
   "include": [
     "src",
-    "tests"
   ],
   "exclude": [
     "node_modules",

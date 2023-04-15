@@ -2,6 +2,25 @@ import { EmbeddedActionsParser } from 'chevrotain';
 import { tokens as t } from './lexer.js';
 import { Identifier, NodeKind } from './types.js';
 
+// function rule() {
+//   return function (target: TwigParser, propertyKey: string, descriptor: PropertyDescriptor) {
+//     let method = descriptor.value!;
+
+//     descriptor.value = target.RULE(propertyKey, methid.call(target))
+
+//       let requiredParameters: number[] = Reflect.getOwnMetadata(requiredMetadataKey, target, propertyName);
+//       if (requiredParameters) {
+//         for (let parameterIndex of requiredParameters) {
+//           if (parameterIndex >= arguments.length || arguments[parameterIndex] === undefined) {
+//             throw new Error("Missing required argument.");
+//           }
+//         }
+//       }
+//       return method.apply(this, arguments);
+//     };
+//   };
+// };
+
 export class TwigParser extends EmbeddedActionsParser {
   constructor() {
     super(t);
@@ -10,15 +29,14 @@ export class TwigParser extends EmbeddedActionsParser {
 
   [NodeKind.Identifier] = this.RULE<() => Identifier>(
     NodeKind.Identifier,
-    () => {
-      const name = this.OR([
+    () => ({
+      type: NodeKind.Identifier,
+      value: this.OR([
         { ALT: () => this.CONSUME(t.DivisibleByToken).image },
         { ALT: () => this.CONSUME(t.SameAsToken).image },
         { ALT: () => this.CONSUME(t.IdentifierToken).image },
-      ]);
-
-      return { type: NodeKind.Identifier, name };
-    }
+      ]),
+    })
   );
 
   Literal = this.RULE('Literal', () =>
@@ -882,6 +900,7 @@ export class TwigParser extends EmbeddedActionsParser {
       const args = this.SUBRULE(this.Arguments);
 
       result = {
+        // @ts-ignore
         type: 'CallExpression',
         // @ts-ignore
         callee: result,
@@ -1039,6 +1058,7 @@ export class TwigParser extends EmbeddedActionsParser {
       const nextFilter = this.SUBRULE1(this.Filter);
 
       filter = {
+        // @ts-ignore
         type: 'FilterExpression',
         // @ts-ignore
         expression: filter,

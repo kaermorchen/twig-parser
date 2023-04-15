@@ -9,5 +9,5 @@ export interface Node {
 
 export interface Identifier extends Node {
   type: NodeKind.Identifier;
-  name: 'string'
+  value: string;
 }
