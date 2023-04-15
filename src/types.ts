@@ -130,23 +130,27 @@ export interface NullLiteral extends Node {
   value: null;
 }
 
-export type Literal = NullLiteral | BooleanLiteral | NumericLiteral | StringLiteral;
+export type Literal =
+  | NullLiteral
+  | BooleanLiteral
+  | NumericLiteral
+  | StringLiteral;
 
 export interface InterpolationExpression extends Node {
   type: NodeKind.InterpolationExpression;
-  expression: Expression
+  expression: Expression;
 }
 
 export interface StringInterpolation extends Node {
   type: NodeKind.StringInterpolation;
-  body: Array<InterpolationExpression | StringLiteral>
+  body: Array<InterpolationExpression | StringLiteral>;
 }
 
 export interface PropertyDefinition extends Node {
   type: NodeKind.PropertyDefinition;
-  key: Literal | Identifier,
+  key: Literal | Identifier;
   value: Expression;
-  shorthand: boolean,
+  shorthand: boolean;
 }
 
 export interface ObjectLiteral extends Node {
@@ -159,9 +163,24 @@ export interface ArrayLiteral extends Node {
   elements: AssignmentExpression_In[];
 }
 
-export type PrimaryExpression = ParenthesizedExpression | ArrowFunctionBody | SingleParamArrowFunction | Identifier | Literal | StringInterpolation | ArrayLiteral | ObjectLiteral;
-export type PropertyName = Identifier | StringLiteral | NumericLiteral | AssignmentExpression_In;
-export type LeftHandSideExpression = PrimaryExpression | MemberExpression | CallExpression;
+export type PrimaryExpression =
+  | ParenthesizedExpression
+  | ArrowFunctionBody
+  | SingleParamArrowFunction
+  | Identifier
+  | Literal
+  | StringInterpolation
+  | ArrayLiteral
+  | ObjectLiteral;
+export type PropertyName =
+  | Identifier
+  | StringLiteral
+  | NumericLiteral
+  | AssignmentExpression_In;
+export type LeftHandSideExpression =
+  | PrimaryExpression
+  | MemberExpression
+  | CallExpression;
 
 export type BoxMemberExpression = Expression_In;
 export type DotMemberExpression = Identifier;
@@ -170,6 +189,12 @@ export interface NamedArgument extends Node {
   type: NodeKind.ArrayLiteral;
   key: Identifier;
   value: AssignmentExpression_In;
+}
+
+export interface MemberExpression extends Node {
+  type: NodeKind.MemberExpression;
+  object: PrimaryExpression;
+  property: BoxMemberExpression | DotMemberExpression;
 }
 
 export type Arguments = Array<NamedArgument | AssignmentExpression_In>;
@@ -200,24 +225,24 @@ export interface BinaryExpression extends Node {
 
 export interface ConditionalExpression extends Node {
   type: NodeKind.ConditionalExpression;
-  test: BinaryExpression,
-  consequent: AssignmentExpression_In,
-  alternate: AssignmentExpression,
+  test: BinaryExpression;
+  consequent: AssignmentExpression_In;
+  alternate: AssignmentExpression;
 }
 
 export interface Text extends Node {
   type: NodeKind.Text;
-  value: string,
+  value: string;
 }
 
 export interface Comment extends Node {
   type: NodeKind.Comment;
-  value: string,
+  value: string;
 }
 
 export interface VariableStatement extends Node {
   type: NodeKind.VariableStatement;
-  value: Expression,
+  value: Expression;
 }
 
 type SourceElement = Text | Comment | VariableStatement | Statement;
@@ -225,5 +250,238 @@ type SourceElementList = SourceElement[];
 
 export interface Template extends Node {
   type: NodeKind.Template;
-  body: SourceElementList,
+  body: SourceElementList;
 }
+
+export interface StopwatchStatement extends Node {
+  type: NodeKind.StopwatchStatement;
+  event_name: string;
+  body: SourceElementList;
+}
+
+export interface TransDefaultDomainStatement extends Node {
+  type: NodeKind.TransDefaultDomainStatement;
+  domain: Expression;
+}
+
+export interface TransStatement extends Node {
+  type: NodeKind.TransStatement;
+  vars: Expression;
+  domain: Expression;
+  locale: Expression;
+  body: SourceElementList;
+}
+
+export interface FormThemeStatement extends Node {
+  type: NodeKind.FormThemeStatement;
+  form: Expression;
+  resources: Expression | Expression[];
+  only: boolean;
+}
+
+export interface VerbatimStatement extends Node {
+  type: NodeKind.VerbatimStatement;
+  body: SourceElementList;
+}
+
+export interface EmbedStatement extends Node {
+  type: NodeKind.EmbedStatement;
+  expr: Expression;
+  variables: Expression;
+  ignoreMissing: boolean;
+  only: boolean;
+  body: SourceElementList;
+}
+
+export interface FromStatement extends Node {
+  type: NodeKind.EmbedStatement;
+  expr: Expression;
+  variables: AsOperator | Identifier;
+}
+
+export interface ImportStatement extends Node {
+  type: NodeKind.EmbedStatement;
+  expr: Expression;
+  name: Identifier;
+}
+
+export interface MacroStatement extends Node {
+  type: NodeKind.MacroStatement;
+  name: Identifier;
+  arguments: Arguments;
+  body: SourceElementList;
+}
+
+export interface IncludeStatement extends Node {
+  type: NodeKind.IncludeStatement;
+  expr: null;
+  variables: Expression;
+  ignoreMissing: boolean;
+  only: boolean;
+}
+
+export interface SandboxStatement extends Node {
+  type: NodeKind.SandboxStatement;
+  body: SourceElementList;
+}
+
+export interface UseStatement extends Node {
+  type: NodeKind.UseStatement;
+  name: Expression;
+  importedBlocks: AsOperator[];
+}
+
+export interface AsOperator extends Node {
+  type: NodeKind.UseStatement;
+  operator: 'as';
+  left: Identifier;
+  right: Identifier;
+}
+
+export interface WithStatement extends Node {
+  type: NodeKind.WithStatement;
+  expr: Expression;
+  body: SourceElementList;
+  accessToOuterScope: boolean;
+}
+
+export interface ExtendsStatement extends Node {
+  type: NodeKind.ExtendsStatement;
+  expr: Expression;
+}
+
+export interface BlockStatement extends Node {
+  type: NodeKind.BlockStatement;
+  name: Identifier;
+  body: SourceElementList;
+  shortcut: boolean;
+}
+
+export interface BlockInlineStatement extends Node {
+  type: NodeKind.BlockInlineStatement;
+  name: Identifier;
+  body: SourceElementList;
+  shortcut: boolean;
+}
+
+export interface FlushStatement extends Node {
+  type: NodeKind.FlushStatement;
+}
+
+export interface DoStatement extends Node {
+  type: NodeKind.DoStatement;
+  expr: Expression;
+}
+
+export interface DeprecatedStatement extends Node {
+  type: NodeKind.DeprecatedStatement;
+  expr: Expression;
+}
+
+export interface CacheStatement extends Node {
+  type: NodeKind.CacheStatement;
+  expiration: Expression;
+  key: Expression;
+  value: SourceElementList;
+}
+
+export interface AutoescapeStatement extends Node {
+  type: NodeKind.AutoescapeStatement;
+  strategy: StringLiteral | BooleanLiteral;
+  value: SourceElementList;
+}
+
+export interface IfStatement extends Node {
+  type: NodeKind.IfStatement;
+  test: Expression;
+  consequent: SourceElementList;
+  alternate: SourceElementList | IfStatement;
+}
+
+export interface ForInStatement extends Node {
+  type: NodeKind.ForInStatement;
+  variables: VariableDeclarationList;
+  expression: Expression;
+  body: SourceElementList;
+  alternate: SourceElement;
+}
+
+export interface ApplyStatement extends Node {
+  type: NodeKind.ApplyStatement;
+  text: Text;
+  filter: Filter;
+}
+
+export interface FilterExpression extends Node {
+  type: NodeKind.FilterExpression;
+  expression: Filter;
+  filter: Filter;
+}
+
+export interface VariableDeclaration extends Node {
+  type: NodeKind.VariableDeclaration;
+  name: Identifier;
+  init: Text;
+}
+
+export interface SetBlockStatement extends Node {
+  type: NodeKind.SetBlockStatement;
+  declarations: VariableDeclaration[];
+}
+
+export interface SetInlineStatement extends Node {
+  type: NodeKind.SetInlineStatement;
+  declarations: VariableDeclaration[];
+}
+
+type Statement =
+  | SetInlineStatement
+  | SetBlockStatement
+  | ApplyStatement
+  | ForInStatement
+  | IfStatement
+  | AutoescapeStatement
+  | CacheStatement
+  | DeprecatedStatement
+  | DoStatement
+  | FlushStatement
+  | BlockInlineStatement
+  | BlockStatement
+  | ExtendsStatement
+  | WithStatement
+  | UseStatement
+  | SandboxStatement
+  | IncludeStatement
+  | MacroStatement
+  | ImportStatement
+  | FromStatement
+  | EmbedStatement
+  | VerbatimStatement
+  | FormThemeStatement
+  | TransStatement
+  | TransDefaultDomainStatement
+  | StopwatchStatement;
+
+type VariableDeclarationList = VariableDeclaration[];
+
+export interface VariableStatement extends Node {
+  type: NodeKind.VariableStatement;
+  value: Expression;
+}
+
+type ExpressionList = Expression[];
+type ExpressionList_In = Expression_In[];
+type Expression = FilterExpression;
+
+export interface CallExpression extends Node {
+  type: NodeKind.CallExpression;
+  callee: Identifier;
+  arguments: Arguments;
+}
+
+type Filter = Identifier | Arguments;
+type AssignmentExpression_In = ConditionalExpression_In;
+type AssignmentExpression = ConditionalExpression;
+type ConditionalExpression_In = BinaryExpression;
+type Expression_In = FilterExpression_In;
+type FilterExpression_In = FilterExpression;
