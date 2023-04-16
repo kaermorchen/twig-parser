@@ -628,37 +628,36 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.RelationalExpression_In] = this.RULE<() => BinaryExpression>(
-    NodeKind.RelationalExpression_In,
-    () => {
-      let result = this.SUBRULE(this.UnaryExpression);
+  [NodeKind.RelationalExpression_In] = this.RULE<
+    () => UnaryExpression | BinaryExpression
+  >(NodeKind.RelationalExpression_In, () => {
+    let result = this.SUBRULE(this.UnaryExpression);
 
-      this.MANY(() => {
-        const operator = this.OR1([
-          { ALT: () => this.CONSUME(t.LessEqualToken).image },
-          { ALT: () => this.CONSUME(t.LessToken).image },
-          { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
-          { ALT: () => this.CONSUME(t.GreaterToken).image },
-          { ALT: () => this.CONSUME(t.NotInToken).image },
-          { ALT: () => this.CONSUME(t.InToken).image },
-          { ALT: () => this.CONSUME(t.MatchesToken).image },
-          { ALT: () => this.CONSUME(t.StartsWithToken).image },
-          { ALT: () => this.CONSUME(t.EndsWithToken).image },
-          { ALT: () => this.CONSUME(t.HasSomeToken).image },
-          { ALT: () => this.CONSUME(t.HasEveryToken).image },
-        ]);
+    this.MANY(() => {
+      const operator = this.OR([
+        { ALT: () => this.CONSUME(t.LessEqualToken).image },
+        { ALT: () => this.CONSUME(t.LessToken).image },
+        { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
+        { ALT: () => this.CONSUME(t.GreaterToken).image },
+        { ALT: () => this.CONSUME(t.NotInToken).image },
+        { ALT: () => this.CONSUME(t.InToken).image },
+        { ALT: () => this.CONSUME(t.MatchesToken).image },
+        { ALT: () => this.CONSUME(t.StartsWithToken).image },
+        { ALT: () => this.CONSUME(t.EndsWithToken).image },
+        { ALT: () => this.CONSUME(t.HasSomeToken).image },
+        { ALT: () => this.CONSUME(t.HasEveryToken).image },
+      ]);
 
-        result = {
-          type: NodeKind.BinaryExpression,
-          left: result,
-          operator,
-          right: this.SUBRULE2(this.UnaryExpression),
-        };
-      });
+      result = {
+        type: NodeKind.BinaryExpression,
+        left: result,
+        operator,
+        right: this.SUBRULE1(this.UnaryExpression),
+      };
+    });
 
-      return result;
-    }
-  );
+    return result;
+  });
 
   [NodeKind.EqualityExpression] = this.RULE<() => BinaryExpression>(
     NodeKind.EqualityExpression,
@@ -974,30 +973,31 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.ConditionalExpression_In] = this.RULE<
-    () => ConditionalExpression_In
-  >(NodeKind.ConditionalExpression_In, () => {
-    let result = this.SUBRULE(this.CoalesceExpression_In);
+  [NodeKind.ConditionalExpression_In] = this.RULE<() => ConditionalExpression>(
+    NodeKind.ConditionalExpression_In,
+    () => {
+      let result = this.SUBRULE(this.CoalesceExpression_In);
 
-    this.OPTION(() => {
-      this.CONSUME(t.QuestionToken);
-      let consequent = result;
-      this.OPTION1(() => {
-        consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      this.OPTION(() => {
+        this.CONSUME(t.QuestionToken);
+        let consequent = result;
+        this.OPTION1(() => {
+          consequent = this.SUBRULE1(this.AssignmentExpression_In);
+        });
+        this.CONSUME(t.ColonToken);
+        const alternate = this.SUBRULE2(this.AssignmentExpression_In);
+
+        result = {
+          type: NodeKind.ConditionalExpression,
+          test: result,
+          consequent,
+          alternate,
+        };
       });
-      this.CONSUME(t.ColonToken);
-      const alternate = this.SUBRULE2(this.AssignmentExpression_In);
 
-      result = {
-        type: NodeKind.ConditionalExpression,
-        test: result,
-        consequent,
-        alternate,
-      };
-    });
-
-    return result;
-  });
+      return result;
+    }
+  );
 
   [NodeKind.AssignmentExpression] = this.RULE<() => AssignmentExpression>(
     NodeKind.AssignmentExpression,
@@ -1039,25 +1039,26 @@ export class TwigParser extends EmbeddedActionsParser {
       })
   );
 
-  [NodeKind.FilterExpression] = this.RULE<() => FilterExpression>(
-    NodeKind.FilterExpression,
-    () => {
-      let expression = this.SUBRULE(this.AssignmentExpression);
+  [NodeKind.FilterExpression] = this.RULE<
+    () => FilterExpression | AssignmentExpression
+  >(NodeKind.FilterExpression, () => {
+    let expression: AssignmentExpression = this.SUBRULE(
+      this.AssignmentExpression
+    );
 
-      this.MANY(() => {
-        this.CONSUME(t.BarToken);
-        const filter = this.SUBRULE(this.Filter);
+    this.MANY(() => {
+      this.CONSUME(t.BarToken);
+      const filter = this.SUBRULE(this.Filter);
 
-        expression = {
-          type: NodeKind.FilterExpression,
-          expression,
-          filter,
-        };
-      });
+      expression = {
+        type: NodeKind.FilterExpression,
+        expression,
+        filter,
+      };
+    });
 
-      return expression;
-    }
-  );
+    return expression;
+  });
 
   [NodeKind.FilterExpression_In] = this.RULE<() => FilterExpression>(
     NodeKind.FilterExpression_In,
@@ -1080,7 +1081,7 @@ export class TwigParser extends EmbeddedActionsParser {
   );
 
   [NodeKind.Filter] = this.RULE<() => Filter>(NodeKind.Filter, () => {
-    let result = this.SUBRULE(this.Identifier);
+    let result: Filter = this.SUBRULE(this.Identifier);
 
     this.OPTION(() => {
       const args = this.SUBRULE(this.Arguments);
@@ -1276,7 +1277,6 @@ export class TwigParser extends EmbeddedActionsParser {
 
         filter = {
           type: NodeKind.FilterExpression,
-
           expression: filter,
           filter: nextFilter,
         };
@@ -1336,7 +1336,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.IfStatement] = this.RULE<() => IfStatement>(
     NodeKind.IfStatement,
     () => {
-      let result = {
+      let result: IfStatement = {
         type: NodeKind.IfStatement,
         test: null,
         consequent: [],
@@ -1394,7 +1394,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.AutoescapeStatement] = this.RULE<() => AutoescapeStatement>(
     NodeKind.AutoescapeStatement,
     () => {
-      const result = {
+      const result: AutoescapeStatement = {
         type: NodeKind.AutoescapeStatement,
         value: [],
         strategy: null,
@@ -1425,7 +1425,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.CacheStatement] = this.RULE<() => CacheStatement>(
     NodeKind.CacheStatement,
     () => {
-      const result = {
+      const result: CacheStatement = {
         type: NodeKind.CacheStatement,
         key: null,
         expiration: null,
@@ -1453,7 +1453,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.DeprecatedStatement] = this.RULE<() => DeprecatedStatement>(
     NodeKind.DeprecatedStatement,
     () => {
-      const result = {
+      const result: DeprecatedStatement = {
         type: NodeKind.DeprecatedStatement,
         expr: null,
       };
@@ -1481,33 +1481,28 @@ export class TwigParser extends EmbeddedActionsParser {
     NodeKind.FlushStatement,
     () => {
       this.CONSUME(t.FlushToken);
-
-      return { type: 'FlushStatement' };
+      return { type: NodeKind.FlushStatement };
     }
   );
 
-  [NodeKind.BlockInlineStatement] = this.RULE<() => BlockInlineStatement>(
+  [NodeKind.BlockInlineStatement] = this.RULE<() => BlockStatement>(
     NodeKind.BlockInlineStatement,
     () => {
-      const result = {
+      this.CONSUME(t.BlockToken);
+
+      return {
         type: NodeKind.BlockStatement,
-        name: null,
-        body: [],
+        name: this.SUBRULE(this.Identifier),
+        body: [this.SUBRULE(this.Expression)],
         shortcut: true,
       };
-
-      this.CONSUME(t.BlockToken);
-      result.name = this.SUBRULE(this.Identifier);
-      result.body.push(this.SUBRULE(this.Expression));
-
-      return result;
     }
   );
 
   [NodeKind.BlockStatement] = this.RULE<() => BlockStatement>(
     NodeKind.BlockStatement,
     () => {
-      const result = {
+      const result: BlockStatement = {
         type: NodeKind.BlockStatement,
         name: null,
         body: [],
@@ -1549,7 +1544,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.WithStatement] = this.RULE<() => WithStatement>(
     NodeKind.WithStatement,
     () => {
-      const result = {
+      const result: WithStatement = {
         type: NodeKind.WithStatement,
         expr: null,
         body: [],
@@ -1579,26 +1574,18 @@ export class TwigParser extends EmbeddedActionsParser {
 
   [NodeKind.AsOperator] = this.RULE<() => BinaryExpression>(
     NodeKind.AsOperator,
-    () => {
-      const result = {
-        type: NodeKind.BinaryExpression,
-        operator: 'as',
-        left: null,
-        right: null,
-      };
-
-      result.left = this.SUBRULE(this.Identifier);
-      this.CONSUME(t.AsToken);
-      result.right = this.SUBRULE1(this.Identifier);
-
-      return result;
-    }
+    () => ({
+      type: NodeKind.BinaryExpression,
+      left: this.SUBRULE(this.Identifier),
+      operator: this.CONSUME(t.AsToken).image,
+      right: this.SUBRULE1(this.Identifier),
+    })
   );
 
   [NodeKind.UseStatement] = this.RULE<() => UseStatement>(
     NodeKind.UseStatement,
     () => {
-      const result = {
+      const result: UseStatement = {
         type: NodeKind.UseStatement,
         name: null,
         importedBlocks: [],
@@ -1624,7 +1611,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.SandboxStatement] = this.RULE<() => SandboxStatement>(
     NodeKind.SandboxStatement,
     () => {
-      const result = {
+      const result: SandboxStatement = {
         type: NodeKind.SandboxStatement,
         body: [],
       };
@@ -1646,17 +1633,15 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.IncludeStatement] = this.RULE<() => IncludeStatement>(
     NodeKind.IncludeStatement,
     () => {
-      const result = {
+      this.CONSUME(t.IncludeToken);
+
+      const result: IncludeStatement = {
         type: NodeKind.IncludeStatement,
-        expr: null,
+        expr: this.SUBRULE(this.Expression),
         variables: null,
         ignoreMissing: false,
         only: false,
       };
-
-      this.CONSUME(t.IncludeToken);
-
-      result.expr = this.SUBRULE(this.Expression);
 
       this.OPTION(() => {
         this.CONSUME(t.IgnoreMissingToken);
@@ -1680,16 +1665,15 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.MacroStatement] = this.RULE<() => MacroStatement>(
     NodeKind.MacroStatement,
     () => {
-      const result = {
+      this.CONSUME(t.MacroToken);
+
+      const result: MacroStatement = {
         type: NodeKind.MacroStatement,
-        name: null,
-        arguments: null,
+        name: this.SUBRULE(this.Identifier),
+        arguments: this.SUBRULE(this.Arguments),
         body: [],
       };
 
-      this.CONSUME(t.MacroToken);
-      result.name = this.SUBRULE(this.Identifier);
-      result.arguments = this.SUBRULE(this.Arguments);
       this.CONSUME(t.RBlockToken);
 
       this.MANY(() => {
@@ -1711,15 +1695,13 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.ImportStatement] = this.RULE<() => ImportStatement>(
     NodeKind.ImportStatement,
     () => {
-      const result = {
-        type: NodeKind.ImportStatement,
-        expr: null,
-        name: null,
-      };
-
       this.CONSUME(t.ImportToken);
 
-      result.expr = this.SUBRULE(this.Expression);
+      const result: ImportStatement = {
+        type: NodeKind.ImportStatement,
+        expr: this.SUBRULE(this.Expression),
+        name: null,
+      };
 
       this.CONSUME(t.AsToken);
 

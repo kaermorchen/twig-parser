@@ -215,6 +215,7 @@ export interface UnaryExpression extends Node {
 }
 
 export interface BinaryExpression extends Node {
+  result: Identifier;
   type: NodeKind.BinaryExpression;
   operator: string;
   left: Expression;
@@ -298,7 +299,7 @@ export interface FromStatement extends Node {
 }
 
 export interface ImportStatement extends Node {
-  type: NodeKind.EmbedStatement;
+  type: NodeKind.ImportStatement;
   expr: Expression;
   name: Identifier;
 }
@@ -312,7 +313,7 @@ export interface MacroStatement extends Node {
 
 export interface IncludeStatement extends Node {
   type: NodeKind.IncludeStatement;
-  expr: null;
+  expr: Expression;
   variables: Expression;
   ignoreMissing: boolean;
   only: boolean;
@@ -326,7 +327,7 @@ export interface SandboxStatement extends Node {
 export interface UseStatement extends Node {
   type: NodeKind.UseStatement;
   name: Expression;
-  importedBlocks: AsOperator[];
+  importedBlocks: BinaryExpression[];
 }
 
 export interface AsOperator extends Node {
@@ -356,9 +357,9 @@ export interface BlockStatement extends Node {
 }
 
 export interface BlockInlineStatement extends Node {
-  type: NodeKind.BlockInlineStatement;
+  type: NodeKind.BlockStatement;
   name: Identifier;
-  body: SourceElementList;
+  body: SourceElementList | Expression;
   shortcut: boolean;
 }
 
@@ -412,7 +413,7 @@ export interface ApplyStatement extends Node {
 
 export interface FilterExpression extends Node {
   type: NodeKind.FilterExpression;
-  expression: Filter;
+  expression: AssignmentExpression;
   filter: Filter;
 }
 
@@ -477,7 +478,7 @@ export interface CallExpression extends Node {
   arguments: Arguments;
 }
 
-export type Filter = Identifier | Arguments;
+export type Filter = Identifier | CallExpression;
 export type AssignmentExpression_In = ConditionalExpression_In;
 export type AssignmentExpression = ConditionalExpression;
 export type ConditionalExpression_In = BinaryExpression;
