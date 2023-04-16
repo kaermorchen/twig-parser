@@ -1879,7 +1879,7 @@ test('VerbatimStatement', () => {
     parse(`{% verbatim %}<li>{{ item }}</li>{% endverbatim %}`).Template()
       .body[0]
   ).toStrictEqual({
-    type: 'EmbedStatement',
+    type: 'VerbatimStatement',
     body: [
       {
         type: 'Text',

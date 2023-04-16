@@ -1807,8 +1807,8 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.VerbatimStatement] = this.RULE<() => VerbatimStatement>(
     NodeKind.VerbatimStatement,
     () => {
-      const result = {
-        type: NodeKind.EmbedStatement,
+      const result: VerbatimStatement = {
+        type: NodeKind.VerbatimStatement,
         body: [],
       };
 
@@ -1829,33 +1829,30 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.FormThemeStatement] = this.RULE<() => FormThemeStatement>(
     NodeKind.FormThemeStatement,
     () => {
-      const result = {
-        type: NodeKind.FormThemeStatement,
-        form: null,
-        resources: [],
-        only: false,
-      };
-
       this.CONSUME(t.FormThemeToken);
 
-      result.form = this.SUBRULE(this.Expression);
-
-      this.OR([
-        {
-          ALT: () => {
-            this.CONSUME(t.WithToken);
-            result.resources = this.SUBRULE1(this.Expression);
+      const result: FormThemeStatement = {
+        type: NodeKind.FormThemeStatement,
+        form: this.SUBRULE(this.Expression),
+        only: false,
+        resources: this.OR([
+          {
+            ALT: () => {
+              this.CONSUME(t.WithToken);
+              return this.SUBRULE1(this.Expression);
+            },
           },
-        },
-        {
-          ALT: () => {
-            result.resources = [];
-            this.AT_LEAST_ONE(() => {
-              result.resources.push(this.SUBRULE2(this.Expression));
-            });
+          {
+            ALT: () => {
+              const resources = [];
+              this.AT_LEAST_ONE(() => {
+                resources.push(this.SUBRULE2(this.Expression));
+              });
+              return resources;
+            },
           },
-        },
-      ]);
+        ]),
+      };
 
       this.OPTION(() => {
         this.CONSUME(t.OnlyToken);
