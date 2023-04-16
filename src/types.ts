@@ -292,9 +292,9 @@ export interface EmbedStatement extends Node {
 }
 
 export interface FromStatement extends Node {
-  type: NodeKind.EmbedStatement;
+  type: NodeKind.FromStatement;
   expr: Expression;
-  variables: AsOperator | Identifier;
+  variables: Array<AsOperator | Identifier>;
 }
 
 export interface ImportStatement extends Node {

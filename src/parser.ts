@@ -1732,27 +1732,25 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.FromStatement] = this.RULE<() => FromStatement>(
     NodeKind.FromStatement,
     () => {
-      const result = {
-        type: NodeKind.FromStatement,
-        expr: null,
-        variables: [],
-      };
-
       this.CONSUME(t.FromToken);
 
-      result.expr = this.SUBRULE(this.Expression);
+      const result: FromStatement = {
+        type: NodeKind.FromStatement,
+        expr: this.SUBRULE(this.Expression),
+        variables: [],
+      };
 
       this.CONSUME(t.ImportToken);
 
       this.MANY_SEP({
         SEP: t.CommaToken,
         DEF: () => {
-          const variable = this.OR([
-            { ALT: () => this.SUBRULE(this.AsOperator) },
-            { ALT: () => this.SUBRULE(this.Identifier) },
-          ]);
-
-          result.variables.push(variable);
+          result.variables.push(
+            this.OR([
+              { ALT: () => this.SUBRULE(this.AsOperator) },
+              { ALT: () => this.SUBRULE(this.Identifier) },
+            ])
+          );
         },
       });
 
@@ -1763,7 +1761,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.EmbedStatement] = this.RULE<() => EmbedStatement>(
     NodeKind.EmbedStatement,
     () => {
-      const result = {
+      const result: EmbedStatement = {
         type: NodeKind.EmbedStatement,
         expr: null,
         variables: null,
