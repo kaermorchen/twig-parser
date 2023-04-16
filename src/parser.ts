@@ -49,7 +49,7 @@ import {
   ObjectLiteral,
   ParenthesizedExpression,
   PrimaryExpression,
-  PropertyDefinition,
+  Property,
   PropertyName,
   SandboxStatement,
   SetBlockStatement,
@@ -237,7 +237,7 @@ export class TwigParser extends EmbeddedActionsParser {
       this.MANY_SEP({
         SEP: t.CommaToken,
         DEF: () => {
-          properties.push(this.SUBRULE(this.PropertyDefinition));
+          properties.push(this.SUBRULE(this.Property));
         },
       });
       this.CONSUME(t.CloseBraceToken);
@@ -249,37 +249,36 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.PropertyDefinition] = this.RULE<() => PropertyDefinition>(
-    NodeKind.PropertyDefinition,
-    () => {
-      const result = {
-        type: NodeKind.PropertyAssignment,
-        key,
-        value,
-        shorthand,
-      };
+  [NodeKind.Property] = this.RULE<() => Property>(NodeKind.Property, () => {
+    return this.OR([
+      {
+        ALT: () => {
+          const key = this.SUBRULE(this.PropertyName);
+          this.CONSUME(t.ColonToken);
+          const value = this.SUBRULE(this.AssignmentExpression_In);
 
-      return this.OR([
-        {
-          ALT: () => {
-            result.key = this.SUBRULE(this.PropertyName);
-            this.CONSUME(t.ColonToken);
-            value = this.SUBRULE(this.AssignmentExpression_In);
-            shorthand = false;
-          },
+          return {
+            type: NodeKind.Property,
+            value,
+            key,
+            shorthand: false,
+          };
         },
-        {
-          ALT: () => {
-            value = this.SUBRULE(this.Identifier);
-            key = { type: 'StringLiteral', value: value.name };
-            shorthand = true;
-          },
-        },
-      ]);
+      },
+      {
+        ALT: () => {
+          const value = this.SUBRULE(this.Identifier);
 
-      return result;
-    }
-  );
+          return {
+            type: NodeKind.Property,
+            value,
+            key: { type: 'StringLiteral', value: value.name },
+            shorthand: true,
+          };
+        },
+      },
+    ]);
+  });
 
   [NodeKind.PropertyName] = this.RULE<() => PropertyName>(
     NodeKind.PropertyName,
@@ -466,22 +465,23 @@ export class TwigParser extends EmbeddedActionsParser {
       ])
   );
 
-  [NodeKind.ExponentiationExpression] = this.RULE<
-    () => BinaryExpression
-  >(NodeKind.ExponentiationExpression, () => {
-    let left = this.SUBRULE(this.UnaryExpression);
+  [NodeKind.ExponentiationExpression] = this.RULE<() => BinaryExpression>(
+    NodeKind.ExponentiationExpression,
+    () => {
+      let left = this.SUBRULE(this.UnaryExpression);
 
-    this.MANY(() => {
-      left = {
-        type: NodeKind.BinaryExpression,
-        left,
-        operator: this.CONSUME(t.AsteriskAsteriskToken).image,
-        right: this.SUBRULE1(this.UnaryExpression),
-      };
-    });
+      this.MANY(() => {
+        left = {
+          type: NodeKind.BinaryExpression,
+          left,
+          operator: this.CONSUME(t.AsteriskAsteriskToken).image,
+          right: this.SUBRULE1(this.UnaryExpression),
+        };
+      });
 
-    return left;
-  });
+      return left;
+    }
+  );
 
   [NodeKind.AssociativityExpression] = this.RULE<() => BinaryExpression>(
     NodeKind.AssociativityExpression,
@@ -506,29 +506,30 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.MultiplicativeExpression] = this.RULE<
-    () => BinaryExpression
-  >(NodeKind.MultiplicativeExpression, () => {
-    let result = this.SUBRULE(this.AssociativityExpression);
+  [NodeKind.MultiplicativeExpression] = this.RULE<() => BinaryExpression>(
+    NodeKind.MultiplicativeExpression,
+    () => {
+      let result = this.SUBRULE(this.AssociativityExpression);
 
-    this.MANY(() => {
-      const operator = this.OR1([
-        { ALT: () => this.CONSUME(t.AsteriskToken).image },
-        { ALT: () => this.CONSUME(t.SlashSlashToken).image },
-        { ALT: () => this.CONSUME(t.SlashToken).image },
-        { ALT: () => this.CONSUME(t.PercentToken).image },
-      ]);
+      this.MANY(() => {
+        const operator = this.OR1([
+          { ALT: () => this.CONSUME(t.AsteriskToken).image },
+          { ALT: () => this.CONSUME(t.SlashSlashToken).image },
+          { ALT: () => this.CONSUME(t.SlashToken).image },
+          { ALT: () => this.CONSUME(t.PercentToken).image },
+        ]);
 
-      result = {
-        type: NodeKind.BinaryExpression,
-        left: result,
-        operator,
-        right: this.SUBRULE2(this.AssociativityExpression),
-      };
-    });
+        result = {
+          type: NodeKind.BinaryExpression,
+          left: result,
+          operator,
+          right: this.SUBRULE2(this.AssociativityExpression),
+        };
+      });
 
-    return result;
-  });
+      return result;
+    }
+  );
 
   [NodeKind.ConcatExpression] = this.RULE<() => BinaryExpression>(
     NodeKind.ConcatExpression,

@@ -70,8 +70,7 @@ export enum NodeKind {
   ObjectLiteral = 'ObjectLiteral',
   ParenthesizedExpression = 'ParenthesizedExpression',
   PrimaryExpression = 'PrimaryExpression',
-  PropertyAssignment = 'PropertyAssignment',
-  PropertyDefinition = 'PropertyDefinition',
+  Property = 'Property',
   PropertyName = 'PropertyName',
   RangeExpression = 'RangeExpression',
   RelationalExpression = 'RelationalExpression',
@@ -146,8 +145,8 @@ export interface StringInterpolation extends Node {
   body: Array<InterpolationExpression | StringLiteral>;
 }
 
-export interface PropertyDefinition extends Node {
-  type: NodeKind.PropertyDefinition;
+export interface Property extends Node {
+  type: NodeKind.Property;
   key: Literal | Identifier;
   value: Expression;
   shorthand: boolean;
@@ -155,7 +154,7 @@ export interface PropertyDefinition extends Node {
 
 export interface ObjectLiteral extends Node {
   type: NodeKind.ObjectLiteral;
-  properties: PropertyDefinition[];
+  properties: Property[];
 }
 
 export interface ArrayLiteral extends Node {

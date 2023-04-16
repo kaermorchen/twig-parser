@@ -142,11 +142,11 @@ test('PropertyName', () => {
   // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
 });
 
-test('PropertyAssignment', () => {
+test('Property', () => {
   expect(
-    parse(`"key": 42`, ModeKind.Statement).PropertyDefinition()
+    parse(`"key": 42`, ModeKind.Statement).Property()
   ).toStrictEqual({
-    type: 'PropertyAssignment',
+    type: 'Property',
     key: {
       type: 'StringLiteral',
       value: 'key',
@@ -159,9 +159,9 @@ test('PropertyAssignment', () => {
   });
 
   expect(
-    parse(`(name): "Anna"`, ModeKind.Statement).PropertyDefinition()
+    parse(`(name): "Anna"`, ModeKind.Statement).Property()
   ).toStrictEqual({
-    type: 'PropertyAssignment',
+    type: 'Property',
     key: {
       type: 'Identifier',
       name: 'name',
@@ -173,8 +173,8 @@ test('PropertyAssignment', () => {
     shorthand: false,
   });
 
-  expect(parse(`foo`, ModeKind.Statement).PropertyDefinition()).toStrictEqual({
-    type: 'PropertyAssignment',
+  expect(parse(`foo`, ModeKind.Statement).Property()).toStrictEqual({
+    type: 'Property',
     value: {
       type: 'Identifier',
       name: 'foo',
@@ -199,7 +199,7 @@ test('ObjectLiteral', () => {
     type: 'ObjectLiteral',
     properties: [
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'StringLiteral',
           value: 'key',
@@ -211,7 +211,7 @@ test('ObjectLiteral', () => {
         shorthand: false,
       },
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'Identifier',
           name: 'foo',
@@ -223,7 +223,7 @@ test('ObjectLiteral', () => {
         shorthand: false,
       },
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'StringLiteral',
           value: 'val',
@@ -500,7 +500,7 @@ test('VariableStatement', () => {
             name: 'a',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'true',
@@ -1478,7 +1478,7 @@ test('WithStatement', () => {
             name: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'NumericLiteral',
             value: 42,
@@ -1510,7 +1510,7 @@ test('WithStatement', () => {
             name: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'NumericLiteral',
             value: 42,
@@ -1626,7 +1626,7 @@ test('IncludeStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1670,7 +1670,7 @@ test('IncludeStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1820,7 +1820,7 @@ test('EmbedStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1866,7 +1866,7 @@ test('EmbedStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1976,7 +1976,7 @@ test('StringInterpolation', () => {
                   name: 'a',
                 },
                 shorthand: false,
-                type: 'PropertyAssignment',
+                type: 'Property',
                 value: {
                   type: 'NumericLiteral',
                   value: 32,
@@ -2098,7 +2098,7 @@ test('TransStatement', () => {
             value: '%name%',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'Fabien',
@@ -2137,7 +2137,7 @@ test('TransStatement', () => {
             value: '%name%',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'Fabien',
