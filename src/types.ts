@@ -4,7 +4,6 @@ export enum NodeKind {
   Arguments = 'Arguments',
   ArrayLiteral = 'ArrayLiteral',
   ArrowFunction = 'ArrowFunction',
-  MultiParamArrowFunction = 'MultiParamArrowFunction',
   ArrowParameters = 'ArrowParameters',
   AsOperator = 'AsOperator',
   AssignmentExpression = 'AssignmentExpression',

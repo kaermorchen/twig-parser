@@ -4,7 +4,6 @@ import {
   ApplyStatement,
   Arguments,
   ArrayLiteral,
-  MultiParamArrowFunction,
   ArrowParameters,
   AsOperator,
   AssignmentExpression,
@@ -189,7 +188,7 @@ export class TwigParser extends EmbeddedActionsParser {
             return this.OR1([
               {
                 ALT: () =>
-                  this.SUBRULE(this.MultiParamArrowFunction, {
+                  this.SUBRULE(this.ArrowFunction, {
                     ARGS: [this.SUBRULE(this.ArrowParameters)],
                   }),
               },
@@ -419,28 +418,29 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  // Short version has only one param: v => v + 1
+  // v => v + 1
   [NodeKind.SingleParamArrowFunction] = this.RULE<() => ArrowFunction>(
     NodeKind.SingleParamArrowFunction,
     () => {
-      return this.SUBRULE(this.MultiParamArrowFunction, {
+      return this.SUBRULE(this.ArrowFunction, {
         ARGS: [[this.SUBRULE(this.Identifier)]],
       });
     }
   );
 
-  [NodeKind.MultiParamArrowFunction] = this.RULE<
-    (params: Identifier[]) => ArrowFunction
-  >(NodeKind.MultiParamArrowFunction, (params: Identifier[]) => {
-    this.CONSUME(t.EqualsGreaterToken);
-    const body = this.SUBRULE(this.AssignmentExpression);
+  ArrowFunction = this.RULE<(params: Identifier[]) => ArrowFunction>(
+    NodeKind.ArrowFunction,
+    (params: Identifier[]) => {
+      this.CONSUME(t.EqualsGreaterToken);
+      const body = this.SUBRULE(this.AssignmentExpression);
 
-    return {
-      type: NodeKind.ArrowFunction,
-      body,
-      params,
-    };
-  });
+      return {
+        type: NodeKind.ArrowFunction,
+        body,
+        params,
+      };
+    }
+  );
 
   // Twig don't have increment and decrement operators
   [NodeKind.UpdateExpression] = this.RULE<() => UpdateExpression>(
