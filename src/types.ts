@@ -172,11 +172,13 @@ export type PrimaryExpression =
   | StringInterpolation
   | ArrayLiteral
   | ObjectLiteral;
+
 export type PropertyName =
   | Identifier
   | StringLiteral
   | NumericLiteral
   | AssignmentExpression_In;
+
 export type LeftHandSideExpression =
   | PrimaryExpression
   | MemberExpression
@@ -245,8 +247,8 @@ export interface VariableStatement extends Node {
   value: Expression;
 }
 
-type SourceElement = Text | Comment | VariableStatement | Statement;
-type SourceElementList = SourceElement[];
+export type SourceElement = Text | Comment | VariableStatement | Statement;
+export type SourceElementList = SourceElement[];
 
 export interface Template extends Node {
   type: NodeKind.Template;
@@ -434,7 +436,7 @@ export interface SetInlineStatement extends Node {
   declarations: VariableDeclaration[];
 }
 
-type Statement =
+export type Statement =
   | SetInlineStatement
   | SetBlockStatement
   | ApplyStatement
@@ -462,16 +464,16 @@ type Statement =
   | TransDefaultDomainStatement
   | StopwatchStatement;
 
-type VariableDeclarationList = VariableDeclaration[];
+export type VariableDeclarationList = VariableDeclaration[];
 
 export interface VariableStatement extends Node {
   type: NodeKind.VariableStatement;
   value: Expression;
 }
 
-type ExpressionList = Expression[];
-type ExpressionList_In = Expression_In[];
-type Expression = FilterExpression;
+export type ExpressionList = Expression[];
+export type ExpressionList_In = Expression_In[];
+export type Expression = FilterExpression;
 
 export interface CallExpression extends Node {
   type: NodeKind.CallExpression;
@@ -479,9 +481,9 @@ export interface CallExpression extends Node {
   arguments: Arguments;
 }
 
-type Filter = Identifier | Arguments;
-type AssignmentExpression_In = ConditionalExpression_In;
-type AssignmentExpression = ConditionalExpression;
-type ConditionalExpression_In = BinaryExpression;
-type Expression_In = FilterExpression_In;
-type FilterExpression_In = FilterExpression;
+export type Filter = Identifier | Arguments;
+export type AssignmentExpression_In = ConditionalExpression_In;
+export type AssignmentExpression = ConditionalExpression;
+export type ConditionalExpression_In = BinaryExpression;
+export type Expression_In = FilterExpression_In;
+export type FilterExpression_In = FilterExpression;
