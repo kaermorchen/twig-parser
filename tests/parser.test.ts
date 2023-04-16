@@ -143,9 +143,7 @@ test('PropertyName', () => {
 });
 
 test('Property', () => {
-  expect(
-    parse(`"key": 42`, ModeKind.Statement).Property()
-  ).toStrictEqual({
+  expect(parse(`"key": 42`, ModeKind.Statement).Property()).toStrictEqual({
     type: 'Property',
     key: {
       type: 'StringLiteral',
@@ -158,9 +156,7 @@ test('Property', () => {
     shorthand: false,
   });
 
-  expect(
-    parse(`(name): "Anna"`, ModeKind.Statement).Property()
-  ).toStrictEqual({
+  expect(parse(`(name): "Anna"`, ModeKind.Statement).Property()).toStrictEqual({
     type: 'Property',
     key: {
       type: 'Identifier',
@@ -2066,10 +2062,7 @@ test('TransStatement', () => {
         value: 'Hello %name%',
       },
     ],
-    domain: null,
-    locale: null,
     type: 'TransStatement',
-    vars: [],
   });
 
   expect(
@@ -2087,7 +2080,6 @@ test('TransStatement', () => {
       type: 'StringLiteral',
       value: 'app',
     },
-    locale: null,
     type: 'TransStatement',
     vars: {
       type: 'ObjectLiteral',

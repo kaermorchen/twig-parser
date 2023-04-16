@@ -53,7 +53,6 @@ import {
   SandboxStatement,
   SetBlockStatement,
   SetInlineStatement,
-  SingleParamArrowFunction,
   SourceElement,
   SourceElementList,
   Statement,
@@ -1870,11 +1869,8 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.TransStatement] = this.RULE<() => TransStatement>(
     NodeKind.TransStatement,
     () => {
-      const result = {
+      const result: TransStatement = {
         type: NodeKind.TransStatement,
-        vars: [],
-        domain: null,
-        locale: null,
         body: [],
       };
 
@@ -1882,7 +1878,6 @@ export class TwigParser extends EmbeddedActionsParser {
 
       this.OPTION(() => {
         this.CONSUME(t.WithToken);
-
         result.vars = this.SUBRULE(this.Expression);
       });
 
@@ -1914,39 +1909,35 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.TransDefaultDomainStatement] = this.RULE<
     () => TransDefaultDomainStatement
   >(NodeKind.TransDefaultDomainStatement, () => {
-    const result = {
-      type: NodeKind.TransDefaultDomainStatement,
-      domain: null,
-    };
-
     this.CONSUME(t.TransDefaultDomainToken);
 
-    result.domain = this.SUBRULE1(this.Expression);
-
-    return result;
+    return {
+      type: NodeKind.TransDefaultDomainStatement,
+      domain: this.SUBRULE(this.Expression),
+    };
   });
 
   [NodeKind.StopwatchStatement] = this.RULE<() => StopwatchStatement>(
     NodeKind.StopwatchStatement,
     () => {
-      const result = {
-        type: NodeKind.StopwatchStatement,
-        event_name: null,
-        body: [],
-      };
+      const body: SourceElement[] = [];
 
       this.CONSUME(t.StopwatchToken);
-      result.event_name = this.SUBRULE1(this.Expression);
+      const event_name = this.SUBRULE1(this.Expression);
       this.CONSUME(t.RBlockToken);
 
       this.MANY(() => {
-        result.body.push(this.SUBRULE3(this.SourceElement));
+        body.push(this.SUBRULE2(this.SourceElement));
       });
 
       this.CONSUME(t.LBlockToken);
       this.CONSUME(t.EndStopwatchToken);
 
-      return result;
+      return {
+        type: NodeKind.StopwatchStatement,
+        event_name,
+        body,
+      };
     }
   );
 
@@ -1991,14 +1982,13 @@ export class TwigParser extends EmbeddedActionsParser {
 
   [NodeKind.SourceElement] = this.RULE<() => SourceElement>(
     NodeKind.SourceElement,
-    () => {
-      return this.OR([
+    () =>
+      this.OR([
         { ALT: () => this.SUBRULE(this.Text) },
         { ALT: () => this.SUBRULE(this.Comment) },
         { ALT: () => this.SUBRULE(this.VariableStatement) },
         { ALT: () => this.SUBRULE(this.Statement) },
-      ]);
-    }
+      ])
   );
 
   [NodeKind.SourceElementList] = this.RULE<() => SourceElementList>(

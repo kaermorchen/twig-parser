@@ -264,9 +264,9 @@ export interface TransDefaultDomainStatement extends Node {
 
 export interface TransStatement extends Node {
   type: NodeKind.TransStatement;
-  vars: Expression;
-  domain: Expression;
-  locale: Expression;
+  vars?: Expression;
+  domain?: Expression;
+  locale?: Expression;
   body: SourceElementList;
 }
 
