@@ -4,7 +4,7 @@ export enum NodeKind {
   Arguments = 'Arguments',
   ArrayLiteral = 'ArrayLiteral',
   ArrowFunction = 'ArrowFunction',
-  ArrowFunctionBody = 'ArrowFunctionBody',
+  MultiParamArrowFunction = 'MultiParamArrowFunction',
   ArrowParameters = 'ArrowParameters',
   AsOperator = 'AsOperator',
   AssignmentExpression = 'AssignmentExpression',
@@ -164,8 +164,7 @@ export interface ArrayLiteral extends Node {
 
 export type PrimaryExpression =
   | ParenthesizedExpression
-  | ArrowFunctionBody
-  | SingleParamArrowFunction
+  | ArrowFunction
   | Identifier
   | Literal
   | StringInterpolation
@@ -201,10 +200,9 @@ export interface MemberExpression extends Node {
 export type Arguments = Array<NamedArgument | AssignmentExpression_In>;
 export type ParenthesizedExpression = Expression;
 export type ArrowParameters = Array<Identifier>;
-export type SingleParamArrowFunction = ArrowFunctionBody;
 
-export interface ArrowFunctionBody extends Node {
-  type: NodeKind.ArrowFunctionBody;
+export interface ArrowFunction extends Node {
+  type: NodeKind.ArrowFunction;
   body: AssignmentExpression;
   params: Identifier[];
 }

@@ -4,7 +4,7 @@ import {
   ApplyStatement,
   Arguments,
   ArrayLiteral,
-  ArrowFunctionBody,
+  MultiParamArrowFunction,
   ArrowParameters,
   AsOperator,
   AssignmentExpression,
@@ -73,6 +73,7 @@ import {
   VariableStatement,
   VerbatimStatement,
   WithStatement,
+  ArrowFunction,
 } from './types.js';
 
 export class TwigParser extends EmbeddedActionsParser {
@@ -188,7 +189,7 @@ export class TwigParser extends EmbeddedActionsParser {
             return this.OR1([
               {
                 ALT: () =>
-                  this.SUBRULE(this.ArrowFunctionBody, {
+                  this.SUBRULE(this.MultiParamArrowFunction, {
                     ARGS: [this.SUBRULE(this.ArrowParameters)],
                   }),
               },
@@ -419,26 +420,27 @@ export class TwigParser extends EmbeddedActionsParser {
   );
 
   // Short version has only one param: v => v + 1
-  [NodeKind.SingleParamArrowFunction] = this.RULE<
-    () => SingleParamArrowFunction
-  >(NodeKind.SingleParamArrowFunction, () => {
-    const params = [this.SUBRULE(this.Identifier)];
-    return this.SUBRULE(this.ArrowFunctionBody, { ARGS: [params] });
-  });
-
-  [NodeKind.ArrowFunctionBody] = this.RULE<() => ArrowFunctionBody>(
-    NodeKind.ArrowFunctionBody,
-    (params) => {
-      this.CONSUME(t.EqualsGreaterToken);
-      const body = this.SUBRULE(this.AssignmentExpression);
-
-      return {
-        type: NodeKind.ArrowFunction,
-        body,
-        params,
-      };
+  [NodeKind.SingleParamArrowFunction] = this.RULE<() => ArrowFunction>(
+    NodeKind.SingleParamArrowFunction,
+    () => {
+      return this.SUBRULE(this.MultiParamArrowFunction, {
+        ARGS: [[this.SUBRULE(this.Identifier)]],
+      });
     }
   );
+
+  [NodeKind.MultiParamArrowFunction] = this.RULE<
+    (params: Identifier[]) => ArrowFunction
+  >(NodeKind.MultiParamArrowFunction, (params: Identifier[]) => {
+    this.CONSUME(t.EqualsGreaterToken);
+    const body = this.SUBRULE(this.AssignmentExpression);
+
+    return {
+      type: NodeKind.ArrowFunction,
+      body,
+      params,
+    };
+  });
 
   // Twig don't have increment and decrement operators
   [NodeKind.UpdateExpression] = this.RULE<() => UpdateExpression>(
