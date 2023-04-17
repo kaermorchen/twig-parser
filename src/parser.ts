@@ -997,7 +997,9 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.ConditionalExpression_In] = this.RULE<
     () => ConditionalExpression_In
   >(NodeKind.ConditionalExpression_In, () => {
-    let result: CoalesceExpression_In | ConditionalExpression = this.SUBRULE(this.CoalesceExpression_In);
+    let result: CoalesceExpression_In | ConditionalExpression = this.SUBRULE(
+      this.CoalesceExpression_In
+    );
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
@@ -1204,7 +1206,7 @@ export class TwigParser extends EmbeddedActionsParser {
       this.CONSUME(t.EqualsToken);
 
       const values = this.SUBRULE(this.ExpressionList);
-      const declarations: VariableDeclaration[]  = [];
+      const declarations: VariableDeclaration[] = [];
 
       for (let i = 0; i < variables.length; i++) {
         declarations.push({
@@ -1257,7 +1259,7 @@ export class TwigParser extends EmbeddedActionsParser {
         this.CONSUME(t.BarToken);
         const nextFilter = this.SUBRULE1(this.Filter);
 
-        filter = {
+        filter = <FilterExpression>{
           type: NodeKind.FilterExpression,
           expression: filter,
           filter: nextFilter,

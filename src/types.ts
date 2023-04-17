@@ -410,7 +410,7 @@ export interface ForInStatement extends Node {
 export interface ApplyStatement extends Node {
   type: NodeKind.ApplyStatement;
   text: Text;
-  filter: Filter;
+  filter: Filter | FilterExpression;
 }
 
 export type FilterExpression =
