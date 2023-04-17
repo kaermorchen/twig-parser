@@ -72,6 +72,10 @@ import {
   VerbatimStatement,
   WithStatement,
   ArrowFunction,
+  CoalesceExpression,
+  RelationalExpression_In,
+  EqualityExpression_In,
+  CoalesceExpression_In,
 } from './types.js';
 
 export class TwigParser extends EmbeddedActionsParser {
@@ -628,36 +632,37 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.RelationalExpression_In] = this.RULE<
-    () => UnaryExpression | BinaryExpression
-  >(NodeKind.RelationalExpression_In, () => {
-    let result = this.SUBRULE(this.UnaryExpression);
+  [NodeKind.RelationalExpression_In] = this.RULE<() => RelationalExpression_In>(
+    NodeKind.RelationalExpression_In,
+    () => {
+      let result: RelationalExpression_In = this.SUBRULE(this.UnaryExpression);
 
-    this.MANY(() => {
-      const operator = this.OR([
-        { ALT: () => this.CONSUME(t.LessEqualToken).image },
-        { ALT: () => this.CONSUME(t.LessToken).image },
-        { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
-        { ALT: () => this.CONSUME(t.GreaterToken).image },
-        { ALT: () => this.CONSUME(t.NotInToken).image },
-        { ALT: () => this.CONSUME(t.InToken).image },
-        { ALT: () => this.CONSUME(t.MatchesToken).image },
-        { ALT: () => this.CONSUME(t.StartsWithToken).image },
-        { ALT: () => this.CONSUME(t.EndsWithToken).image },
-        { ALT: () => this.CONSUME(t.HasSomeToken).image },
-        { ALT: () => this.CONSUME(t.HasEveryToken).image },
-      ]);
+      this.MANY(() => {
+        const operator = this.OR([
+          { ALT: () => this.CONSUME(t.LessEqualToken).image },
+          { ALT: () => this.CONSUME(t.LessToken).image },
+          { ALT: () => this.CONSUME(t.GreaterEqualToken).image },
+          { ALT: () => this.CONSUME(t.GreaterToken).image },
+          { ALT: () => this.CONSUME(t.NotInToken).image },
+          { ALT: () => this.CONSUME(t.InToken).image },
+          { ALT: () => this.CONSUME(t.MatchesToken).image },
+          { ALT: () => this.CONSUME(t.StartsWithToken).image },
+          { ALT: () => this.CONSUME(t.EndsWithToken).image },
+          { ALT: () => this.CONSUME(t.HasSomeToken).image },
+          { ALT: () => this.CONSUME(t.HasEveryToken).image },
+        ]);
 
-      result = {
-        type: NodeKind.BinaryExpression,
-        left: result,
-        operator,
-        right: this.SUBRULE1(this.UnaryExpression),
-      };
-    });
+        result = {
+          type: NodeKind.BinaryExpression,
+          left: result,
+          operator,
+          right: this.SUBRULE1(this.UnaryExpression),
+        };
+      });
 
-    return result;
-  });
+      return result;
+    }
+  );
 
   [NodeKind.EqualityExpression] = this.RULE<() => BinaryExpression>(
     NodeKind.EqualityExpression,
@@ -683,7 +688,7 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.EqualityExpression_In] = this.RULE<() => BinaryExpression>(
+  [NodeKind.EqualityExpression_In] = this.RULE<() => EqualityExpression_In>(
     NodeKind.EqualityExpression_In,
     () => {
       let result = this.SUBRULE(this.RelationalExpression_In);
@@ -907,7 +912,7 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.CoalesceExpression] = this.RULE<() => BinaryExpression>(
+  [NodeKind.CoalesceExpression] = this.RULE<() => CoalesceExpression>(
     NodeKind.CoalesceExpression,
     () => {
       let result = this.SUBRULE(this.LogicalORExpression);
@@ -927,7 +932,7 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.CoalesceExpression_In] = this.RULE<() => BinaryExpression>(
+  [NodeKind.CoalesceExpression_In] = this.RULE<() => CoalesceExpression_In>(
     NodeKind.CoalesceExpression_In,
     () => {
       let result = this.SUBRULE(this.LogicalORExpression_In);
@@ -973,92 +978,60 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.ConditionalExpression_In] = this.RULE<() => ConditionalExpression>(
-    NodeKind.ConditionalExpression_In,
-    () => {
-      let result = this.SUBRULE(this.CoalesceExpression_In);
+  [NodeKind.ConditionalExpression_In] = this.RULE<
+    () => ConditionalExpression_In
+  >(NodeKind.ConditionalExpression_In, () => {
+    let result = this.SUBRULE(this.CoalesceExpression_In);
 
-      this.OPTION(() => {
-        this.CONSUME(t.QuestionToken);
-        let consequent = result;
-        this.OPTION1(() => {
-          consequent = this.SUBRULE1(this.AssignmentExpression_In);
-        });
-        this.CONSUME(t.ColonToken);
-        const alternate = this.SUBRULE2(this.AssignmentExpression_In);
-
-        result = {
-          type: NodeKind.ConditionalExpression,
-          test: result,
-          consequent,
-          alternate,
-        };
+    this.OPTION(() => {
+      this.CONSUME(t.QuestionToken);
+      let consequent = result;
+      this.OPTION1(() => {
+        consequent = this.SUBRULE1(this.AssignmentExpression_In);
       });
+      this.CONSUME(t.ColonToken);
+      const alternate = this.SUBRULE2(this.AssignmentExpression_In);
 
-      return result;
-    }
-  );
+      result = {
+        type: NodeKind.ConditionalExpression,
+        test: result,
+        consequent,
+        alternate,
+      };
+    });
+
+    return result;
+  });
 
   [NodeKind.AssignmentExpression] = this.RULE<() => AssignmentExpression>(
     NodeKind.AssignmentExpression,
-    () =>
-      this.OR({
-        MAX_LOOKAHEAD: 4,
-        DEF: [
-          // { ALT: () => this.SUBRULE(this.ArrowFunction) },
-          { ALT: () => this.SUBRULE(this.ConditionalExpression) },
-          // {
-          //   ALT: () => ({
-          //     type: NodeKind.AssignmentExpression,
-          //     left: this.SUBRULE(this.LeftHandSideExpression),
-          //     operator: this.CONSUME(t.EqualsToken).image,
-          //     right: this.SUBRULE(this.AssignmentExpression),
-          //   }),
-          // },
-        ],
-      })
+    () => this.SUBRULE(this.ConditionalExpression)
   );
 
   [NodeKind.AssignmentExpression_In] = this.RULE<() => AssignmentExpression_In>(
     NodeKind.AssignmentExpression_In,
-    () =>
-      this.OR({
-        MAX_LOOKAHEAD: 4,
-        DEF: [
-          // { ALT: () => this.SUBRULE(this.ArrowFunction_In) },
-          { ALT: () => this.SUBRULE(this.ConditionalExpression_In) },
-          // {
-          //   ALT: () => ({
-          //     type: NodeKind.AssignmentExpression,
-          //     left: this.SUBRULE(this.LeftHandSideExpression),
-          //     operator: this.CONSUME(t.EqualsToken).image,
-          //     right: this.SUBRULE(this.AssignmentExpression_In),
-          //   }),
-          // },
-        ],
-      })
+    () => this.SUBRULE(this.ConditionalExpression_In)
   );
 
-  [NodeKind.FilterExpression] = this.RULE<
-    () => FilterExpression | AssignmentExpression
-  >(NodeKind.FilterExpression, () => {
-    let expression: AssignmentExpression = this.SUBRULE(
-      this.AssignmentExpression
-    );
+  [NodeKind.FilterExpression] = this.RULE<() => FilterExpression>(
+    NodeKind.FilterExpression,
+    () => {
+      let expression = this.SUBRULE(this.AssignmentExpression);
 
-    this.MANY(() => {
-      this.CONSUME(t.BarToken);
-      const filter = this.SUBRULE(this.Filter);
+      this.MANY(() => {
+        this.CONSUME(t.BarToken);
+        const filter = this.SUBRULE(this.Filter);
 
-      expression = {
-        type: NodeKind.FilterExpression,
-        expression,
-        filter,
-      };
-    });
+        expression = {
+          type: NodeKind.FilterExpression,
+          expression,
+          filter,
+        };
+      });
 
-    return expression;
-  });
+      return expression;
+    }
+  );
 
   [NodeKind.FilterExpression_In] = this.RULE<() => FilterExpression>(
     NodeKind.FilterExpression_In,
@@ -1493,7 +1466,12 @@ export class TwigParser extends EmbeddedActionsParser {
       return {
         type: NodeKind.BlockStatement,
         name: this.SUBRULE(this.Identifier),
-        body: [this.SUBRULE(this.Expression)],
+        body: [
+          {
+            type: NodeKind.VariableStatement,
+            value: this.SUBRULE(this.Expression),
+          },
+        ],
         shortcut: true,
       };
     }
@@ -1897,24 +1875,24 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.StopwatchStatement] = this.RULE<() => StopwatchStatement>(
     NodeKind.StopwatchStatement,
     () => {
-      const body: SourceElement[] = [];
-
       this.CONSUME(t.StopwatchToken);
-      const event_name = this.SUBRULE1(this.Expression);
+
+      const result: StopwatchStatement = {
+        type: NodeKind.StopwatchStatement,
+        event_name: this.SUBRULE1(this.Expression),
+        body: [],
+      };
+
       this.CONSUME(t.RBlockToken);
 
       this.MANY(() => {
-        body.push(this.SUBRULE2(this.SourceElement));
+        result.body.push(this.SUBRULE2(this.SourceElement));
       });
 
       this.CONSUME(t.LBlockToken);
       this.CONSUME(t.EndStopwatchToken);
 
-      return {
-        type: NodeKind.StopwatchStatement,
-        event_name,
-        body,
-      };
+      return result;
     }
   );
 

@@ -208,26 +208,33 @@ export interface ArrowFunction extends Node {
 
 export type UpdateExpression = LeftHandSideExpression;
 
-export interface UnaryExpression extends Node {
-  type: NodeKind.UnaryExpression;
-  operator: string;
-  argument: UnaryExpression | UpdateExpression;
-}
+export type UnaryExpression =
+  | UpdateExpression
+  | {
+      type: NodeKind.UnaryExpression;
+      operator: string;
+      argument: UnaryExpression | UpdateExpression;
+    };
+
+export type EqualityExpression_In = RelationalExpression_In | BinaryExpression;
 
 export interface BinaryExpression extends Node {
-  result: Identifier;
   type: NodeKind.BinaryExpression;
-  operator: string;
   left: Expression;
+  operator: string;
   right: Expression;
 }
 
-export interface ConditionalExpression extends Node {
-  type: NodeKind.ConditionalExpression;
-  test: BinaryExpression;
-  consequent: AssignmentExpression_In;
-  alternate: AssignmentExpression;
-}
+export type CoalesceExpression = BinaryExpression;
+
+export type ConditionalExpression =
+  | CoalesceExpression
+  | {
+      type: NodeKind.ConditionalExpression;
+      test: BinaryExpression;
+      consequent: AssignmentExpression_In;
+      alternate: AssignmentExpression;
+    };
 
 export interface Text extends Node {
   type: NodeKind.Text;
@@ -254,7 +261,7 @@ export interface Template extends Node {
 
 export interface StopwatchStatement extends Node {
   type: NodeKind.StopwatchStatement;
-  event_name: string;
+  event_name: Expression;
   body: SourceElementList;
 }
 
@@ -411,11 +418,13 @@ export interface ApplyStatement extends Node {
   filter: Filter;
 }
 
-export interface FilterExpression extends Node {
-  type: NodeKind.FilterExpression;
-  expression: AssignmentExpression;
-  filter: Filter;
-}
+export type FilterExpression =
+  | AssignmentExpression
+  | {
+      type: NodeKind.FilterExpression;
+      expression: AssignmentExpression | FilterExpression;
+      filter: Filter;
+    };
 
 export interface VariableDeclaration extends Node {
   type: NodeKind.VariableDeclaration;
@@ -481,6 +490,8 @@ export interface CallExpression extends Node {
 export type Filter = Identifier | CallExpression;
 export type AssignmentExpression_In = ConditionalExpression_In;
 export type AssignmentExpression = ConditionalExpression;
-export type ConditionalExpression_In = BinaryExpression;
+export type ConditionalExpression_In = CoalesceExpression_In | ConditionalExpression;
 export type Expression_In = FilterExpression_In;
 export type FilterExpression_In = FilterExpression;
+export type RelationalExpression_In = UnaryExpression | BinaryExpression;
+export type CoalesceExpression_In = BinaryExpression;
