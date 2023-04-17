@@ -551,7 +551,7 @@ test('Template', () => {
   });
 });
 
-test('SetInlineStatement', () => {
+test('SetStatement', () => {
   expect(parse(`{% set name = 'Bruce Wayne' %}`).Statement()).toStrictEqual({
     type: 'SetStatement',
     declarations: [
@@ -598,9 +598,7 @@ test('SetInlineStatement', () => {
       },
     ],
   });
-});
 
-test('SetBlockStatement', () => {
   expect(
     parse(`{% set greetings %}Hello user!{% endset %}`).Statement()
   ).toStrictEqual({

@@ -1167,55 +1167,52 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  [NodeKind.SetInlineStatement] = this.RULE<() => SetStatement>(
-    NodeKind.SetInlineStatement,
+  [NodeKind.SetStatement] = this.RULE<() => SetStatement>(
+    NodeKind.SetStatement,
     () => {
       this.CONSUME(t.SetToken);
 
-      const variables = this.SUBRULE(this.VariableDeclarationList);
-
-      this.CONSUME(t.EqualsToken);
-
-      const values = this.SUBRULE(this.ExpressionList);
-      const declarations: VariableDeclaration[] = [];
-
-      for (let i = 0; i < variables.length; i++) {
-        declarations.push({
-          type: NodeKind.VariableDeclaration,
-          name: variables[i],
-          init: values[i],
-        });
-      }
-
-      return {
+      const result: SetStatement = {
         type: NodeKind.SetStatement,
-        declarations,
+        declarations: [],
       };
-    }
-  );
 
-  [NodeKind.SetBlockStatement] = this.RULE<() => SetStatement>(
-    NodeKind.SetBlockStatement,
-    () => {
-      this.CONSUME(t.SetToken);
-      const name = this.SUBRULE(this.Identifier);
-      this.CONSUME(t.RBlockToken);
+      this.OR([
+        {
+          ALT: () => {
+            const name = this.SUBRULE(this.Identifier);
+            this.CONSUME(t.RBlockToken);
 
-      const init = this.SUBRULE1(this.Text);
+            const init = this.SUBRULE1(this.Text);
 
-      this.CONSUME1(t.LBlockToken);
-      this.CONSUME1(t.EndSetToken);
+            this.CONSUME1(t.LBlockToken);
+            this.CONSUME1(t.EndSetToken);
 
-      return {
-        type: NodeKind.SetStatement,
-        declarations: [
-          {
-            type: NodeKind.VariableDeclaration,
-            name,
-            init,
+            result.declarations.push({
+              type: NodeKind.VariableDeclaration,
+              name,
+              init,
+            });
           },
-        ],
-      };
+        },
+        {
+          ALT: () => {
+            const variables = this.SUBRULE(this.VariableDeclarationList);
+            this.CONSUME(t.EqualsToken);
+            const values = this.SUBRULE(this.ExpressionList);
+
+            for (let i = 0; i < variables.length; i++) {
+              result.declarations.push({
+                type: NodeKind.VariableDeclaration,
+                name: variables[i],
+                init: values[i],
+              });
+            }
+          },
+        },
+      ]);
+
+      return result;
     }
   );
 
@@ -1885,8 +1882,7 @@ export class TwigParser extends EmbeddedActionsParser {
     const statement = this.OR({
       DEF: [
         // Twig
-        { ALT: () => this.SUBRULE(this.SetInlineStatement) },
-        { ALT: () => this.SUBRULE(this.SetBlockStatement) },
+        { ALT: () => this.SUBRULE(this.SetStatement) },
         { ALT: () => this.SUBRULE(this.ApplyStatement) },
         { ALT: () => this.SUBRULE(this.ForInStatement) },
         { ALT: () => this.SUBRULE(this.IfStatement) },

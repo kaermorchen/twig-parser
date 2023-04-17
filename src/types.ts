@@ -74,8 +74,6 @@ export enum NodeKind {
   RelationalExpression = 'RelationalExpression',
   RelationalExpression_In = 'RelationalExpression_In',
   SandboxStatement = 'SandboxStatement',
-  SetBlockStatement = 'SetBlockStatement',
-  SetInlineStatement = 'SetInlineStatement',
   SetStatement = 'SetStatement',
   SingleParamArrowFunction = 'SingleParamArrowFunction',
   SourceElement = 'SourceElement',
@@ -428,12 +426,8 @@ export interface SetStatement extends Node {
   declarations: VariableDeclaration[];
 }
 
-export type SetBlockStatement = SetStatement;
-export type SetInlineStatement = SetStatement;
-
 export type Statement =
-  | SetInlineStatement
-  | SetBlockStatement
+  | SetStatement
   | ApplyStatement
   | ForInStatement
   | IfStatement
