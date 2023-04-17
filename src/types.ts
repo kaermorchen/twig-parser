@@ -185,7 +185,7 @@ export type BoxMemberExpression = Expression_In;
 export type DotMemberExpression = Identifier;
 
 export interface NamedArgument extends Node {
-  type: NodeKind.ArrayLiteral;
+  type: NodeKind.NamedArgument;
   key: Identifier;
   value: AssignmentExpression_In;
 }
@@ -225,7 +225,7 @@ export interface BinaryExpression extends Node {
   right: Expression;
 }
 
-export type CoalesceExpression = BinaryExpression;
+export type CoalesceExpression = LogicalORExpression | BinaryExpression;
 
 export type ConditionalExpression =
   | CoalesceExpression
@@ -337,12 +337,7 @@ export interface UseStatement extends Node {
   importedBlocks: BinaryExpression[];
 }
 
-export interface AsOperator extends Node {
-  type: NodeKind.UseStatement;
-  operator: 'as';
-  left: Identifier;
-  right: Identifier;
-}
+export type AsOperator = BinaryExpression;
 
 export interface WithStatement extends Node {
   type: NodeKind.WithStatement;
@@ -432,15 +427,13 @@ export interface VariableDeclaration extends Node {
   init: Text;
 }
 
-export interface SetBlockStatement extends Node {
-  type: NodeKind.SetBlockStatement;
+export interface SetStatement extends Node {
+  type: NodeKind.SetStatement;
   declarations: VariableDeclaration[];
 }
 
-export interface SetInlineStatement extends Node {
-  type: NodeKind.SetInlineStatement;
-  declarations: VariableDeclaration[];
-}
+export type SetBlockStatement = SetStatement;
+export type SetInlineStatement = SetStatement;
 
 export type Statement =
   | SetInlineStatement
@@ -470,7 +463,7 @@ export type Statement =
   | TransDefaultDomainStatement
   | StopwatchStatement;
 
-export type VariableDeclarationList = VariableDeclaration[];
+export type VariableDeclarationList = Identifier[];
 
 export interface VariableStatement extends Node {
   type: NodeKind.VariableStatement;
@@ -492,6 +485,25 @@ export type AssignmentExpression_In = ConditionalExpression_In;
 export type AssignmentExpression = ConditionalExpression;
 export type ConditionalExpression_In = CoalesceExpression_In | ConditionalExpression;
 export type Expression_In = FilterExpression_In;
-export type FilterExpression_In = FilterExpression;
+export type FilterExpression_In = AssignmentExpression_In | FilterExpression;
 export type RelationalExpression_In = UnaryExpression | BinaryExpression;
 export type CoalesceExpression_In = BinaryExpression;
+
+export type ExponentiationExpression = UnaryExpression | BinaryExpression;
+export type AssociativityExpression = ExponentiationExpression | BinaryExpression;
+export type MultiplicativeExpression = AssociativityExpression | BinaryExpression;
+export type ConcatExpression = MultiplicativeExpression | BinaryExpression;
+export type AdditiveExpression = ConcatExpression | BinaryExpression;
+export type RangeExpression = AdditiveExpression | BinaryExpression;
+export type RelationalExpression = RangeExpression | BinaryExpression;
+export type EqualityExpression = RelationalExpression | BinaryExpression;
+export type BitwiseANDExpression = EqualityExpression | BinaryExpression;
+export type BitwiseANDExpression_In = EqualityExpression_In | BinaryExpression;
+export type BitwiseXORExpression = BitwiseANDExpression | BinaryExpression;
+export type BitwiseXORExpression_In = BitwiseANDExpression_In | BinaryExpression;
+export type BitwiseORExpression = BitwiseXORExpression | BinaryExpression;
+export type BitwiseORExpression_In = BitwiseXORExpression_In | BinaryExpression;
+export type LogicalANDExpression = BitwiseORExpression | BinaryExpression;
+export type LogicalANDExpression_In = BitwiseORExpression_In | BinaryExpression;
+export type LogicalORExpression = LogicalANDExpression | BinaryExpression;
+export type LogicalORExpression_In = LogicalANDExpression_In | BinaryExpression;

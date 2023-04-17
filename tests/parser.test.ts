@@ -1415,15 +1415,18 @@ test('BlockInlineStatement', () => {
   ).toStrictEqual({
     body: [
       {
-        expression: {
-          type: 'Identifier',
-          name: 'page_title',
+        type: 'VariableStatement',
+        value: {
+          expression: {
+            type: 'Identifier',
+            name: 'page_title',
+          },
+          filter: {
+            type: 'Identifier',
+            name: 'title',
+          },
+          type: 'FilterExpression',
         },
-        filter: {
-          type: 'Identifier',
-          name: 'title',
-        },
-        type: 'FilterExpression',
       },
     ],
     name: {
