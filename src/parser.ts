@@ -9,8 +9,6 @@ import {
   AssignmentExpression,
   AssignmentExpression_In,
   AutoescapeStatement,
-  BinaryExpression,
-  BlockInlineStatement,
   BlockStatement,
   BooleanLiteral,
   BoxMemberExpression,
@@ -25,7 +23,6 @@ import {
   EmbedStatement,
   Expression,
   ExpressionList,
-  ExpressionList_In,
   Expression_In,
   ExtendsStatement,
   Filter,
@@ -51,8 +48,6 @@ import {
   Property,
   PropertyName,
   SandboxStatement,
-  SetBlockStatement,
-  SetInlineStatement,
   SourceElement,
   SourceElementList,
   Statement,
@@ -64,7 +59,6 @@ import {
   TransDefaultDomainStatement,
   TransStatement,
   UnaryExpression,
-  UpdateExpression,
   UseStatement,
   VariableDeclaration,
   VariableDeclarationList,
@@ -463,17 +457,11 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  // Twig don't have increment and decrement operators
-  [NodeKind.UpdateExpression] = this.RULE<() => UpdateExpression>(
-    NodeKind.UpdateExpression,
-    () => this.SUBRULE(this.LeftHandSideExpression)
-  );
-
   [NodeKind.UnaryExpression] = this.RULE<() => UnaryExpression>(
     NodeKind.UnaryExpression,
     () =>
       this.OR([
-        { ALT: () => this.SUBRULE(this.UpdateExpression) },
+        { ALT: () => this.SUBRULE(this.LeftHandSideExpression) },
         {
           ALT: () => ({
             type: NodeKind.UnaryExpression,
@@ -1122,23 +1110,6 @@ export class TwigParser extends EmbeddedActionsParser {
         SEP: t.CommaToken,
         DEF: () => {
           arr.push(this.SUBRULE(this.Expression));
-        },
-      });
-
-      return arr;
-    }
-  );
-
-  // TODO: Is it used?
-  [NodeKind.ExpressionList_In] = this.RULE<() => ExpressionList_In>(
-    NodeKind.ExpressionList_In,
-    () => {
-      const arr = [];
-
-      this.MANY_SEP({
-        SEP: t.CommaToken,
-        DEF: () => {
-          arr.push(this.SUBRULE(this.Expression_In));
         },
       });
 

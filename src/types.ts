@@ -38,7 +38,6 @@ export enum NodeKind {
   ExponentiationExpression = 'ExponentiationExpression',
   Expression = 'Expression',
   ExpressionList = 'ExpressionList',
-  ExpressionList_In = 'ExpressionList_In',
   Expression_In = 'Expression_In',
   ExtendsStatement = 'ExtendsStatement',
   Filter = 'Filter',
@@ -90,7 +89,6 @@ export enum NodeKind {
   TransDefaultDomainStatement = 'TransDefaultDomainStatement',
   TransStatement = 'TransStatement',
   UnaryExpression = 'UnaryExpression',
-  UpdateExpression = 'UpdateExpression',
   UseStatement = 'UseStatement',
   VariableDeclaration = 'VariableDeclaration',
   VariableDeclarationList = 'VariableDeclarationList',
@@ -206,14 +204,12 @@ export interface ArrowFunction extends Node {
   params: Identifier[];
 }
 
-export type UpdateExpression = LeftHandSideExpression;
-
 export type UnaryExpression =
-  | UpdateExpression
+  | LeftHandSideExpression
   | {
       type: NodeKind.UnaryExpression;
       operator: string;
-      argument: UnaryExpression | UpdateExpression;
+      argument: UnaryExpression;
     };
 
 export type EqualityExpression_In = RelationalExpression_In | BinaryExpression;
@@ -471,7 +467,6 @@ export interface VariableStatement extends Node {
 }
 
 export type ExpressionList = Expression[];
-export type ExpressionList_In = Expression_In[];
 export type Expression = FilterExpression;
 
 export interface CallExpression extends Node {
@@ -483,15 +478,21 @@ export interface CallExpression extends Node {
 export type Filter = Identifier | CallExpression;
 export type AssignmentExpression_In = ConditionalExpression_In;
 export type AssignmentExpression = ConditionalExpression;
-export type ConditionalExpression_In = CoalesceExpression_In | ConditionalExpression;
+export type ConditionalExpression_In =
+  | CoalesceExpression_In
+  | ConditionalExpression;
 export type Expression_In = FilterExpression_In;
 export type FilterExpression_In = AssignmentExpression_In | FilterExpression;
 export type RelationalExpression_In = UnaryExpression | BinaryExpression;
 export type CoalesceExpression_In = BinaryExpression;
 
 export type ExponentiationExpression = UnaryExpression | BinaryExpression;
-export type AssociativityExpression = ExponentiationExpression | BinaryExpression;
-export type MultiplicativeExpression = AssociativityExpression | BinaryExpression;
+export type AssociativityExpression =
+  | ExponentiationExpression
+  | BinaryExpression;
+export type MultiplicativeExpression =
+  | AssociativityExpression
+  | BinaryExpression;
 export type ConcatExpression = MultiplicativeExpression | BinaryExpression;
 export type AdditiveExpression = ConcatExpression | BinaryExpression;
 export type RangeExpression = AdditiveExpression | BinaryExpression;
@@ -500,7 +501,9 @@ export type EqualityExpression = RelationalExpression | BinaryExpression;
 export type BitwiseANDExpression = EqualityExpression | BinaryExpression;
 export type BitwiseANDExpression_In = EqualityExpression_In | BinaryExpression;
 export type BitwiseXORExpression = BitwiseANDExpression | BinaryExpression;
-export type BitwiseXORExpression_In = BitwiseANDExpression_In | BinaryExpression;
+export type BitwiseXORExpression_In =
+  | BitwiseANDExpression_In
+  | BinaryExpression;
 export type BitwiseORExpression = BitwiseXORExpression | BinaryExpression;
 export type BitwiseORExpression_In = BitwiseXORExpression_In | BinaryExpression;
 export type LogicalANDExpression = BitwiseORExpression | BinaryExpression;
