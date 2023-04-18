@@ -481,6 +481,26 @@ test('UnaryExpression', () => {
       type: 'UnaryExpression',
     }
   );
+
+  expect(parse(`{{ 2 + -2 }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      type: 'BinaryExpression',
+      left: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      operator: '+',
+      right: {
+        argument: {
+          type: 'NumericLiteral',
+          value: 2,
+        },
+        operator: '-',
+        type: 'UnaryExpression',
+      },
+    },
+  });
 });
 
 test('VariableStatement', () => {
