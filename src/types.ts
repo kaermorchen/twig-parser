@@ -193,8 +193,12 @@ export interface MemberExpression extends Node {
 }
 
 export type Arguments = Array<NamedArgument | AssignmentExpression_In>;
-export type ParenthesizedExpression = Expression;
 export type ArrowParameters = Array<Identifier>;
+
+export interface ParenthesizedExpression extends Node {
+  type: NodeKind.ParenthesizedExpression;
+  expr: Expression
+}
 
 export interface ArrowFunction extends Node {
   type: NodeKind.ArrowFunction;
@@ -418,7 +422,7 @@ export type FilterExpression =
 export interface VariableDeclaration extends Node {
   type: NodeKind.VariableDeclaration;
   name: Identifier;
-  init: Text;
+  init: Expression | Text;
 }
 
 export interface SetStatement extends Node {
@@ -478,7 +482,7 @@ export type ConditionalExpression_In =
 export type Expression_In = FilterExpression_In;
 export type FilterExpression_In = AssignmentExpression_In | FilterExpression;
 export type RelationalExpression_In = UnaryExpression | BinaryExpression;
-export type CoalesceExpression_In = BinaryExpression;
+export type CoalesceExpression_In = LogicalORExpression_In | BinaryExpression;
 
 export type ExponentiationExpression = UnaryExpression | BinaryExpression;
 export type AssociativityExpression =

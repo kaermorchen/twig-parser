@@ -238,8 +238,11 @@ test('ParenthesizedExpression', () => {
   expect(parse(`{{ (4) }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
-      type: 'NumericLiteral',
-      value: 4,
+      type: 'ParenthesizedExpression',
+      expr: {
+        type: 'NumericLiteral',
+        value: 4,
+      },
     },
   });
 
@@ -252,32 +255,35 @@ test('ParenthesizedExpression', () => {
       type: 'UnaryExpression',
       operator: 'not',
       argument: {
-        left: {
-          object: {
-            type: 'Identifier',
-            name: 'post',
-          },
-          property: {
-            type: 'Identifier',
-            name: 'status',
-          },
-          type: 'MemberExpression',
-        },
-        operator: 'is',
-        right: {
-          arguments: [
-            {
-              type: 'StringLiteral',
-              value: 'Post::PUBLISHED',
+        type: 'ParenthesizedExpression',
+        expr: {
+          left: {
+            object: {
+              type: 'Identifier',
+              name: 'post',
             },
-          ],
-          callee: {
-            type: 'Identifier',
-            name: 'constant',
+            property: {
+              type: 'Identifier',
+              name: 'status',
+            },
+            type: 'MemberExpression',
           },
-          type: 'CallExpression',
+          operator: 'is',
+          right: {
+            arguments: [
+              {
+                type: 'StringLiteral',
+                value: 'Post::PUBLISHED',
+              },
+            ],
+            callee: {
+              type: 'Identifier',
+              name: 'constant',
+            },
+            type: 'CallExpression',
+          },
+          type: 'BinaryExpression',
         },
-        type: 'BinaryExpression',
       },
     },
   });

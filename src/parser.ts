@@ -60,7 +60,6 @@ import {
   TransStatement,
   UnaryExpression,
   UseStatement,
-  VariableDeclaration,
   VariableDeclarationList,
   VariableStatement,
   VerbatimStatement,
@@ -409,10 +408,13 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.ParenthesizedExpression] = this.RULE<() => ParenthesizedExpression>(
     NodeKind.ParenthesizedExpression,
     () => {
-      const result = this.SUBRULE(this.Expression);
+      const expr = this.SUBRULE(this.Expression);
       this.CONSUME(t.CloseParenToken);
 
-      return result;
+      return {
+        type: NodeKind.ParenthesizedExpression,
+        expr: expr,
+      };
     }
   );
 
@@ -939,7 +941,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.CoalesceExpression_In] = this.RULE<() => CoalesceExpression_In>(
     NodeKind.CoalesceExpression_In,
     () => {
-      let result = this.SUBRULE(this.LogicalORExpression_In);
+      let result: CoalesceExpression_In = this.SUBRULE(this.LogicalORExpression_In);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.QuestionQuestionToken).image;
@@ -1024,7 +1026,7 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.FilterExpression] = this.RULE<() => FilterExpression>(
     NodeKind.FilterExpression,
     () => {
-      let expression = this.SUBRULE(this.AssignmentExpression);
+      let expression: AssignmentExpression | FilterExpression = this.SUBRULE(this.AssignmentExpression);
 
       this.MANY(() => {
         this.CONSUME(t.BarToken);
@@ -1044,7 +1046,9 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.FilterExpression_In] = this.RULE<() => FilterExpression_In>(
     NodeKind.FilterExpression_In,
     () => {
-      let expression = this.SUBRULE(this.AssignmentExpression_In);
+      let expression: AssignmentExpression_In | FilterExpression = this.SUBRULE(
+        this.AssignmentExpression_In
+      );
 
       this.MANY(() => {
         this.CONSUME(t.BarToken);
@@ -1221,13 +1225,13 @@ export class TwigParser extends EmbeddedActionsParser {
     () => {
       this.CONSUME(t.ApplyToken);
 
-      let filter = this.SUBRULE(this.Filter);
+      let filter: Filter | FilterExpression = this.SUBRULE(this.Filter);
 
       this.MANY(() => {
         this.CONSUME(t.BarToken);
         const nextFilter = this.SUBRULE1(this.Filter);
 
-        filter = <FilterExpression>{
+        filter = {
           type: NodeKind.FilterExpression,
           expression: filter,
           filter: nextFilter,
