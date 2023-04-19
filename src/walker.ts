@@ -50,8 +50,11 @@ function isNode(value: unknown): boolean {
   );
 }
 
-export function walk<T extends Node>(ast: T, enter: (...args: any) => any): boolean {
+export function walk<T extends Node>(
+  ast: T,
+  enter: (...args: any) => any
+): boolean {
   const instance = new Walker(enter);
 
-	return instance.visit(ast);
+  return instance.visit(ast);
 }

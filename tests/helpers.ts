@@ -5,7 +5,7 @@ const lexer = new TwigLexer();
 const twigParser = new TwigParser();
 
 export function parser(
-  tpl,
+  tpl: string,
   modeKind = ModeKind.Template
 ) {
   const { tokens } = lexer.tokenize(tpl, modeKind);

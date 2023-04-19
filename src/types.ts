@@ -508,3 +508,13 @@ export type LogicalANDExpression = BitwiseORExpression | BinaryExpression;
 export type LogicalANDExpression_In = BitwiseORExpression_In | BinaryExpression;
 export type LogicalORExpression = LogicalANDExpression | BinaryExpression;
 export type LogicalORExpression_In = LogicalANDExpression_In | BinaryExpression;
+
+export class Position {
+  line: number; //zero-based
+  character: number; //zero-based
+
+  constructor(line: number, character: number) {
+    this.line = line;
+    this.character = character;
+  }
+}
