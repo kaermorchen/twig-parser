@@ -19,7 +19,7 @@ export class Walker {
       }
 
       for (let key in node) {
-        const value: unknown = node[key];
+        const value = node[key];
 
         if (Array.isArray(value)) {
           const nodes = value;
@@ -32,6 +32,7 @@ export class Walker {
             }
           }
         } else if (isNode(value)) {
+          // @ts-ignore
           this.visit(value, node, key, null);
         }
       }
@@ -41,7 +42,7 @@ export class Walker {
   }
 }
 
-function isNode(value: unknown): boolean {
+function isNode(value: unknown): value is Node {
   return (
     value !== null &&
     typeof value === 'object' &&
@@ -50,10 +51,7 @@ function isNode(value: unknown): boolean {
   );
 }
 
-export function walk<T extends Node>(
-  ast: T,
-  enter: (...args: any) => any
-): boolean {
+export function walk<T extends Node>(ast: T, enter: (...args: any) => any): T {
   const instance = new Walker(enter);
 
   return instance.visit(ast);
