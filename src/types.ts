@@ -197,7 +197,7 @@ export type ArrowParameters = Array<Identifier>;
 
 export interface ParenthesizedExpression extends Node {
   type: NodeKind.ParenthesizedExpression;
-  expr: Expression
+  expr: Expression;
 }
 
 export interface ArrowFunction extends Node {
@@ -233,6 +233,15 @@ export type ConditionalExpression =
       consequent: AssignmentExpression_In;
       alternate: AssignmentExpression;
     };
+
+export type ConditionalExpression_In =
+  | CoalesceExpression_In
+  | {
+    type: NodeKind.ConditionalExpression;
+    test: BinaryExpression;
+    consequent: AssignmentExpression_In;
+    alternate: AssignmentExpression_In;
+  };
 
 export interface Text extends Node {
   type: NodeKind.Text;
@@ -474,11 +483,10 @@ export interface CallExpression extends Node {
 }
 
 export type Filter = Identifier | CallExpression;
-export type AssignmentExpression_In = ConditionalExpression_In;
+
 export type AssignmentExpression = ConditionalExpression;
-export type ConditionalExpression_In =
-  | CoalesceExpression_In
-  | ConditionalExpression;
+export type AssignmentExpression_In = ConditionalExpression_In;
+
 export type Expression_In = FilterExpression_In;
 export type FilterExpression_In = AssignmentExpression_In | FilterExpression;
 export type RelationalExpression_In = UnaryExpression | BinaryExpression;

@@ -918,6 +918,7 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
+  // TODO: Should I replace LogicalORExpression to BitwiseORExpression?
   [NodeKind.CoalesceExpression] = this.RULE<() => CoalesceExpression>(
     NodeKind.CoalesceExpression,
     () => {
@@ -941,7 +942,9 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.CoalesceExpression_In] = this.RULE<() => CoalesceExpression_In>(
     NodeKind.CoalesceExpression_In,
     () => {
-      let result: CoalesceExpression_In = this.SUBRULE(this.LogicalORExpression_In);
+      let result: CoalesceExpression_In = this.SUBRULE(
+        this.LogicalORExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.QuestionQuestionToken).image;
@@ -987,27 +990,26 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.ConditionalExpression_In] = this.RULE<
     () => ConditionalExpression_In
   >(NodeKind.ConditionalExpression_In, () => {
-    let result: CoalesceExpression_In | ConditionalExpression = this.SUBRULE(
+    let result: ConditionalExpression_In = this.SUBRULE(
       this.CoalesceExpression_In
     );
 
     this.OPTION(() => {
       this.CONSUME(t.QuestionToken);
+      let consequent = result;
+      this.OPTION1(() => {
+        consequent = this.SUBRULE1(this.AssignmentExpression_In);
+      });
+      this.CONSUME(t.ColonToken);
+      const alternate = this.SUBRULE2(this.AssignmentExpression_In);
 
       result = {
         type: NodeKind.ConditionalExpression,
+        // @ts-ignore
         test: result,
-        consequent: result,
-        alternate: null,
+        consequent,
+        alternate,
       };
-
-      //test ?: alternate -> test ? test : alternate
-      this.OPTION1(() => {
-        result.consequent = this.SUBRULE1(this.AssignmentExpression_In);
-      });
-
-      this.CONSUME(t.ColonToken);
-      result.alternate = this.SUBRULE2(this.AssignmentExpression_In);
     });
 
     return result;
@@ -1026,7 +1028,9 @@ export class TwigParser extends EmbeddedActionsParser {
   [NodeKind.FilterExpression] = this.RULE<() => FilterExpression>(
     NodeKind.FilterExpression,
     () => {
-      let expression: AssignmentExpression | FilterExpression = this.SUBRULE(this.AssignmentExpression);
+      let expression: FilterExpression = this.SUBRULE(
+        this.AssignmentExpression
+      );
 
       this.MANY(() => {
         this.CONSUME(t.BarToken);
@@ -1091,11 +1095,8 @@ export class TwigParser extends EmbeddedActionsParser {
     })
   );
 
-  [NodeKind.Expression] = this.RULE<() => Expression>(
-    NodeKind.Expression,
-    () => {
-      return this.SUBRULE(this.FilterExpression);
-    }
+  [NodeKind.Expression] = this.RULE<() => Expression>(NodeKind.Expression, () =>
+    this.SUBRULE(this.FilterExpression)
   );
 
   [NodeKind.Expression_In] = this.RULE<() => Expression_In>(
@@ -1147,7 +1148,7 @@ export class TwigParser extends EmbeddedActionsParser {
     NodeKind.VariableStatement,
     () => {
       this.CONSUME(t.LVariableToken);
-      const value = this.SUBRULE(this.Expression);
+      const value: Expression = this.SUBRULE(this.Expression);
       this.CONSUME(t.RVariableToken);
 
       return {
@@ -1259,7 +1260,7 @@ export class TwigParser extends EmbeddedActionsParser {
       this.CONSUME(t.ForToken);
       const variables = this.SUBRULE(this.VariableDeclarationList);
       this.CONSUME(t.InToken);
-      const expression = this.SUBRULE(this.Expression);
+      const expression: Expression = this.SUBRULE(this.Expression);
       this.CONSUME(t.RBlockToken);
 
       let body = [],
