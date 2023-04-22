@@ -1,10 +1,15 @@
 import { TwigLexer } from './lexer.js';
 import { TwigParser } from './twig-parser.js';
 
-const lexer = new TwigLexer();
-const parser = new TwigParser();
+let lexer: TwigLexer;
+let parser: TwigParser;
 
 export function parse(sourceText: string) {
+  if (!lexer && !parser) {
+    lexer = new TwigLexer();
+    parser = new TwigParser();
+  }
+
   const { tokens } = lexer.tokenize(sourceText);
 
   parser.input = tokens;
@@ -14,6 +19,6 @@ export function parse(sourceText: string) {
   return {
     ast,
     tokens,
-    Errors: parser.errors,
+    errors: parser.errors,
   };
 }
