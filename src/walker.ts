@@ -9,10 +9,10 @@ export class Walker {
 
   visit<AST extends Node>(
     node: AST,
-    parent: AST = null,
-    prop: string = null,
-    index: number = null
-  ): AST | null {
+    parent?: AST,
+    prop?: string,
+    index?: number
+  ): AST {
     if (node) {
       if (this.enter) {
         this.enter(node, parent, prop, index);
@@ -33,7 +33,7 @@ export class Walker {
           }
         } else if (isNode(value)) {
           // @ts-ignore
-          this.visit(value, node, key, null);
+          this.visit(value, node, key);
         }
       }
     }
