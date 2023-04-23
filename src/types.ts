@@ -132,7 +132,7 @@ export type Literal =
 
 export interface InterpolationExpression extends Node {
   type: NodeKind.InterpolationExpression;
-  expression: Expression;
+  expr: Expression;
 }
 
 export interface StringInterpolation extends Node {
@@ -237,11 +237,11 @@ export type ConditionalExpression =
 export type ConditionalExpression_In =
   | CoalesceExpression_In
   | {
-    type: NodeKind.ConditionalExpression;
-    test: BinaryExpression;
-    consequent: AssignmentExpression_In;
-    alternate: AssignmentExpression_In;
-  };
+      type: NodeKind.ConditionalExpression;
+      test: BinaryExpression;
+      consequent: AssignmentExpression_In;
+      alternate: AssignmentExpression_In;
+    };
 
 export interface Text extends Node {
   type: NodeKind.Text;
@@ -250,7 +250,7 @@ export interface Text extends Node {
 
 export interface Comment extends Node {
   type: NodeKind.Comment;
-  value: string;
+  value: string | null;
 }
 
 export interface VariableStatement extends Node {
@@ -300,7 +300,7 @@ export interface VerbatimStatement extends Node {
 export interface EmbedStatement extends Node {
   type: NodeKind.EmbedStatement;
   expr: Expression;
-  variables: Expression;
+  variables: Expression | null;
   ignoreMissing: boolean;
   only: boolean;
   body: SourceElementList;
@@ -328,7 +328,7 @@ export interface MacroStatement extends Node {
 export interface IncludeStatement extends Node {
   type: NodeKind.IncludeStatement;
   expr: Expression;
-  variables: Expression;
+  variables: Expression | null;
   ignoreMissing: boolean;
   only: boolean;
 }
@@ -348,7 +348,7 @@ export type AsOperator = BinaryExpression;
 
 export interface WithStatement extends Node {
   type: NodeKind.WithStatement;
-  expr: Expression;
+  expr: Expression | null;
   body: SourceElementList;
   accessToOuterScope: boolean;
 }
@@ -388,14 +388,14 @@ export interface DeprecatedStatement extends Node {
 
 export interface CacheStatement extends Node {
   type: NodeKind.CacheStatement;
-  expiration: Expression;
+  expiration: Expression | null;
   key: Expression;
   value: SourceElementList;
 }
 
 export interface AutoescapeStatement extends Node {
   type: NodeKind.AutoescapeStatement;
-  strategy: StringLiteral | BooleanLiteral;
+  strategy: StringLiteral | BooleanLiteral | null;
   value: SourceElementList;
 }
 
@@ -403,7 +403,7 @@ export interface IfStatement extends Node {
   type: NodeKind.IfStatement;
   test: Expression;
   consequent: SourceElementList;
-  alternate: SourceElementList | IfStatement;
+  alternate: SourceElementList | IfStatement | null;
 }
 
 export interface ForInStatement extends Node {
@@ -411,7 +411,7 @@ export interface ForInStatement extends Node {
   variables: VariableDeclarationList;
   expression: Expression;
   body: SourceElementList;
-  alternate: SourceElement;
+  alternate: SourceElement | null;
 }
 
 export interface ApplyStatement extends Node {
