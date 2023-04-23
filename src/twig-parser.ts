@@ -430,10 +430,16 @@ export class TwigParser extends EmbeddedActionsParser {
   // v => v + 1
   SingleParamArrowFunction = this.RULE<() => ArrowFunction>(
     NodeKind.SingleParamArrowFunction,
-    () =>
-      this.SUBRULE(this.ArrowFunction, {
-        ARGS: [[this.SUBRULE(this.Identifier)]],
-      })
+    () => {
+      const params = [this.SUBRULE(this.Identifier)];
+      this.CONSUME(t.EqualsGreaterToken);
+
+      return {
+        type: NodeKind.ArrowFunction,
+        body: this.SUBRULE(this.AssignmentExpression),
+        params,
+      };
+    }
   );
 
   ArrowFunction = this.RULE<(params: Identifier[]) => ArrowFunction>(
