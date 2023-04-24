@@ -637,10 +637,10 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  RelationalExpression_In = this.RULE<() => RelationalExpression_In>(
+  RelationalExpression_In = this.RULE<() => RelationalExpression>(
     NodeKind.RelationalExpression_In,
     () => {
-      let result: RelationalExpression_In = this.SUBRULE(this.UnaryExpression);
+      let result: RelationalExpression = this.SUBRULE(this.RangeExpression);
 
       this.MANY(() => {
         const operator = this.OR([
@@ -661,7 +661,7 @@ export class TwigParser extends EmbeddedActionsParser {
           type: NodeKind.BinaryExpression,
           left: result,
           operator,
-          right: this.SUBRULE1(this.UnaryExpression),
+          right: this.SUBRULE1(this.RangeExpression),
         };
       });
 
