@@ -304,7 +304,9 @@ export class TwigParser extends EmbeddedActionsParser {
   LeftHandSideExpression = this.RULE<() => LeftHandSideExpression>(
     NodeKind.LeftHandSideExpression,
     () => {
-      let object: LeftHandSideExpression = this.SUBRULE(this.PrimaryExpression);
+      let object: LeftHandSideExpression = <PrimaryExpression>(
+        this.SUBRULE(this.PrimaryExpression)
+      );
 
       this.MANY(() => {
         this.OR([
@@ -451,6 +453,8 @@ export class TwigParser extends EmbeddedActionsParser {
     };
   });
 
+  // TODO: fix `any` return type
+  // @ts-ignore
   UnaryExpression = this.RULE<() => UnaryExpression>(
     NodeKind.UnaryExpression,
     () =>
