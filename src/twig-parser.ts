@@ -201,10 +201,7 @@ export class TwigParser extends EmbeddedActionsParser {
 
             return this.OR1([
               {
-                ALT: () =>
-                  this.SUBRULE(this.ArrowFunction, {
-                    ARGS: [this.SUBRULE(this.ArrowParameters)],
-                  }),
+                ALT: () => this.SUBRULE(this.ArrowFunction),
               },
               {
                 ALT: () => this.SUBRULE(this.ParenthesizedExpression),
@@ -442,21 +439,17 @@ export class TwigParser extends EmbeddedActionsParser {
     }
   );
 
-  ArrowFunction = this.RULE<(params: Identifier[]) => ArrowFunction>(
-    NodeKind.ArrowFunction,
-    (params: Identifier[]) => {
-      this.CONSUME(t.EqualsGreaterToken);
-      const body: AssignmentExpression = this.SUBRULE(
-        this.AssignmentExpression
-      );
+  ArrowFunction = this.RULE<() => ArrowFunction>(NodeKind.ArrowFunction, () => {
+    const params = this.SUBRULE(this.ArrowParameters);
+    this.CONSUME(t.EqualsGreaterToken);
+    const body: AssignmentExpression = this.SUBRULE(this.AssignmentExpression);
 
-      return {
-        type: NodeKind.ArrowFunction,
-        body,
-        params,
-      };
-    }
-  );
+    return {
+      type: NodeKind.ArrowFunction,
+      body,
+      params,
+    };
+  });
 
   UnaryExpression = this.RULE<() => UnaryExpression>(
     NodeKind.UnaryExpression,
