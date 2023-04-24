@@ -446,7 +446,9 @@ export class TwigParser extends EmbeddedActionsParser {
     NodeKind.ArrowFunction,
     (params: Identifier[]) => {
       this.CONSUME(t.EqualsGreaterToken);
-      const body = this.SUBRULE(this.AssignmentExpression);
+      const body: AssignmentExpression = this.SUBRULE(
+        this.AssignmentExpression
+      );
 
       return {
         type: NodeKind.ArrowFunction,
@@ -478,25 +480,27 @@ export class TwigParser extends EmbeddedActionsParser {
   ExponentiationExpression = this.RULE<() => ExponentiationExpression>(
     NodeKind.ExponentiationExpression,
     () => {
-      let left: ExponentiationExpression = this.SUBRULE(this.UnaryExpression);
+      let result: ExponentiationExpression = this.SUBRULE(this.UnaryExpression);
 
       this.MANY(() => {
-        left = {
+        result = {
           type: NodeKind.BinaryExpression,
-          left,
+          left: result,
           operator: this.CONSUME(t.AsteriskAsteriskToken).image,
           right: this.SUBRULE1(this.UnaryExpression),
         };
       });
 
-      return left;
+      return result;
     }
   );
 
   AssociativityExpression = this.RULE<() => AssociativityExpression>(
     NodeKind.AssociativityExpression,
     () => {
-      let result = this.SUBRULE(this.ExponentiationExpression);
+      let result: AssociativityExpression = this.SUBRULE(
+        this.ExponentiationExpression
+      );
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -519,7 +523,9 @@ export class TwigParser extends EmbeddedActionsParser {
   MultiplicativeExpression = this.RULE<() => MultiplicativeExpression>(
     NodeKind.MultiplicativeExpression,
     () => {
-      let result = this.SUBRULE(this.AssociativityExpression);
+      let result: MultiplicativeExpression = this.SUBRULE(
+        this.AssociativityExpression
+      );
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -544,7 +550,9 @@ export class TwigParser extends EmbeddedActionsParser {
   ConcatExpression = this.RULE<() => ConcatExpression>(
     NodeKind.ConcatExpression,
     () => {
-      let result = this.SUBRULE(this.MultiplicativeExpression);
+      let result: ConcatExpression = this.SUBRULE(
+        this.MultiplicativeExpression
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.TildeToken).image;
@@ -564,7 +572,7 @@ export class TwigParser extends EmbeddedActionsParser {
   AdditiveExpression = this.RULE<() => AdditiveExpression>(
     NodeKind.AdditiveExpression,
     () => {
-      let result = this.SUBRULE(this.ConcatExpression);
+      let result: AdditiveExpression = this.SUBRULE(this.ConcatExpression);
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -587,7 +595,7 @@ export class TwigParser extends EmbeddedActionsParser {
   RangeExpression = this.RULE<() => RangeExpression>(
     NodeKind.RangeExpression,
     () => {
-      let result = this.SUBRULE(this.AdditiveExpression);
+      let result: RangeExpression = this.SUBRULE(this.AdditiveExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.DotDotToken).image;
@@ -607,7 +615,7 @@ export class TwigParser extends EmbeddedActionsParser {
   RelationalExpression = this.RULE<() => RelationalExpression>(
     NodeKind.RelationalExpression,
     () => {
-      let result = this.SUBRULE(this.RangeExpression);
+      let result: RelationalExpression = this.SUBRULE(this.RangeExpression);
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -672,7 +680,7 @@ export class TwigParser extends EmbeddedActionsParser {
   EqualityExpression = this.RULE<() => EqualityExpression>(
     NodeKind.EqualityExpression,
     () => {
-      let result = this.SUBRULE(this.RelationalExpression);
+      let result: EqualityExpression = this.SUBRULE(this.RelationalExpression);
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -696,7 +704,9 @@ export class TwigParser extends EmbeddedActionsParser {
   EqualityExpression_In = this.RULE<() => EqualityExpression_In>(
     NodeKind.EqualityExpression_In,
     () => {
-      let result = this.SUBRULE(this.RelationalExpression_In);
+      let result: EqualityExpression_In = this.SUBRULE(
+        this.RelationalExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.OR1([
@@ -720,7 +730,7 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseANDExpression = this.RULE<() => BitwiseANDExpression>(
     NodeKind.BitwiseANDExpression,
     () => {
-      let result = this.SUBRULE(this.EqualityExpression);
+      let result: BitwiseANDExpression = this.SUBRULE(this.EqualityExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseAndToken).image;
@@ -740,7 +750,9 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseANDExpression_In = this.RULE<() => BitwiseANDExpression_In>(
     NodeKind.BitwiseANDExpression_In,
     () => {
-      let result = this.SUBRULE(this.EqualityExpression_In);
+      let result: BitwiseANDExpression_In = this.SUBRULE(
+        this.EqualityExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseAndToken).image;
@@ -760,7 +772,9 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseXORExpression = this.RULE<() => BitwiseXORExpression>(
     NodeKind.BitwiseXORExpression,
     () => {
-      let result = this.SUBRULE(this.BitwiseANDExpression);
+      let result: BitwiseXORExpression = this.SUBRULE(
+        this.BitwiseANDExpression
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseXorToken).image;
@@ -780,7 +794,9 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseXORExpression_In = this.RULE<() => BitwiseXORExpression_In>(
     NodeKind.BitwiseXORExpression_In,
     () => {
-      let result = this.SUBRULE(this.BitwiseANDExpression_In);
+      let result: BitwiseXORExpression_In = this.SUBRULE(
+        this.BitwiseANDExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseXorToken).image;
@@ -800,7 +816,7 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseORExpression = this.RULE<() => BitwiseORExpression>(
     NodeKind.BitwiseORExpression,
     () => {
-      let result = this.SUBRULE(this.BitwiseXORExpression);
+      let result: BitwiseORExpression = this.SUBRULE(this.BitwiseXORExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseOrToken).image;
@@ -820,7 +836,9 @@ export class TwigParser extends EmbeddedActionsParser {
   BitwiseORExpression_In = this.RULE<() => BitwiseORExpression_In>(
     NodeKind.BitwiseORExpression_In,
     () => {
-      let result = this.SUBRULE(this.BitwiseXORExpression_In);
+      let result: BitwiseORExpression_In = this.SUBRULE(
+        this.BitwiseXORExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.BitwiseOrToken).image;
@@ -840,7 +858,7 @@ export class TwigParser extends EmbeddedActionsParser {
   LogicalANDExpression = this.RULE<() => LogicalANDExpression>(
     NodeKind.LogicalANDExpression,
     () => {
-      let result = this.SUBRULE(this.BitwiseORExpression);
+      let result: LogicalANDExpression = this.SUBRULE(this.BitwiseORExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.AndToken).image;
@@ -860,7 +878,9 @@ export class TwigParser extends EmbeddedActionsParser {
   LogicalANDExpression_In = this.RULE<() => LogicalANDExpression_In>(
     NodeKind.LogicalANDExpression_In,
     () => {
-      let result = this.SUBRULE(this.BitwiseORExpression_In);
+      let result: LogicalANDExpression_In = this.SUBRULE(
+        this.BitwiseORExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.AndToken).image;
@@ -880,7 +900,7 @@ export class TwigParser extends EmbeddedActionsParser {
   LogicalORExpression = this.RULE<() => LogicalORExpression>(
     NodeKind.LogicalORExpression,
     () => {
-      let result = this.SUBRULE(this.LogicalANDExpression);
+      let result: LogicalORExpression = this.SUBRULE(this.LogicalANDExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.OrToken).image;
@@ -900,7 +920,9 @@ export class TwigParser extends EmbeddedActionsParser {
   LogicalORExpression_In = this.RULE<() => LogicalORExpression_In>(
     NodeKind.LogicalORExpression_In,
     () => {
-      let result = this.SUBRULE(this.LogicalANDExpression_In);
+      let result: LogicalORExpression_In = this.SUBRULE(
+        this.LogicalANDExpression_In
+      );
 
       this.MANY(() => {
         const operator = this.CONSUME(t.OrToken).image;
@@ -921,7 +943,7 @@ export class TwigParser extends EmbeddedActionsParser {
   CoalesceExpression = this.RULE<() => CoalesceExpression>(
     NodeKind.CoalesceExpression,
     () => {
-      let result = this.SUBRULE(this.LogicalORExpression);
+      let result: CoalesceExpression = this.SUBRULE(this.LogicalORExpression);
 
       this.MANY(() => {
         const operator = this.CONSUME(t.QuestionQuestionToken).image;
@@ -972,7 +994,9 @@ export class TwigParser extends EmbeddedActionsParser {
           consequent = this.SUBRULE1(this.AssignmentExpression_In);
         });
         this.CONSUME(t.ColonToken);
-        const alternate: AssignmentExpression = this.SUBRULE2(this.AssignmentExpression);
+        const alternate: AssignmentExpression = this.SUBRULE2(
+          this.AssignmentExpression
+        );
 
         result = {
           type: NodeKind.ConditionalExpression,
@@ -1050,7 +1074,7 @@ export class TwigParser extends EmbeddedActionsParser {
   FilterExpression_In = this.RULE<() => FilterExpression_In>(
     NodeKind.FilterExpression_In,
     () => {
-      let expression: AssignmentExpression_In | FilterExpression = this.SUBRULE(
+      let expression: FilterExpression_In = this.SUBRULE(
         this.AssignmentExpression_In
       );
 
