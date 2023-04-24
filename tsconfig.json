@@ -8,12 +8,12 @@
     ],
     "outDir": "out",
     "sourceMap": true,
-    "strict": false,
+    "strict": true,
+    "experimentalDecorators": true,
     "rootDir": "src"
   },
   "include": [
     "src",
-    "tests"
   ],
   "exclude": [
     "node_modules",

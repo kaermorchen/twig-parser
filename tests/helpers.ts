@@ -1,17 +1,17 @@
 import { ModeKind, TwigLexer } from '../src/lexer.js';
-import { TwigParser } from '../src/parser.js';
+import { TwigParser } from '../src/twig-parser.js';
 
 const lexer = new TwigLexer();
-const parser = new TwigParser();
+const twigParser = new TwigParser();
 
-export function parse(
-  tpl,
+export function parser(
+  tpl: string,
   modeKind = ModeKind.Template
 ) {
   const { tokens } = lexer.tokenize(tpl, modeKind);
   // console.log(tokens);
 
-  parser.input = tokens;
+  twigParser.input = tokens;
 
-  return parser;
+  return twigParser;
 }

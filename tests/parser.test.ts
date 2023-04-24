@@ -1,30 +1,30 @@
 import { test, expect } from 'vitest';
-import { parse } from './helpers.js';
+import { parser } from './helpers.js';
 import { ModeKind } from '../src/lexer.js';
 
 test('Identifier', () => {
-  expect(parse(`user`, ModeKind.Statement).Identifier()).toStrictEqual({
+  expect(parser(`user`, ModeKind.Statement).Identifier()).toStrictEqual({
     type: 'Identifier',
-    value: `user`,
+    name: `user`,
   });
 });
 
 test('Number', () => {
-  expect(parse('0', ModeKind.Statement).NumericLiteral(), 'Zero').toStrictEqual(
+  expect(parser('0', ModeKind.Statement).NumericLiteral(), 'Zero').toStrictEqual(
     {
       type: 'NumericLiteral',
       value: 0,
     }
   );
   expect(
-    parse('42', ModeKind.Statement).NumericLiteral(),
+    parser('42', ModeKind.Statement).NumericLiteral(),
     'Integer'
   ).toStrictEqual({
     type: 'NumericLiteral',
     value: 42,
   });
   expect(
-    parse('42.23', ModeKind.Statement).NumericLiteral(),
+    parser('42.23', ModeKind.Statement).NumericLiteral(),
     'Float'
   ).toStrictEqual({
     type: 'NumericLiteral',
@@ -34,23 +34,23 @@ test('Number', () => {
 
 test('String', () => {
   expect(
-    parse(`"Hello world"`, ModeKind.Statement).StringLiteral()
+    parser(`"Hello world"`, ModeKind.Statement).StringLiteral()
   ).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello world',
   });
   expect(
-    parse(`'Hello world'`, ModeKind.Statement).StringLiteral()
+    parser(`'Hello world'`, ModeKind.Statement).StringLiteral()
   ).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello world',
   });
-  expect(parse(`""`, ModeKind.Statement).StringLiteral()).toStrictEqual({
+  expect(parser(`""`, ModeKind.Statement).StringLiteral()).toStrictEqual({
     type: 'StringLiteral',
     value: '',
   });
   expect(
-    parse(`'It\\'s good'`, ModeKind.Statement).StringLiteral()
+    parser(`'It\\'s good'`, ModeKind.Statement).StringLiteral()
   ).toStrictEqual({
     type: 'StringLiteral',
     value: `It\\'s good`,
@@ -58,19 +58,19 @@ test('String', () => {
 });
 
 test('Boolean', () => {
-  expect(parse(`true`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
+  expect(parser(`true`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: true,
   });
-  expect(parse(`TRUE`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
+  expect(parser(`TRUE`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: true,
   });
-  expect(parse(`false`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
+  expect(parser(`false`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: false,
   });
-  expect(parse(`FALSE`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
+  expect(parser(`FALSE`, ModeKind.Statement).BooleanLiteral()).toStrictEqual({
     type: 'BooleanLiteral',
     value: false,
   });
@@ -82,24 +82,24 @@ test('Null', () => {
     value: null,
   };
 
-  expect(parse(`null`, ModeKind.Statement).NullLiteral()).toStrictEqual(
+  expect(parser(`null`, ModeKind.Statement).NullLiteral()).toStrictEqual(
     expected
   );
-  expect(parse(`NULL`, ModeKind.Statement).NullLiteral()).toStrictEqual(
+  expect(parser(`NULL`, ModeKind.Statement).NullLiteral()).toStrictEqual(
     expected
   );
-  expect(parse(`none`, ModeKind.Statement).NullLiteral()).toStrictEqual(
+  expect(parser(`none`, ModeKind.Statement).NullLiteral()).toStrictEqual(
     expected
   );
 });
 
 test('ArrayLiteral', () => {
-  expect(parse(`[]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual({
+  expect(parser(`[]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual({
     type: 'ArrayLiteral',
     elements: [],
   });
 
-  expect(parse(`[1, [2, 3]]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual(
+  expect(parser(`[1, [2, 3]]`, ModeKind.Statement).ArrayLiteral()).toStrictEqual(
     {
       type: 'ArrayLiteral',
       elements: [
@@ -126,27 +126,25 @@ test('ArrayLiteral', () => {
 });
 
 test('PropertyName', () => {
-  expect(parse(`"key"`, ModeKind.Statement).PropertyName()).toStrictEqual(
-    parse(`"key"`, ModeKind.Statement).StringLiteral()
+  expect(parser(`"key"`, ModeKind.Statement).PropertyName()).toStrictEqual(
+    parser(`"key"`, ModeKind.Statement).StringLiteral()
   );
-  expect(parse(`1`, ModeKind.Statement).PropertyName()).toStrictEqual(
-    parse(`1`, ModeKind.Statement).NumericLiteral()
+  expect(parser(`1`, ModeKind.Statement).PropertyName()).toStrictEqual(
+    parser(`1`, ModeKind.Statement).NumericLiteral()
   );
-  expect(parse(`key`, ModeKind.Statement).PropertyName()).toStrictEqual(
-    parse(`key`, ModeKind.Statement).Identifier()
+  expect(parser(`key`, ModeKind.Statement).PropertyName()).toStrictEqual(
+    parser(`key`, ModeKind.Statement).Identifier()
   );
-  expect(parse(`(name)`, ModeKind.Statement).PropertyName()).toStrictEqual({
+  expect(parser(`(name)`, ModeKind.Statement).PropertyName()).toStrictEqual({
     type: 'Identifier',
-    value: 'name',
+    name: 'name',
   });
   // TODO: { (1 + 1): 'bar', (foo ~ 'b'): 'baz' }
 });
 
-test('PropertyAssignment', () => {
-  expect(
-    parse(`"key": 42`, ModeKind.Statement).PropertyDefinition()
-  ).toStrictEqual({
-    type: 'PropertyAssignment',
+test('Property', () => {
+  expect(parser(`"key": 42`, ModeKind.Statement).Property()).toStrictEqual({
+    type: 'Property',
     key: {
       type: 'StringLiteral',
       value: 'key',
@@ -158,13 +156,11 @@ test('PropertyAssignment', () => {
     shorthand: false,
   });
 
-  expect(
-    parse(`(name): "Anna"`, ModeKind.Statement).PropertyDefinition()
-  ).toStrictEqual({
-    type: 'PropertyAssignment',
+  expect(parser(`(name): "Anna"`, ModeKind.Statement).Property()).toStrictEqual({
+    type: 'Property',
     key: {
       type: 'Identifier',
-      value: 'name',
+      name: 'name',
     },
     value: {
       type: 'StringLiteral',
@@ -173,14 +169,14 @@ test('PropertyAssignment', () => {
     shorthand: false,
   });
 
-  expect(parse(`foo`, ModeKind.Statement).PropertyDefinition()).toStrictEqual({
-    type: 'PropertyAssignment',
-    key: {
-      type: 'StringLiteral',
-      value: 'foo',
-    },
+  expect(parser(`foo`, ModeKind.Statement).Property()).toStrictEqual({
+    type: 'Property',
     value: {
       type: 'Identifier',
+      name: 'foo',
+    },
+    key: {
+      type: 'StringLiteral',
       value: 'foo',
     },
     shorthand: true,
@@ -188,18 +184,18 @@ test('PropertyAssignment', () => {
 });
 
 test('ObjectLiteral', () => {
-  expect(parse(`{}`, ModeKind.Statement).ObjectLiteral()).toStrictEqual({
+  expect(parser(`{}`, ModeKind.Statement).ObjectLiteral()).toStrictEqual({
     type: 'ObjectLiteral',
     properties: [],
   });
 
   expect(
-    parse(`{"key": 23, foo: bar, val}`, ModeKind.Statement).ObjectLiteral()
+    parser(`{"key": 23, foo: bar, val}`, ModeKind.Statement).ObjectLiteral()
   ).toStrictEqual({
     type: 'ObjectLiteral',
     properties: [
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'StringLiteral',
           value: 'key',
@@ -211,26 +207,26 @@ test('ObjectLiteral', () => {
         shorthand: false,
       },
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
         value: {
           type: 'Identifier',
-          value: 'bar',
+          name: 'bar',
         },
         shorthand: false,
       },
       {
-        type: 'PropertyAssignment',
+        type: 'Property',
         key: {
           type: 'StringLiteral',
           value: 'val',
         },
         value: {
           type: 'Identifier',
-          value: 'val',
+          name: 'val',
         },
         shorthand: true,
       },
@@ -239,16 +235,19 @@ test('ObjectLiteral', () => {
 });
 
 test('ParenthesizedExpression', () => {
-  expect(parse(`{{ (4) }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ (4) }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
-      type: 'NumericLiteral',
-      value: 4,
+      type: 'ParenthesizedExpression',
+      expr: {
+        type: 'NumericLiteral',
+        value: 4,
+      },
     },
   });
 
   expect(
-    parse(`{{ not (post.status is constant('Post::PUBLISHED')) }}`).Template()
+    parser(`{{ not (post.status is constant('Post::PUBLISHED')) }}`).Template()
       .body[0]
   ).toStrictEqual({
     type: 'VariableStatement',
@@ -256,39 +255,42 @@ test('ParenthesizedExpression', () => {
       type: 'UnaryExpression',
       operator: 'not',
       argument: {
-        left: {
-          object: {
-            type: 'Identifier',
-            value: 'post',
-          },
-          property: {
-            type: 'Identifier',
-            value: 'status',
-          },
-          type: 'MemberExpression',
-        },
-        operator: 'is',
-        right: {
-          arguments: [
-            {
-              type: 'StringLiteral',
-              value: 'Post::PUBLISHED',
+        type: 'ParenthesizedExpression',
+        expr: {
+          left: {
+            object: {
+              type: 'Identifier',
+              name: 'post',
             },
-          ],
-          callee: {
-            type: 'Identifier',
-            value: 'constant',
+            property: {
+              type: 'Identifier',
+              name: 'status',
+            },
+            type: 'MemberExpression',
           },
-          type: 'CallExpression',
+          operator: 'is',
+          right: {
+            arguments: [
+              {
+                type: 'StringLiteral',
+                value: 'Post::PUBLISHED',
+              },
+            ],
+            callee: {
+              type: 'Identifier',
+              name: 'constant',
+            },
+            type: 'CallExpression',
+          },
+          type: 'BinaryExpression',
         },
-        type: 'BinaryExpression',
       },
     },
   });
 });
 
 test('BinaryExpression', () => {
-  expect(parse(`1 + 2`, ModeKind.Statement).Expression()).toStrictEqual({
+  expect(parser(`1 + 2`, ModeKind.Statement).Expression()).toStrictEqual({
     type: 'BinaryExpression',
     left: {
       type: 'NumericLiteral',
@@ -301,7 +303,7 @@ test('BinaryExpression', () => {
     },
   });
 
-  expect(parse(`4 * 2 + 2 * 3`, ModeKind.Statement).Expression()).toStrictEqual(
+  expect(parser(`4 * 2 + 2 * 3`, ModeKind.Statement).Expression()).toStrictEqual(
     {
       type: 'BinaryExpression',
       left: {
@@ -335,7 +337,7 @@ test('BinaryExpression', () => {
 
 test('ExpressionList', () => {
   expect(
-    parse(`"Hello", 42`, ModeKind.Statement).ExpressionList()
+    parser(`"Hello", 42`, ModeKind.Statement).ExpressionList()
   ).toStrictEqual([
     {
       type: 'StringLiteral',
@@ -350,14 +352,14 @@ test('ExpressionList', () => {
 
 test('AssignmentExpression', () => {
   expect(
-    parse(`"Hello"`, ModeKind.Statement).AssignmentExpression()
+    parser(`"Hello"`, ModeKind.Statement).AssignmentExpression()
   ).toStrictEqual({
     type: 'StringLiteral',
     value: 'Hello',
   });
 
   expect(
-    parse(`4 > 1`, ModeKind.Statement).AssignmentExpression()
+    parser(`4 > 1`, ModeKind.Statement).AssignmentExpression()
   ).toStrictEqual({
     left: {
       type: 'NumericLiteral',
@@ -372,7 +374,7 @@ test('AssignmentExpression', () => {
   });
 
   expect(
-    parse(`true ? 1 : 2`, ModeKind.Statement).AssignmentExpression()
+    parser(`true ? 1 : 2`, ModeKind.Statement).AssignmentExpression()
   ).toStrictEqual({
     alternate: {
       type: 'NumericLiteral',
@@ -390,7 +392,7 @@ test('AssignmentExpression', () => {
   });
 
   expect(
-    parse(`1 ?: 2`, ModeKind.Statement).AssignmentExpression()
+    parser(`1 ?: 2`, ModeKind.Statement).AssignmentExpression()
   ).toStrictEqual({
     alternate: {
       type: 'NumericLiteral',
@@ -410,25 +412,25 @@ test('AssignmentExpression', () => {
 
 test('LeftHandSideExpression', () => {
   expect(
-    parse(`user.firstName`, ModeKind.Statement).LeftHandSideExpression()
+    parser(`user.firstName`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
     object: {
       type: 'Identifier',
-      value: 'user',
+      name: 'user',
     },
     property: {
       type: 'Identifier',
-      value: 'firstName',
+      name: 'firstName',
     },
     type: 'MemberExpression',
   });
 
   expect(
-    parse(`user['name']`, ModeKind.Statement).LeftHandSideExpression()
+    parser(`user['name']`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
     object: {
       type: 'Identifier',
-      value: 'user',
+      name: 'user',
     },
     property: {
       type: 'StringLiteral',
@@ -438,29 +440,29 @@ test('LeftHandSideExpression', () => {
   });
 
   expect(
-    parse(`user.a.b`, ModeKind.Statement).LeftHandSideExpression()
+    parser(`user.a.b`, ModeKind.Statement).LeftHandSideExpression()
   ).toStrictEqual({
     type: 'MemberExpression',
     object: {
       type: 'MemberExpression',
       object: {
         type: 'Identifier',
-        value: 'user',
+        name: 'user',
       },
       property: {
         type: 'Identifier',
-        value: 'a',
+        name: 'a',
       },
     },
     property: {
       type: 'Identifier',
-      value: 'b',
+      name: 'b',
     },
   });
 });
 
 test('UnaryExpression', () => {
-  expect(parse(`-4`, ModeKind.Statement).UnaryExpression()).toStrictEqual({
+  expect(parser(`-4`, ModeKind.Statement).UnaryExpression()).toStrictEqual({
     argument: {
       type: 'NumericLiteral',
       value: 4,
@@ -469,7 +471,7 @@ test('UnaryExpression', () => {
     type: 'UnaryExpression',
   });
 
-  expect(parse(`not true`, ModeKind.Statement).UnaryExpression()).toStrictEqual(
+  expect(parser(`not true`, ModeKind.Statement).UnaryExpression()).toStrictEqual(
     {
       argument: {
         type: 'BooleanLiteral',
@@ -479,10 +481,30 @@ test('UnaryExpression', () => {
       type: 'UnaryExpression',
     }
   );
+
+  expect(parser(`{{ 2 + -2 }}`).Template().body[0]).toStrictEqual({
+    type: 'VariableStatement',
+    value: {
+      type: 'BinaryExpression',
+      left: {
+        type: 'NumericLiteral',
+        value: 2,
+      },
+      operator: '+',
+      right: {
+        argument: {
+          type: 'NumericLiteral',
+          value: 2,
+        },
+        operator: '-',
+        type: 'UnaryExpression',
+      },
+    },
+  });
 });
 
 test('VariableStatement', () => {
-  expect(parse(`{{ 4 }}`).VariableStatement()).toStrictEqual({
+  expect(parser(`{{ 4 }}`).VariableStatement()).toStrictEqual({
     value: {
       type: 'NumericLiteral',
       value: 4,
@@ -490,17 +512,17 @@ test('VariableStatement', () => {
     type: 'VariableStatement',
   });
 
-  expect(parse(`{{ {a: "true"} }}`).VariableStatement()).toStrictEqual({
+  expect(parser(`{{ {a: "true"} }}`).VariableStatement()).toStrictEqual({
     value: {
       type: 'ObjectLiteral',
       properties: [
         {
           key: {
             type: 'Identifier',
-            value: 'a',
+            name: 'a',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'true',
@@ -513,14 +535,14 @@ test('VariableStatement', () => {
 });
 
 test('Text', () => {
-  expect(parse(`Hello world`).Text()).toStrictEqual({
+  expect(parser(`Hello world`).Text()).toStrictEqual({
     value: 'Hello world',
     type: 'Text',
   });
 });
 
 test('Comment', () => {
-  expect(parse(`{# Lorem Ipsum #}`).Comment()).toStrictEqual({
+  expect(parser(`{# Lorem Ipsum #}`).Comment()).toStrictEqual({
     value: 'Lorem Ipsum',
     type: 'Comment',
   });
@@ -528,7 +550,7 @@ test('Comment', () => {
 
 test('Template', () => {
   expect(
-    parse(`{# Lorem Ipsum #} {{"str"}} <div></div>`).Template()
+    parser(`{# Lorem Ipsum #} {{"str"}} <div></div>`).Template()
   ).toStrictEqual({
     type: 'Template',
     body: [
@@ -555,8 +577,8 @@ test('Template', () => {
   });
 });
 
-test('SetInlineStatement', () => {
-  expect(parse(`{% set name = 'Bruce Wayne' %}`).Statement()).toStrictEqual({
+test('SetStatement', () => {
+  expect(parser(`{% set name = 'Bruce Wayne' %}`).Statement()).toStrictEqual({
     type: 'SetStatement',
     declarations: [
       {
@@ -566,7 +588,7 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'name',
+          name: 'name',
         },
         type: 'VariableDeclaration',
       },
@@ -574,7 +596,7 @@ test('SetInlineStatement', () => {
   });
 
   expect(
-    parse(`{% set name, nick_name = 'Bruce Wayne', 'Batman' %}`).Statement()
+    parser(`{% set name, nick_name = 'Bruce Wayne', 'Batman' %}`).Statement()
   ).toStrictEqual({
     type: 'SetStatement',
     declarations: [
@@ -585,7 +607,7 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'name',
+          name: 'name',
         },
         type: 'VariableDeclaration',
       },
@@ -596,17 +618,15 @@ test('SetInlineStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'nick_name',
+          name: 'nick_name',
         },
         type: 'VariableDeclaration',
       },
     ],
   });
-});
 
-test('SetBlockStatement', () => {
   expect(
-    parse(`{% set greetings %}Hello user!{% endset %}`).Statement()
+    parser(`{% set greetings %}Hello user!{% endset %}`).Statement()
   ).toStrictEqual({
     type: 'SetStatement',
     declarations: [
@@ -617,7 +637,7 @@ test('SetBlockStatement', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'greetings',
+          name: 'greetings',
         },
         type: 'VariableDeclaration',
       },
@@ -626,20 +646,20 @@ test('SetBlockStatement', () => {
 });
 
 test('CallExpression', () => {
-  expect(parse(`{{ hello() }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ hello() }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
       arguments: [],
       callee: {
         type: 'Identifier',
-        value: 'hello',
+        name: 'hello',
       },
       type: 'CallExpression',
     },
   });
 
   expect(
-    parse(`{{ hello(42, model="T800") }}`).Template().body[0]
+    parser(`{{ hello(42, model="T800") }}`).Template().body[0]
   ).toStrictEqual({
     type: 'VariableStatement',
     value: {
@@ -651,7 +671,7 @@ test('CallExpression', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'model',
+            name: 'model',
           },
           type: 'NamedArgument',
           value: {
@@ -662,7 +682,7 @@ test('CallExpression', () => {
       ],
       callee: {
         type: 'Identifier',
-        value: 'hello',
+        name: 'hello',
       },
       type: 'CallExpression',
     },
@@ -671,20 +691,20 @@ test('CallExpression', () => {
 
 test('FilterExpression', () => {
   expect(
-    parse(`list|join(', ')|title`, ModeKind.Statement).FilterExpression()
+    parser(`list|join(', ')|title`, ModeKind.Statement).FilterExpression()
   ).toStrictEqual({
     type: 'FilterExpression',
     expression: {
       type: 'FilterExpression',
       expression: {
         type: 'Identifier',
-        value: 'list',
+        name: 'list',
       },
       filter: {
         type: 'CallExpression',
         callee: {
           type: 'Identifier',
-          value: 'join',
+          name: 'join',
         },
         arguments: [
           {
@@ -696,14 +716,14 @@ test('FilterExpression', () => {
     },
     filter: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
   });
 });
 
 test('ApplyStatement', () => {
   expect(
-    parse(
+    parser(
       `{% apply upper %}This text becomes uppercase{% endapply %}`
     ).SourceElementList()
   ).toStrictEqual([
@@ -715,13 +735,13 @@ test('ApplyStatement', () => {
       },
       filter: {
         type: 'Identifier',
-        value: 'upper',
+        name: 'upper',
       },
     },
   ]);
 
   expect(
-    parse(
+    parser(
       `{% apply lower|escape('html') %}<strong>SOME TEXT</strong>{% endapply %}`
     ).SourceElementList()
   ).toStrictEqual([
@@ -735,7 +755,7 @@ test('ApplyStatement', () => {
         type: 'FilterExpression',
         expression: {
           type: 'Identifier',
-          value: 'lower',
+          name: 'lower',
         },
         filter: {
           type: 'CallExpression',
@@ -747,7 +767,7 @@ test('ApplyStatement', () => {
           ],
           callee: {
             type: 'Identifier',
-            value: 'escape',
+            name: 'escape',
           },
         },
       },
@@ -757,7 +777,7 @@ test('ApplyStatement', () => {
 
 test('ForInStatement', () => {
   expect(
-    parse(`{% for i in arr %}{{ i }}{% endfor %}`).Template()
+    parser(`{% for i in arr %}{{ i }}{% endfor %}`).Template()
   ).toStrictEqual({
     type: 'Template',
     body: [
@@ -767,19 +787,19 @@ test('ForInStatement', () => {
         variables: [
           {
             type: 'Identifier',
-            value: 'i',
+            name: 'i',
           },
         ],
         expression: {
           type: 'Identifier',
-          value: 'arr',
+          name: 'arr',
         },
         body: [
           {
             type: 'VariableStatement',
             value: {
               type: 'Identifier',
-              value: 'i',
+              name: 'i',
             },
           },
         ],
@@ -788,7 +808,7 @@ test('ForInStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% for user in users %}{{ user }}{% else %}<em>no user found</em>{% endfor %}`
     ).Template()
   ).toStrictEqual({
@@ -799,19 +819,19 @@ test('ForInStatement', () => {
         variables: [
           {
             type: 'Identifier',
-            value: 'user',
+            name: 'user',
           },
         ],
         expression: {
           type: 'Identifier',
-          value: 'users',
+          name: 'users',
         },
         body: [
           {
             type: 'VariableStatement',
             value: {
               type: 'Identifier',
-              value: 'user',
+              name: 'user',
             },
           },
         ],
@@ -825,19 +845,19 @@ test('ForInStatement', () => {
 });
 
 test('ArrowFunction', () => {
-  expect(parse(`{{ v => v * 2 }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ v => v * 2 }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
       params: [
         {
           type: 'Identifier',
-          value: 'v',
+          name: 'v',
         },
       ],
       body: {
         left: {
           type: 'Identifier',
-          value: 'v',
+          name: 'v',
         },
         operator: '*',
         right: {
@@ -850,7 +870,7 @@ test('ArrowFunction', () => {
     },
   });
 
-  expect(parse(`{{ () => "Hello" }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ () => "Hello" }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
       params: [],
@@ -863,29 +883,29 @@ test('ArrowFunction', () => {
   });
 
   expect(
-    parse(`{{ (first, second) => first + second }}`).Template().body[0]
+    parser(`{{ (first, second) => first + second }}`).Template().body[0]
   ).toStrictEqual({
     type: 'VariableStatement',
     value: {
       params: [
         {
           type: 'Identifier',
-          value: 'first',
+          name: 'first',
         },
         {
           type: 'Identifier',
-          value: 'second',
+          name: 'second',
         },
       ],
       body: {
         left: {
           type: 'Identifier',
-          value: 'first',
+          name: 'first',
         },
         operator: '+',
         right: {
           type: 'Identifier',
-          value: 'second',
+          name: 'second',
         },
         type: 'BinaryExpression',
       },
@@ -896,7 +916,7 @@ test('ArrowFunction', () => {
 
 test('ExponentiationExpression', () => {
   expect(
-    parse(`2 ** 2`, ModeKind.Statement).ExponentiationExpression()
+    parser(`2 ** 2`, ModeKind.Statement).ExponentiationExpression()
   ).toStrictEqual({
     left: {
       type: 'NumericLiteral',
@@ -911,7 +931,7 @@ test('ExponentiationExpression', () => {
   });
 
   expect(
-    parse(`2 ** 2 ** PI`, ModeKind.Statement).ExponentiationExpression()
+    parser(`2 ** 2 ** PI`, ModeKind.Statement).ExponentiationExpression()
   ).toStrictEqual({
     left: {
       left: {
@@ -928,7 +948,7 @@ test('ExponentiationExpression', () => {
     operator: '**',
     right: {
       type: 'Identifier',
-      value: 'PI',
+      name: 'PI',
     },
     type: 'BinaryExpression',
   });
@@ -936,7 +956,7 @@ test('ExponentiationExpression', () => {
 
 test('CoalesceExpression', () => {
   expect(
-    parse(`2 ?? 2`, ModeKind.Statement).CoalesceExpression()
+    parser(`2 ?? 2`, ModeKind.Statement).CoalesceExpression()
   ).toStrictEqual({
     left: {
       type: 'NumericLiteral',
@@ -951,17 +971,17 @@ test('CoalesceExpression', () => {
   });
 
   expect(
-    parse(`a and b ?? c or d`, ModeKind.Statement).CoalesceExpression()
+    parser(`a and b ?? c or d`, ModeKind.Statement).CoalesceExpression()
   ).toStrictEqual({
     left: {
       left: {
         type: 'Identifier',
-        value: 'a',
+        name: 'a',
       },
       operator: 'and',
       right: {
         type: 'Identifier',
-        value: 'b',
+        name: 'b',
       },
       type: 'BinaryExpression',
     },
@@ -969,12 +989,12 @@ test('CoalesceExpression', () => {
     right: {
       left: {
         type: 'Identifier',
-        value: 'c',
+        name: 'c',
       },
       operator: 'or',
       right: {
         type: 'Identifier',
-        value: 'd',
+        name: 'd',
       },
       type: 'BinaryExpression',
     },
@@ -984,7 +1004,7 @@ test('CoalesceExpression', () => {
 
 test('IfStatement', () => {
   expect(
-    parse(
+    parser(
       `{% if online == false %}<p>Our website is in maintenance mode. Please, come back later.</p>{% endif %}`
     ).Template()
   ).toStrictEqual({
@@ -1001,7 +1021,7 @@ test('IfStatement', () => {
         test: {
           left: {
             type: 'Identifier',
-            value: 'online',
+            name: 'online',
           },
           operator: '==',
           right: {
@@ -1017,7 +1037,7 @@ test('IfStatement', () => {
   });
 
   expect(
-    parse(`{% if not user.subscribed %}{% endif %}`).Template()
+    parser(`{% if not user.subscribed %}{% endif %}`).Template()
   ).toStrictEqual({
     body: [
       {
@@ -1027,11 +1047,11 @@ test('IfStatement', () => {
           argument: {
             object: {
               type: 'Identifier',
-              value: 'user',
+              name: 'user',
             },
             property: {
               type: 'Identifier',
-              value: 'subscribed',
+              name: 'subscribed',
             },
             type: 'MemberExpression',
           },
@@ -1045,7 +1065,7 @@ test('IfStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% if product.stock > 10 %}Available{% else %}Sold-out!{% endif %}`
     ).Template()
   ).toStrictEqual({
@@ -1067,11 +1087,11 @@ test('IfStatement', () => {
           left: {
             object: {
               type: 'Identifier',
-              value: 'product',
+              name: 'product',
             },
             property: {
               type: 'Identifier',
-              value: 'stock',
+              name: 'stock',
             },
             type: 'MemberExpression',
           },
@@ -1089,7 +1109,7 @@ test('IfStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% if product.stock > 10 %}Available{% elseif product.stock > 0 %}Only {{ product.stock }} left!{% else %}Sold-out!{% endif %}`
     ).Template()
   ).toStrictEqual({
@@ -1112,11 +1132,11 @@ test('IfStatement', () => {
               value: {
                 object: {
                   type: 'Identifier',
-                  value: 'product',
+                  name: 'product',
                 },
                 property: {
                   type: 'Identifier',
-                  value: 'stock',
+                  name: 'stock',
                 },
                 type: 'MemberExpression',
               },
@@ -1130,11 +1150,11 @@ test('IfStatement', () => {
             left: {
               object: {
                 type: 'Identifier',
-                value: 'product',
+                name: 'product',
               },
               property: {
                 type: 'Identifier',
-                value: 'stock',
+                name: 'stock',
               },
               type: 'MemberExpression',
             },
@@ -1157,11 +1177,11 @@ test('IfStatement', () => {
           left: {
             object: {
               type: 'Identifier',
-              value: 'product',
+              name: 'product',
             },
             property: {
               type: 'Identifier',
-              value: 'stock',
+              name: 'stock',
             },
             type: 'MemberExpression',
           },
@@ -1179,7 +1199,7 @@ test('IfStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% if true %}111{{ text }}222{% else %}333{{ item }}444{% endif %}`
     ).Template()
   ).toStrictEqual({
@@ -1193,8 +1213,8 @@ test('IfStatement', () => {
           {
             type: 'VariableStatement',
             value: {
-              value: 'item',
               type: 'Identifier',
+              name: 'item',
             },
           },
           {
@@ -1210,8 +1230,8 @@ test('IfStatement', () => {
           {
             type: 'VariableStatement',
             value: {
-              value: 'text',
               type: 'Identifier',
+              name: 'text',
             },
           },
           {
@@ -1232,7 +1252,7 @@ test('IfStatement', () => {
 
 test('AutoescapeStatement', () => {
   expect(
-    parse(`{% autoescape %}{% endautoescape %}`).Template().body[0]
+    parser(`{% autoescape %}{% endautoescape %}`).Template().body[0]
   ).toStrictEqual({
     strategy: null,
     type: 'AutoescapeStatement',
@@ -1240,7 +1260,7 @@ test('AutoescapeStatement', () => {
   });
 
   expect(
-    parse(`{% autoescape %}Everything{% endautoescape %}`).Template().body[0]
+    parser(`{% autoescape %}Everything{% endautoescape %}`).Template().body[0]
   ).toStrictEqual({
     strategy: null,
     type: 'AutoescapeStatement',
@@ -1253,7 +1273,7 @@ test('AutoescapeStatement', () => {
   });
 
   expect(
-    parse(`{% autoescape 'html' %}Everything{% endautoescape %}`).Template()
+    parser(`{% autoescape 'html' %}Everything{% endautoescape %}`).Template()
       .body[0]
   ).toStrictEqual({
     strategy: {
@@ -1270,7 +1290,7 @@ test('AutoescapeStatement', () => {
   });
 
   expect(
-    parse(`{% autoescape false %}Everything{% endautoescape %}`).Template()
+    parser(`{% autoescape false %}Everything{% endautoescape %}`).Template()
       .body[0]
   ).toStrictEqual({
     strategy: {
@@ -1289,7 +1309,7 @@ test('AutoescapeStatement', () => {
 
 test('CacheStatement', () => {
   expect(
-    parse(`{% cache "cache key" %}Cached forever{% endcache %}`).Template()
+    parser(`{% cache "cache key" %}Cached forever{% endcache %}`).Template()
       .body[0]
   ).toStrictEqual({
     expiration: null,
@@ -1307,14 +1327,14 @@ test('CacheStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% cache "cache key" ttl(300) %}Cached for 300 seconds{% endcache %}`
     ).Template().body[0]
   ).toStrictEqual({
     expiration: {
       callee: {
         type: 'Identifier',
-        value: 'ttl',
+        name: 'ttl',
       },
       arguments: [
         {
@@ -1340,7 +1360,7 @@ test('CacheStatement', () => {
 
 test('DeprecatedStatement', () => {
   expect(
-    parse(
+    parser(
       `{% deprecated 'The "base.twig" template is deprecated, use "layout.twig" instead.' %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1354,7 +1374,7 @@ test('DeprecatedStatement', () => {
 });
 
 test('DoStatement', () => {
-  expect(parse(`{% do 1 + 2 %}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{% do 1 + 2 %}`).Template().body[0]).toStrictEqual({
     expr: {
       left: {
         type: 'NumericLiteral',
@@ -1372,14 +1392,14 @@ test('DoStatement', () => {
 });
 
 test('FlushStatement', () => {
-  expect(parse(`{% flush %}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{% flush %}`).Template().body[0]).toStrictEqual({
     type: 'FlushStatement',
   });
 });
 
 test('BlockStatement', () => {
   expect(
-    parse(`{% block title %}Index{% endblock %}`).Template().body[0]
+    parser(`{% block title %}Index{% endblock %}`).Template().body[0]
   ).toStrictEqual({
     body: [
       {
@@ -1389,14 +1409,14 @@ test('BlockStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: false,
   });
 
   expect(
-    parse(`{% block title %}Index{% endblock title %}`).Template().body[0]
+    parser(`{% block title %}Index{% endblock title %}`).Template().body[0]
   ).toStrictEqual({
     body: [
       {
@@ -1406,7 +1426,7 @@ test('BlockStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: false,
@@ -1415,24 +1435,27 @@ test('BlockStatement', () => {
 
 test('BlockInlineStatement', () => {
   expect(
-    parse(`{% block title page_title|title %}`).Template().body[0]
+    parser(`{% block title page_title|title %}`).Template().body[0]
   ).toStrictEqual({
     body: [
       {
-        expression: {
-          type: 'Identifier',
-          value: 'page_title',
+        type: 'VariableStatement',
+        value: {
+          expression: {
+            type: 'Identifier',
+            name: 'page_title',
+          },
+          filter: {
+            type: 'Identifier',
+            name: 'title',
+          },
+          type: 'FilterExpression',
         },
-        filter: {
-          type: 'Identifier',
-          value: 'title',
-        },
-        type: 'FilterExpression',
       },
     ],
     name: {
       type: 'Identifier',
-      value: 'title',
+      name: 'title',
     },
     type: 'BlockStatement',
     shortcut: true,
@@ -1440,7 +1463,7 @@ test('BlockInlineStatement', () => {
 });
 
 test('ExtendsStatement', () => {
-  expect(parse(`{% extends "base.html" %}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{% extends "base.html" %}`).Template().body[0]).toStrictEqual({
     expr: {
       type: 'StringLiteral',
       value: 'base.html',
@@ -1450,7 +1473,7 @@ test('ExtendsStatement', () => {
 });
 
 test('WithStatement', () => {
-  expect(parse(`{% with %}{% endwith %}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{% with %}{% endwith %}`).Template().body[0]).toStrictEqual({
     accessToOuterScope: true,
     body: [],
     expr: null,
@@ -1458,7 +1481,7 @@ test('WithStatement', () => {
   });
 
   expect(
-    parse(`{% with { foo: 42 } %}{{ foo }}{% endwith %}`).Template().body[0]
+    parser(`{% with { foo: 42 } %}{{ foo }}{% endwith %}`).Template().body[0]
   ).toStrictEqual({
     accessToOuterScope: true,
     body: [
@@ -1466,7 +1489,7 @@ test('WithStatement', () => {
         type: 'VariableStatement',
         value: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
       },
     ],
@@ -1475,10 +1498,10 @@ test('WithStatement', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'foo',
+            name: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'NumericLiteral',
             value: 42,
@@ -1491,7 +1514,7 @@ test('WithStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% with { foo: 42 } only %}{# only foo is defined #}{% endwith %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1507,10 +1530,10 @@ test('WithStatement', () => {
         {
           key: {
             type: 'Identifier',
-            value: 'foo',
+            name: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'NumericLiteral',
             value: 42,
@@ -1524,7 +1547,7 @@ test('WithStatement', () => {
 });
 
 test('UseStatement', () => {
-  expect(parse(`{% use "blocks.html" %}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{% use "blocks.html" %}`).Template().body[0]).toStrictEqual({
     importedBlocks: [],
     name: {
       type: 'StringLiteral',
@@ -1534,7 +1557,7 @@ test('UseStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% use "blocks.html" with sidebar as base_sidebar, title as base_title %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1542,24 +1565,24 @@ test('UseStatement', () => {
       {
         left: {
           type: 'Identifier',
-          value: 'sidebar',
+          name: 'sidebar',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'base_sidebar',
+          name: 'base_sidebar',
         },
         type: 'BinaryExpression',
       },
       {
         left: {
           type: 'Identifier',
-          value: 'title',
+          name: 'title',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'base_title',
+          name: 'base_title',
         },
         type: 'BinaryExpression',
       },
@@ -1574,7 +1597,7 @@ test('UseStatement', () => {
 
 test('SandboxStatement', () => {
   expect(
-    parse(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template()
+    parser(`{% sandbox %}{% include 'user.html' %}{% endsandbox %}`).Template()
       .body[0]
   ).toStrictEqual({
     body: [
@@ -1594,7 +1617,7 @@ test('SandboxStatement', () => {
 });
 
 test('IncludeStatement', () => {
-  expect(parse(`{% include 'header.html' %}`).Template().body[0]).toStrictEqual(
+  expect(parser(`{% include 'header.html' %}`).Template().body[0]).toStrictEqual(
     {
       expr: {
         type: 'StringLiteral',
@@ -1608,7 +1631,7 @@ test('IncludeStatement', () => {
   );
 
   expect(
-    parse(`{% include 'header.html' with {'foo': 'bar'} %}`).Template().body[0]
+    parser(`{% include 'header.html' with {'foo': 'bar'} %}`).Template().body[0]
   ).toStrictEqual({
     expr: {
       type: 'StringLiteral',
@@ -1626,7 +1649,7 @@ test('IncludeStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1637,7 +1660,7 @@ test('IncludeStatement', () => {
   });
 
   expect(
-    parse(`{% include 'header.html' only %}`).Template().body[0]
+    parser(`{% include 'header.html' only %}`).Template().body[0]
   ).toStrictEqual({
     expr: {
       type: 'StringLiteral',
@@ -1650,7 +1673,7 @@ test('IncludeStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% include 'header.html' ignore missing with {'foo': 'bar'} only %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1670,7 +1693,7 @@ test('IncludeStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1683,19 +1706,19 @@ test('IncludeStatement', () => {
 
 test('MacroStatement', () => {
   expect(
-    parse(`{% macro input() %}{% endmacro %}`).Template().body[0]
+    parser(`{% macro input() %}{% endmacro %}`).Template().body[0]
   ).toStrictEqual({
     type: 'MacroStatement',
     body: [],
     arguments: [],
     name: {
       type: 'Identifier',
-      value: 'input',
+      name: 'input',
     },
   });
 
   expect(
-    parse(`{% macro input(name, age = 42) %}<input/>{% endmacro %}`).Template()
+    parser(`{% macro input(name, age = 42) %}<input/>{% endmacro %}`).Template()
       .body[0]
   ).toStrictEqual({
     type: 'MacroStatement',
@@ -1708,12 +1731,12 @@ test('MacroStatement', () => {
     arguments: [
       {
         type: 'Identifier',
-        value: 'name',
+        name: 'name',
       },
       {
         key: {
           type: 'Identifier',
-          value: 'age',
+          name: 'age',
         },
         type: 'NamedArgument',
         value: {
@@ -1724,14 +1747,14 @@ test('MacroStatement', () => {
     ],
     name: {
       type: 'Identifier',
-      value: 'input',
+      name: 'input',
     },
   });
 });
 
 test('ImportStatement', () => {
   expect(
-    parse(`{% import "forms.html" as forms %}`).Template().body[0]
+    parser(`{% import "forms.html" as forms %}`).Template().body[0]
   ).toStrictEqual({
     expr: {
       type: 'StringLiteral',
@@ -1739,7 +1762,7 @@ test('ImportStatement', () => {
     },
     name: {
       type: 'Identifier',
-      value: 'forms',
+      name: 'forms',
     },
     type: 'ImportStatement',
   });
@@ -1747,7 +1770,7 @@ test('ImportStatement', () => {
 
 test('FromStatement', () => {
   expect(
-    parse(
+    parser(
       `{% from 'forms.html' import input as input_field, textarea %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1760,18 +1783,18 @@ test('FromStatement', () => {
       {
         left: {
           type: 'Identifier',
-          value: 'input',
+          name: 'input',
         },
         operator: 'as',
         right: {
           type: 'Identifier',
-          value: 'input_field',
+          name: 'input_field',
         },
         type: 'BinaryExpression',
       },
       {
         type: 'Identifier',
-        value: 'textarea',
+        name: 'textarea',
       },
     ],
   });
@@ -1779,7 +1802,7 @@ test('FromStatement', () => {
 
 test('EmbedStatement', () => {
   expect(
-    parse(
+    parser(
       `{% embed 'teasers_skeleton.twig' %}{# These blocks are defined in "teasers_skeleton.twig" #}{% endembed %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1800,7 +1823,7 @@ test('EmbedStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% embed 'header.html' with {'foo': 'bar'} %}{% endembed %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1820,7 +1843,7 @@ test('EmbedStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1832,7 +1855,7 @@ test('EmbedStatement', () => {
   });
 
   expect(
-    parse(`{% embed 'header.html' only %}{% endembed %}`).Template().body[0]
+    parser(`{% embed 'header.html' only %}{% endembed %}`).Template().body[0]
   ).toStrictEqual({
     expr: {
       type: 'StringLiteral',
@@ -1846,7 +1869,7 @@ test('EmbedStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% embed 'header.html' ignore missing with {'foo': 'bar'} only %}{% endembed %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -1866,7 +1889,7 @@ test('EmbedStatement', () => {
             value: 'foo',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'bar',
@@ -1880,10 +1903,10 @@ test('EmbedStatement', () => {
 
 test('VerbatimStatement', () => {
   expect(
-    parse(`{% verbatim %}<li>{{ item }}</li>{% endverbatim %}`).Template()
+    parser(`{% verbatim %}<li>{{ item }}</li>{% endverbatim %}`).Template()
       .body[0]
   ).toStrictEqual({
-    type: 'EmbedStatement',
+    type: 'VerbatimStatement',
     body: [
       {
         type: 'Text',
@@ -1893,7 +1916,7 @@ test('VerbatimStatement', () => {
         type: 'VariableStatement',
         value: {
           type: 'Identifier',
-          value: 'item',
+          name: 'item',
         },
       },
       {
@@ -1905,7 +1928,7 @@ test('VerbatimStatement', () => {
 });
 
 test('StringInterpolation', () => {
-  expect(parse(`{{ "#{ 32 } baz" }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ "#{ 32 } baz" }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
       body: [
@@ -1925,7 +1948,7 @@ test('StringInterpolation', () => {
     },
   });
 
-  expect(parse(`{{ "foo #{ 32 }" }}`).Template().body[0]).toStrictEqual({
+  expect(parser(`{{ "foo #{ 32 }" }}`).Template().body[0]).toStrictEqual({
     type: 'VariableStatement',
     value: {
       body: [
@@ -1946,7 +1969,7 @@ test('StringInterpolation', () => {
   });
 
   expect(
-    parse(`{{ "foo #{ 32 } baz#{ { a: 32} }" }}`).Template().body[0]
+    parser(`{{ "foo #{ 32 } baz#{ { a: 32} }" }}`).Template().body[0]
   ).toStrictEqual({
     type: 'VariableStatement',
     value: {
@@ -1973,10 +1996,10 @@ test('StringInterpolation', () => {
               {
                 key: {
                   type: 'Identifier',
-                  value: 'a',
+                  name: 'a',
                 },
                 shorthand: false,
-                type: 'PropertyAssignment',
+                type: 'Property',
                 value: {
                   type: 'NumericLiteral',
                   value: 32,
@@ -1994,11 +2017,11 @@ test('StringInterpolation', () => {
 
 test('FormThemeStatement', () => {
   expect(
-    parse(`{% form_theme form 'form/fields.html.twig' %}`).Template().body[0]
+    parser(`{% form_theme form 'form/fields.html.twig' %}`).Template().body[0]
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: [
       {
@@ -2011,13 +2034,13 @@ test('FormThemeStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% form_theme form 'form/fields.html.twig' 'form/fields2.html.twig' %}`
     ).Template().body[0]
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: [
       {
@@ -2034,13 +2057,13 @@ test('FormThemeStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% form_theme form with ['foundation_5_layout.html.twig'] only %}`
     ).Template().body[0]
   ).toStrictEqual({
     form: {
       type: 'Identifier',
-      value: 'form',
+      name: 'form',
     },
     resources: {
       elements: [
@@ -2058,7 +2081,7 @@ test('FormThemeStatement', () => {
 
 test('TransStatement', () => {
   expect(
-    parse(`{% trans %}Hello %name%{% endtrans %}`).Template().body[0]
+    parser(`{% trans %}Hello %name%{% endtrans %}`).Template().body[0]
   ).toStrictEqual({
     body: [
       {
@@ -2066,14 +2089,11 @@ test('TransStatement', () => {
         value: 'Hello %name%',
       },
     ],
-    domain: null,
-    locale: null,
     type: 'TransStatement',
-    vars: [],
   });
 
   expect(
-    parse(
+    parser(
       `{% trans with {'%name%': 'Fabien'} from 'app' %}Hello %name%{% endtrans %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -2087,7 +2107,6 @@ test('TransStatement', () => {
       type: 'StringLiteral',
       value: 'app',
     },
-    locale: null,
     type: 'TransStatement',
     vars: {
       type: 'ObjectLiteral',
@@ -2098,7 +2117,7 @@ test('TransStatement', () => {
             value: '%name%',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'Fabien',
@@ -2109,7 +2128,7 @@ test('TransStatement', () => {
   });
 
   expect(
-    parse(
+    parser(
       `{% trans with {'%name%': 'Fabien'} from 'app' into 'fr' %}Hello %name%{% endtrans %}`
     ).Template().body[0]
   ).toStrictEqual({
@@ -2137,7 +2156,7 @@ test('TransStatement', () => {
             value: '%name%',
           },
           shorthand: false,
-          type: 'PropertyAssignment',
+          type: 'Property',
           value: {
             type: 'StringLiteral',
             value: 'Fabien',
@@ -2150,11 +2169,11 @@ test('TransStatement', () => {
 
 test('TransDefaultDomainStatement', () => {
   expect(
-    parse(`{% trans_default_domain domain %}`).Template().body[0]
+    parser(`{% trans_default_domain domain %}`).Template().body[0]
   ).toStrictEqual({
     domain: {
       type: 'Identifier',
-      value: 'domain',
+      name: 'domain',
     },
     type: 'TransDefaultDomainStatement',
   });
@@ -2162,7 +2181,7 @@ test('TransDefaultDomainStatement', () => {
 
 test('StopwatchStatement', () => {
   expect(
-    parse(`{% stopwatch 'event_name' %}...{% endstopwatch %}`).Template()
+    parser(`{% stopwatch 'event_name' %}...{% endstopwatch %}`).Template()
       .body[0]
   ).toStrictEqual({
     body: [
@@ -2181,7 +2200,7 @@ test('StopwatchStatement', () => {
 
 test('Divisible by', () => {
   expect(
-    parse(`{% if loop.index is divisible by(3) %}{% endif %}`).Template()
+    parser(`{% if loop.index is divisible by(3) %}{% endif %}`).Template()
       .body[0]
   ).toStrictEqual({
     alternate: null,
@@ -2190,11 +2209,11 @@ test('Divisible by', () => {
       left: {
         object: {
           type: 'Identifier',
-          value: 'loop',
+          name: 'loop',
         },
         property: {
           type: 'Identifier',
-          value: 'index',
+          name: 'index',
         },
         type: 'MemberExpression',
       },
@@ -2208,7 +2227,7 @@ test('Divisible by', () => {
         ],
         callee: {
           type: 'Identifier',
-          value: 'divisible by',
+          name: 'divisible by',
         },
         type: 'CallExpression',
       },
@@ -2220,7 +2239,7 @@ test('Divisible by', () => {
 
 test('Same as', () => {
   expect(
-    parse(`{% if foo.attribute is same as(false) %}{% endif %}`).Template()
+    parser(`{% if foo.attribute is same as(false) %}{% endif %}`).Template()
       .body[0]
   ).toStrictEqual({
     alternate: null,
@@ -2229,11 +2248,11 @@ test('Same as', () => {
       left: {
         object: {
           type: 'Identifier',
-          value: 'foo',
+          name: 'foo',
         },
         property: {
           type: 'Identifier',
-          value: 'attribute',
+          name: 'attribute',
         },
         type: 'MemberExpression',
       },
@@ -2247,7 +2266,7 @@ test('Same as', () => {
         ],
         callee: {
           type: 'Identifier',
-          value: 'same as',
+          name: 'same as',
         },
         type: 'CallExpression',
       },
@@ -2259,21 +2278,21 @@ test('Same as', () => {
 
 test('Boilerplate', () => {
   expect(
-    parse(`{% set sizes = sizes in v => v > 38 %}`).Template().body[0]
+    parser(`{% set sizes = sizes in v => v > 38 %}`).Template().body[0]
   ).toStrictEqual({
     declarations: [
       {
         init: {
           left: {
             type: 'Identifier',
-            value: 'sizes',
+            name: 'sizes',
           },
           operator: 'in',
           right: {
             body: {
               left: {
                 type: 'Identifier',
-                value: 'v',
+                name: 'v',
               },
               operator: '>',
               right: {
@@ -2285,7 +2304,7 @@ test('Boilerplate', () => {
             params: [
               {
                 type: 'Identifier',
-                value: 'v',
+                name: 'v',
               },
             ],
             type: 'ArrowFunction',
@@ -2294,7 +2313,7 @@ test('Boilerplate', () => {
         },
         name: {
           type: 'Identifier',
-          value: 'sizes',
+          name: 'sizes',
         },
         type: 'VariableDeclaration',
       },
