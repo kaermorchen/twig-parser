@@ -972,7 +972,7 @@ export class TwigParser extends EmbeddedActionsParser {
           consequent = this.SUBRULE1(this.AssignmentExpression_In);
         });
         this.CONSUME(t.ColonToken);
-        const alternate = this.SUBRULE2(this.AssignmentExpression);
+        const alternate: AssignmentExpression = this.SUBRULE2(this.AssignmentExpression);
 
         result = {
           type: NodeKind.ConditionalExpression,
