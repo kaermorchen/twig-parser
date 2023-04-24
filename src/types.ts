@@ -188,7 +188,7 @@ export interface NamedArgument extends Node {
 
 export interface MemberExpression extends Node {
   type: NodeKind.MemberExpression;
-  object: PrimaryExpression;
+  object: Expression;
   property: BoxMemberExpression | DotMemberExpression;
 }
 
@@ -229,7 +229,7 @@ export type ConditionalExpression =
   | CoalesceExpression
   | {
       type: NodeKind.ConditionalExpression;
-      test: BinaryExpression;
+      test: Expression;
       consequent: AssignmentExpression_In;
       alternate: AssignmentExpression;
     };
@@ -238,7 +238,7 @@ export type ConditionalExpression_In =
   | CoalesceExpression_In
   | {
       type: NodeKind.ConditionalExpression;
-      test: BinaryExpression;
+      test: Expression;
       consequent: AssignmentExpression_In;
       alternate: AssignmentExpression_In;
     };
@@ -478,7 +478,7 @@ export type Expression = FilterExpression;
 
 export interface CallExpression extends Node {
   type: NodeKind.CallExpression;
-  callee: Identifier;
+  callee: Expression;
   arguments: Arguments;
 }
 

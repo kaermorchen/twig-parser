@@ -307,7 +307,7 @@ export class TwigParser extends EmbeddedActionsParser {
   LeftHandSideExpression = this.RULE<() => LeftHandSideExpression>(
     NodeKind.LeftHandSideExpression,
     () => {
-      let object = this.SUBRULE(this.PrimaryExpression);
+      let object: LeftHandSideExpression = this.SUBRULE(this.PrimaryExpression);
 
       this.MANY(() => {
         this.OR([
@@ -478,7 +478,7 @@ export class TwigParser extends EmbeddedActionsParser {
   ExponentiationExpression = this.RULE<() => ExponentiationExpression>(
     NodeKind.ExponentiationExpression,
     () => {
-      let left = this.SUBRULE(this.UnaryExpression);
+      let left: ExponentiationExpression = this.SUBRULE(this.UnaryExpression);
 
       this.MANY(() => {
         left = {
@@ -963,7 +963,7 @@ export class TwigParser extends EmbeddedActionsParser {
   ConditionalExpression = this.RULE<() => ConditionalExpression>(
     NodeKind.ConditionalExpression,
     () => {
-      let result = this.SUBRULE(this.CoalesceExpression);
+      let result: ConditionalExpression = this.SUBRULE(this.CoalesceExpression);
 
       this.OPTION(() => {
         this.CONSUME(t.QuestionToken);
