@@ -9,7 +9,6 @@ export function parser(
   modeKind = ModeKind.Template
 ) {
   const { tokens } = lexer.tokenize(tpl, modeKind);
-  // console.log(tokens);
 
   twigParser.input = tokens;
 
