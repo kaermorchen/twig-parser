@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "clean": "rm -rf ./out",
-    "esbuild-base": "esbuild ./src/index.ts --bundle --platform=node",
+    "esbuild-base": "esbuild ./src/index.ts --bundle --external:chevrotain --platform=node",
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "build:esm": "npm run esbuild-base -- --target=es2022 --outfile=out/esm/index.mjs --format=esm --minify",
     "build:cjs": "npm run esbuild-base -- --target=es6    --outfile=out/cjs/index.cjs --format=cjs --minify",
@@ -23,7 +23,6 @@
     "@types/node": "^18.11.15",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
-    "chevrotain": "^10.5.0",
     "esbuild": "^0.17.8",
     "eslint": "^8.29.0",
     "release-it": "^15.6.0",
@@ -41,5 +40,8 @@
         "default": "./out/cjs/index.cjs"
       }
     }
+  },
+  "dependencies": {
+    "chevrotain": "^10.5.0"
   }
 }
