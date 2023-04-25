@@ -89,6 +89,7 @@ import {
   VerbatimStatement,
   WithStatement,
 } from './types.js';
+import { Position } from './position.js';
 
 export class TwigParser extends EmbeddedActionsParser {
   constructor() {
@@ -1905,6 +1906,13 @@ export class TwigParser extends EmbeddedActionsParser {
       ],
     });
     this.CONSUME1(t.RBlockToken);
+
+    this.ACTION(() => {
+      statement.loc = {
+        start: Position.create(0, 1),
+        end: Position.create(1, 10),
+      }
+    });
 
     return statement;
   });
