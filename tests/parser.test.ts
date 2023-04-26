@@ -2276,7 +2276,7 @@ test('Same as', () => {
   });
 });
 
-test('Boilerplate', () => {
+test('Set, In, Arrow Function', () => {
   expect(
     parser(`{% set sizes = sizes in v => v > 38 %}`).Template().body[0]
   ).toStrictEqual({
