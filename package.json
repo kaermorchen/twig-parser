@@ -17,7 +17,7 @@
     "test": "vitest"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
-  "license": "",
+  "license": "Mozilla Public License 2.0",
   "devDependencies": {
     "@release-it-plugins/lerna-changelog": "^5.0.0",
     "@types/node": "^18.11.15",
