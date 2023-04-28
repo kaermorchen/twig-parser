@@ -25,7 +25,7 @@ module.exports = function (defaults) {
                   loader: 'postcss-loader',
                   options: {
                     postcssOptions: {
-                      config: 'postcss.config.js',
+                      config: 'config/postcss.config.js',
                     },
                   },
                 },
