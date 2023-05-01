@@ -104,7 +104,9 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
 
   @action
   updateValue() {
-    if (this.args.value && this.args.value !== this.editor.getValue()) {
+    if (this.args.value === undefined) {
+      this.editor.setValue('');
+    } else if (this.args.value !== this.editor.getValue()) {
       this.editor.setValue(this.args.value);
     }
   }
