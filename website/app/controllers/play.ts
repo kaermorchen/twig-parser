@@ -1,13 +1,11 @@
 import Controller from '@ember/controller';
-import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
 export default class PlayController extends Controller {
-  @action
-  onCodeChanged(event: Event) {
-    // console.log(event.target?.);
-  }
+  @tracked
+  code = 'hello';
 
-  ast() {
-    return { name: 'hello' };
+  get ast() {
+    return this.code;
   }
 }

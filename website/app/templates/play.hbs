@@ -1,5 +1,9 @@
 <div class="flex-1 flex items-stretch">
-  <MonacoEditor class="flex-auto p-4" @value="hello"/>
+  <MonacoEditor
+    class="flex-auto p-4"
+    @value={{this.code}}
+    @onDidChangeModelContent={{set this "code"}}
+  />
   <div class="flex-none border-solid border-2"></div>
   <div class="flex-1 p-4">
     {{this.ast}}

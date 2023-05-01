@@ -1,17 +1,20 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
-import {
-  Uri,
-  editor,
-  languages,
-} from 'monaco-editor/esm/vs/editor/editor.api.js';
+import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { registerDestructor } from '@ember/destroyable';
+import type monaco from 'monaco-editor';
+
+type IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
 
 interface MonacoEditorSignature {
   Args: {
     readOnly?: boolean;
     language: string;
     value?: string;
+    onDidChangeModelContent: (
+      value: string,
+      editor: IStandaloneCodeEditor
+    ) => void;
   };
   Blocks: {
     default: [];
@@ -20,7 +23,7 @@ interface MonacoEditorSignature {
 }
 
 export default class MonacoEditorComponent extends Component<MonacoEditorSignature> {
-  editor: unknown;
+  declare editor: IStandaloneCodeEditor;
 
   // constructor(owner, args) {
   //   super(owner, args);
@@ -70,18 +73,18 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
     // );
     // registerDestructor(this, onDidContentSizeChangeHandler.dispose);
 
-    // // onDidChangeModelContent
-    // if (this.args.onDidChangeModelContent) {
-    //   const onDidChangeModelContent = this.editor.onDidChangeModelContent(
-    //     () => {
-    //       this.args.onDidChangeModelContent(
-    //         this.editor.getValue(),
-    //         this.editor
-    //       );
-    //     }
-    //   );
-    //   registerDestructor(this, onDidChangeModelContent.dispose);
-    // }
+    // onDidChangeModelContent
+    if (this.args.onDidChangeModelContent) {
+      const onDidChangeModelContent = this.editor.onDidChangeModelContent(
+        () => {
+          this.args.onDidChangeModelContent(
+            this.editor.getValue(),
+            this.editor
+          );
+        }
+      );
+      registerDestructor(this, onDidChangeModelContent.dispose);
+    }
 
     // // Validation
     // if (this.args.onDidValidation) {
@@ -99,24 +102,12 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
     // }
   }
 
-  // @action
-  // updateValue() {
-  //   const model = this.editor.getModel();
-
-  //   if (model.uri.toString() !== this.args.uri) {
-  //     const newModel = getModel(
-  //       this.args.value,
-  //       this.args.language,
-  //       this.args.uri,
-  //       this.args.schema
-  //     );
-
-  //     this.editor.setModel(newModel);
-  //     model.dispose();
-  //   } else {
-  //     this.editor.setValue(this.args.value);
-  //   }
-  // }
+  @action
+  updateValue() {
+    if (this.args.value && this.args.value !== this.editor.getValue()) {
+      this.editor.setValue(this.args.value);
+    }
+  }
 
   // @action
   // invokeSendValue() {
