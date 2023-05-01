@@ -1,4 +1,11 @@
-<div class="h-max flex items-stretch">
-  <div class="flex-auto">Test 1</div>
-  <div class="flex-1">Test 2</div>
+<div class="flex-1 flex items-stretch">
+  <div
+    class="flex-auto p-4"
+    contenteditable="true"
+    {{on "input" this.onCodeChanged}}
+  ></div>
+  <div class="flex-none border-solid border-2"></div>
+  <div class="flex-1 p-4">
+    {{this.ast}}
+  </div>
 </div>
