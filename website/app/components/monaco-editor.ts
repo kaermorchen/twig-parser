@@ -54,29 +54,6 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
       value: this.args.value,
     });
 
-    // if (Array.isArray(this.args.actions)) {
-    //   this.args.actions.forEach((item) => {
-    //     // assign because item can be a proxy object
-    //     this.editor.addAction(Object.assign({}, item));
-    //   });
-    // }
-
-    // Autoresize height of element
-    // const minHeight = this.args.minHeight ?? 160;
-    // const maxHeight = this.args.maxHeight ?? 420;
-    // const onDidContentSizeChangeHandler = this.editor.onDidContentSizeChange(
-    //   () => {
-    //     const contentHeight = Math.min(
-    //       Math.max(this.editor.getContentHeight(), minHeight),
-    //       maxHeight
-    //     );
-
-    //     el.style.height = `${contentHeight + 1}px`;
-    //     this.editor.layout();
-    //   }
-    // );
-    // registerDestructor(this, onDidContentSizeChangeHandler.dispose);
-
     // onDidChangeModelContent
     if (this.args.onDidChangeModelContent) {
       const onDidChangeModelContent = this.editor.onDidChangeModelContent(
@@ -89,21 +66,6 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
       );
       registerDestructor(this, onDidChangeModelContent.dispose);
     }
-
-    // // Validation
-    // if (this.args.onDidValidation) {
-    //   const onDidChangeMarkersHandler = editor.onDidChangeMarkers(() => {
-    //     const model = this.editor.getModel();
-
-    //     this.args.onDidValidation(
-    //       editor
-    //         .getModelMarkers({ resource: model.uri })
-    //         .map((item) => item.message),
-    //       this.editor
-    //     );
-    //   });
-    //   registerDestructor(this, onDidChangeMarkersHandler.dispose);
-    // }
   }
 
   @action
@@ -115,14 +77,9 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
     }
   }
 
-  // @action
-  // invokeSendValue() {
-  //   this.args.sendValue?.(this.editor.getValue(), this.editor);
-  // }
-
   willDestroy() {
-    // this.editor.getModel()?.dispose();
-    // this.editor.dispose();
+    this.editor.getModel()?.dispose();
+    this.editor.dispose();
 
     super.willDestroy();
   }
