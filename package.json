@@ -54,7 +54,7 @@
   },
   "release-it": {
     "hooks": {
-      "after:bump": "npm run build && tar -zcf dist.tgz *"
+      "after:bump": "npm run build"
     },
     "plugins": {
       "release-it-lerna-changelog": {
@@ -67,10 +67,7 @@
     },
     "github": {
       "release": true,
-      "tokenRef": "GITHUB_AUTH",
-      "assets": [
-        "dist/dist.tgz"
-      ]
+      "tokenRef": "GITHUB_AUTH"
     }
   }
 }
