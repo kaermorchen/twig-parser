@@ -58,10 +58,7 @@
     },
     "github": {
       "release": true,
-      "tokenRef": "GITHUB_AUTH",
-      "assets": [
-        "dist/dist.tgz"
-      ]
+      "tokenRef": "GITHUB_AUTH"
     },
     "npm": true
   }
