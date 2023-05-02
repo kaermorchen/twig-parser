@@ -4,13 +4,22 @@ import { editor } from 'monaco-editor/esm/vs/editor/editor.api.js';
 import { registerDestructor } from '@ember/destroyable';
 import type monaco from 'monaco-editor';
 
+// @ts-expect-error This is needed because the SimpleWorker.js in monaco-editor has the following code:
+// loaderConfiguration = self.requirejs.s.contexts._.config;
+window.requirejs.s = {
+  contexts: {
+    _: {
+      config: '',
+    },
+  },
+};
+
 type IStandaloneCodeEditor = monaco.editor.IStandaloneCodeEditor;
+type IStandaloneEditorConstructionOptions =
+  monaco.editor.IStandaloneEditorConstructionOptions;
 
 interface MonacoEditorSignature {
-  Args: {
-    readOnly?: boolean;
-    language: string;
-    value?: string;
+  Args: IStandaloneEditorConstructionOptions & {
     onDidChangeModelContent: (
       value: string,
       editor: IStandaloneCodeEditor
@@ -25,12 +34,6 @@ interface MonacoEditorSignature {
 export default class MonacoEditorComponent extends Component<MonacoEditorSignature> {
   declare editor: IStandaloneCodeEditor;
 
-  // constructor(owner, args) {
-  //   super(owner, args);
-
-  //   this.args.invoker?.subscribe(this);
-  // }
-
   @action
   initEditor(el: HTMLElement) {
     this.editor = editor.create(el, {
@@ -41,6 +44,7 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
       lineNumbers: 'off',
       roundedSelection: false,
       scrollBeyondLastLine: false,
+      automaticLayout: true,
       minimap: {
         enabled: false,
       },
