@@ -6,15 +6,16 @@
   "types": "out/cjs/index.d.js",
   "type": "module",
   "scripts": {
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build:cjs": "npm run esbuild-base -- --target=es6    --outfile=out/cjs/index.cjs --format=cjs --minify",
+    "build:esm": "npm run esbuild-base -- --target=es2022 --outfile=out/esm/index.mjs --format=esm --minify",
     "clean": "rm -rf ./out",
     "esbuild-base": "esbuild ./src/index.ts --bundle --external:chevrotain --platform=node",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs",
-    "build:esm": "npm run esbuild-base -- --target=es2022 --outfile=out/esm/index.mjs --format=esm --minify",
-    "build:cjs": "npm run esbuild-base -- --target=es6    --outfile=out/cjs/index.cjs --format=cjs --minify",
-    "postbuild:esm": "tsc --emitDeclarationOnly --declaration --target es2022 --module NodeNext --moduleResolution NodeNext --outDir out/esm",
     "postbuild:cjs": "tsc --emitDeclarationOnly --declaration --target ES6    --module CommonJS --moduleResolution Node     --outDir out/cjs",
-    "watch": "npm run esbuild-base -- --sourcemap --watch",
-    "test": "vitest"
+    "postbuild:esm": "tsc --emitDeclarationOnly --declaration --target es2022 --module NodeNext --moduleResolution NodeNext --outDir out/esm",
+    "release": "release-it",
+    "test": "vitest",
+    "watch": "npm run esbuild-base -- --sourcemap --watch"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0",
@@ -25,7 +26,8 @@
     "@typescript-eslint/parser": "^5.46.1",
     "esbuild": "^0.17.8",
     "eslint": "^8.29.0",
-    "release-it": "^15.6.0",
+    "release-it": "^15.10.2",
+    "release-it-lerna-changelog": "^5.0.0",
     "typescript": "^4.9.4",
     "vitest": "^0.29.2"
   },
@@ -43,5 +45,21 @@
   },
   "dependencies": {
     "chevrotain": "^10.5.0"
+  },
+  "release-it": {
+    "plugins": {
+      "release-it-lerna-changelog": {
+        "infile": "CHANGELOG.md",
+        "launchEditor": false
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
+    },
+    "npm": true
   }
 }
