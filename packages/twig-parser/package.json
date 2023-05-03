@@ -14,7 +14,6 @@
     "esbuild-base": "esbuild ./src/index.ts --bundle --external:chevrotain --platform=node",
     "postbuild:cjs": "tsc --emitDeclarationOnly --declaration --target ES6    --module CommonJS --moduleResolution Node     --outDir out/cjs",
     "postbuild:esm": "tsc --emitDeclarationOnly --declaration --target es2022 --module NodeNext --moduleResolution NodeNext --outDir out/esm",
-    "release": "release-it",
     "test": "vitest",
     "watch": "npm run esbuild-base -- --sourcemap --watch"
   },
@@ -48,23 +47,5 @@
   },
   "dependencies": {
     "chevrotain": "^10.5.0"
-  },
-  "release-it": {
-    "hooks": {
-      "after:bump": "npm run build"
-    },
-    "plugins": {
-      "release-it-lerna-changelog": {
-        "infile": "CHANGELOG.md",
-        "launchEditor": false
-      }
-    },
-    "git": {
-      "tagName": "v${version}"
-    },
-    "github": {
-      "release": true,
-      "tokenRef": "GITHUB_AUTH"
-    }
   }
 }
