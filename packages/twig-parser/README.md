@@ -1,6 +1,6 @@
 # Twig Parser
 
-This tool transforms twig tempalte to AST.
+This tool transforms a twig template to AST. It uses [chevrotain](https://chevrotain.io) under the hood.
 
 ## How to use it
 ```js

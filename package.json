@@ -1,47 +1,47 @@
 {
   "name": "twig-parser",
-  "version": "0.0.0",
-  "description": "",
-  "main": "out/cjs/index.cjs",
-  "types": "out/cjs/index.d.js",
-  "type": "module",
+  "version": "0.1.0",
+  "repository": "https://github.com/kaermorchen/twig-parser",
   "scripts": {
-    "clean": "rm -rf ./out",
-    "esbuild-base": "esbuild ./src/index.ts --bundle --external:chevrotain --platform=node",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs",
-    "build:esm": "npm run esbuild-base -- --target=es2022 --outfile=out/esm/index.mjs --format=esm --minify",
-    "build:cjs": "npm run esbuild-base -- --target=es6    --outfile=out/cjs/index.cjs --format=cjs --minify",
-    "postbuild:esm": "tsc --emitDeclarationOnly --declaration --target es2022 --module NodeNext --moduleResolution NodeNext --outDir out/esm",
-    "postbuild:cjs": "tsc --emitDeclarationOnly --declaration --target ES6    --module CommonJS --moduleResolution Node     --outDir out/cjs",
-    "watch": "npm run esbuild-base -- --sourcemap --watch",
-    "test": "vitest"
+    "release": "release-it"
   },
   "author": "Stanislav Romanov <kaermorchen@gmail.com>",
   "license": "Mozilla Public License 2.0",
-  "devDependencies": {
-    "@release-it-plugins/lerna-changelog": "^5.0.0",
-    "@types/node": "^18.11.15",
-    "@typescript-eslint/eslint-plugin": "^5.46.1",
-    "@typescript-eslint/parser": "^5.46.1",
-    "esbuild": "^0.17.8",
-    "eslint": "^8.29.0",
-    "release-it": "^15.6.0",
-    "typescript": "^4.9.4",
-    "vitest": "^0.29.2"
-  },
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./out/esm/index.d.ts",
-        "default": "./out/esm/index.mjs"
+  "release-it": {
+    "hooks": {
+      "after:bump": "npm run build -ws"
+    },
+    "plugins": {
+      "@release-it-plugins/lerna-changelog": {
+        "infile": "CHANGELOG.md",
+        "launchEditor": false
       },
-      "require": {
-        "types": "./out/cjs/index.d.ts",
-        "default": "./out/cjs/index.cjs"
+      "@release-it-plugins/workspaces": {
+        "additionalManifests": {
+          "versionUpdates": [
+            "package.json",
+            "packages/twig-parser/package.json"
+          ],
+          "dependencyUpdates": [
+            "packages/twig-parser/package.json"
+          ]
+        }
       }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true,
+      "tokenRef": "GITHUB_AUTH"
     }
   },
-  "dependencies": {
-    "chevrotain": "^10.5.0"
+  "workspaces": [
+    "packages/twig-parser"
+  ],
+  "devDependencies": {
+    "@release-it-plugins/lerna-changelog": "^5.0.0",
+    "@release-it-plugins/workspaces": "^3.2.0",
+    "release-it": "^15.10.3"
   }
 }
