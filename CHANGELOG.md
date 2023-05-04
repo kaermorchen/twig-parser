@@ -1,3 +1,13 @@
+
+## v0.2.0 (2023-05-04)
+
+#### :rocket: Enhancement
+* `twig-parser`
+  * [#7](https://github.com/kaermorchen/twig-parser/pull/7) Transform repo to monorepo ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
+
 ## v0.1.0 (2023-05-02)
 
 #### :rocket: Enhancement
