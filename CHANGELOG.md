@@ -1,3 +1,11 @@
+## v0.2.1 (2023-05-04)
+
+#### :bug: Bug Fix
+* `twig-parser`
+  * [#8](https://github.com/kaermorchen/twig-parser/pull/8) Fix workspace settings ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
 
 ## v0.2.0 (2023-05-04)
 
