@@ -4,7 +4,13 @@ import { parse } from 'twig-parser';
 
 export default class PlayController extends Controller {
   @tracked
-  code = 'hello';
+  code = `{% set greeting = 'Hello World' %}
+
+{{ greeting|lower }}
+
+{% for i in range(low=1, high=10, step=2) %}
+  {{ i }},
+{% endfor %}`;
 
   get ast() {
     const { ast } = parse(this.code);
