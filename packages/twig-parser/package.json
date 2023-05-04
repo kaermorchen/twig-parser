@@ -3,9 +3,14 @@
   "version": "0.2.0",
   "description": "This tool transforms a twig template to AST",
   "main": "out/cjs/index.cjs",
-  "types": "out/cjs/index.d.js",
+  "module": "out/esm/index.mjs",
+  "types": "out/esm/index.d.js",
   "type": "module",
-  "repository": "https://github.com/kaermorchen/twig-parser",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-parser",
+    "directory": "packages/twig-parser"
+  },
   "scripts": {
     "build": "npm run clean && npm run build:esm && npm run build:cjs",
     "build:cjs": "npm run esbuild-base -- --target=es6    --outfile=out/cjs/index.cjs --format=cjs --minify",
