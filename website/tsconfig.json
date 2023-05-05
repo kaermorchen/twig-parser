@@ -7,10 +7,10 @@
     // work with TypeScript.
     "baseUrl": ".",
     "paths": {
-      "twig-parser-demo/tests/*": [
+      "website/tests/*": [
         "tests/*"
       ],
-      "twig-parser-demo/*": [
+      "website/*": [
         "app/*"
       ],
       "*": [

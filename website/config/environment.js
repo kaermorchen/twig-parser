@@ -2,7 +2,7 @@
 
 module.exports = function (environment) {
   const ENV = {
-    modulePrefix: 'twig-parser-demo',
+    modulePrefix: 'website',
     environment,
     rootURL: '/',
     locationType: 'history',

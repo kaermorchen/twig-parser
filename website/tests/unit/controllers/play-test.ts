@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { setupTest } from 'twig-parser-demo/tests/helpers';
+import { setupTest } from 'website/tests/helpers';
 
 module('Unit | Controller | play', function (hooks) {
   setupTest(hooks);
