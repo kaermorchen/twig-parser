@@ -4,10 +4,22 @@
     @value={{this.code}}
     @onDidChangeModelContent={{set this "code"}}
   />
-  <MonacoEditor
-    class="flex-1"
-    @value={{this.ast}}
-    @language="json"
-    @readOnly={{true}}
-  />
+
+  {{#if this.errors}}
+    <div class="flex-1 px-4 py-2">
+      <h2 class="text-lg mb-4">Errors:</h2>
+      <ul>
+        {{#each this.errors as |error|}}
+          <li>{{error.message}}</li>
+        {{/each}}
+      </ul>
+    </div>
+  {{else}}
+    <MonacoEditor
+      class="flex-1"
+      @value={{this.ast}}
+      @language="json"
+      @readOnly={{true}}
+    />
+  {{/if}}
 </div>

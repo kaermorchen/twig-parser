@@ -12,9 +12,19 @@ export default class PlayController extends Controller {
   {{ i }},
 {% endfor %}`;
 
+  get twig() {
+    return parse(this.code);
+  }
+
   get ast() {
-    const { ast } = parse(this.code);
+    const ast = this.twig.ast;
 
     return JSON.stringify(ast, null, 2);
+  }
+
+  get errors() {
+    const errors = this.twig.errors;
+
+    return errors;
   }
 }
