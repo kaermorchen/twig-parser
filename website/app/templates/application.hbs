@@ -1,0 +1,19 @@
+<div class="flex flex-col h-screen">
+  <header class="flex-none flex items-center px-3 py-4 sm:px-4 lg:px-6 shadow">
+    <h1 class="flex-none text-xl font-bold">
+      <LinkTo @route="play" class="flex items-center">
+        <img src="logo.svg" alt="Twig Parser" class="h-10 -my-4 mr-2" />
+        Twig Parser</LinkTo>
+    </h1>
+    <nav class="ml-4 flex items-baseline gap-4" role="navigation">
+      <a
+        href="https://github.com/kaermorchen/twig-parser"
+        title="Link to Twig Parser repository"
+      >GitHub</a>
+    </nav>
+  </header>
+
+  <main class="grow flex">
+    {{outlet}}
+  </main>
+</div>

@@ -19,10 +19,12 @@
         "additionalManifests": {
           "versionUpdates": [
             "package.json",
-            "packages/twig-parser/package.json"
+            "packages/twig-parser/package.json",
+            "website/package.json"
           ],
           "dependencyUpdates": [
-            "packages/twig-parser/package.json"
+            "packages/twig-parser/package.json",
+            "website/package.json"
           ]
         }
       }
@@ -37,7 +39,8 @@
     "npm": false
   },
   "workspaces": [
-    "packages/twig-parser"
+    "packages/twig-parser",
+    "website"
   ],
   "devDependencies": {
     "@release-it-plugins/lerna-changelog": "^5.0.0",
