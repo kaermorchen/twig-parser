@@ -1,6 +1,6 @@
 {
   "name": "twig-parser",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "This tool transforms a twig template to AST",
   "main": "out/cjs/index.cjs",
   "module": "out/esm/index.mjs",

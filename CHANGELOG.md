@@ -1,3 +1,14 @@
+## v0.2.2 (2023-05-06)
+
+#### :rocket: Enhancement
+* [#9](https://github.com/kaermorchen/twig-parser/pull/9) Add demo page ([@kaermorchen](https://github.com/kaermorchen))
+
+#### :memo: Documentation
+* [#10](https://github.com/kaermorchen/twig-parser/pull/10) Add main readme ([@kaermorchen](https://github.com/kaermorchen))
+
+#### Committers: 1
+- Stanislav Romanov ([@kaermorchen](https://github.com/kaermorchen))
+
 ## v0.2.1 (2023-05-04)
 
 #### :bug: Bug Fix
