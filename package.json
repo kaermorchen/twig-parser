@@ -20,10 +20,12 @@
           "versionUpdates": [
             "package.json",
             "packages/twig-parser/package.json",
+            "packages/twig-language-server/package.json",
             "website/package.json"
           ],
           "dependencyUpdates": [
             "packages/twig-parser/package.json",
+            "packages/twig-language-server/package.json",
             "website/package.json"
           ]
         }
@@ -40,6 +42,7 @@
   },
   "workspaces": [
     "packages/twig-parser",
+    "packages/twig-language-server",
     "website"
   ],
   "devDependencies": {

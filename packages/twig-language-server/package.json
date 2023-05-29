@@ -1,0 +1,15 @@
+{
+  "name": "twig-language-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "out/index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaermorchen/twig-parser",
+    "directory": "packages/twig-language-server"
+  }
+}
