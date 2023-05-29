@@ -14,6 +14,9 @@ export async function activate(context: ExtensionContext) {
     join('twig-language-server', 'out', 'index.js')
   );
 
+  console.log(serverModule);
+
+
   const serverOptions: ServerOptions = {
     run: { module: serverModule, transport: TransportKind.ipc },
     debug: {
