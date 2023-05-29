@@ -1,0 +1,7 @@
+{
+  "references": [
+    { "path": "packages/twig-language-server" },
+    { "path": "packages/twig-parser" }
+  ],
+  "files": []
+}

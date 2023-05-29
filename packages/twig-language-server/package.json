@@ -4,6 +4,7 @@
   "description": "",
   "main": "out/index.js",
   "scripts": {
+    "build": "tsc --build",
     "test": "test"
   },
   "author": "",
@@ -11,5 +12,12 @@
     "type": "git",
     "url": "https://github.com/kaermorchen/twig-parser",
     "directory": "packages/twig-language-server"
+  },
+  "dependencies": {
+    "vscode-languageserver": "^8.1.0",
+    "vscode-languageserver-textdocument": "^1.0.8"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.0"
   }
 }
