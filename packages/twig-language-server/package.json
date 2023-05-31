@@ -5,7 +5,7 @@
   "main": "out/index.js",
   "scripts": {
     "vscode:prepublish": "npm run esbuild-base -- --minify",
-    "esbuild-base": "esbuild ./src/index.ts --bundle --outfile=out/index.js --format=cjs --platform=node",
+    "esbuild-base": "esbuild ./src/*.ts --outdir=out --format=cjs --platform=node",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "release": "release-it"
@@ -17,6 +17,7 @@
     "directory": "packages/twig-language-server"
   },
   "dependencies": {
+    "twig-parser": "^0.2.2",
     "vscode-languageserver": "^8.1.0",
     "vscode-languageserver-textdocument": "^1.0.8"
   },

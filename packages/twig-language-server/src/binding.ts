@@ -2,12 +2,15 @@ import {
   Connection,
   InitializeParams,
   ServerCapabilities,
+  TextDocumentSyncKind,
   TextDocuments,
 } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { validateTwig } from './utils/validate-twig';
 
-export const capabilities: ServerCapabilities = {};
+export const capabilities: ServerCapabilities = {
+  textDocumentSync: TextDocumentSyncKind.Full,
+};
 
 export type BindingArgs = {
   openDocuments: TextDocuments<TextDocument>;
@@ -21,5 +24,9 @@ export function bindLanguageServer(arg: BindingArgs): void {
     return { capabilities };
   });
 
-  openDocuments.onDidChangeContent(validateTwig, arg);
+  openDocuments.onDidChangeContent((event) => {
+    connection.console.log('onDidChangeContent1');
+    console.log('onDidChangeContent2');
+    // validateTwig(event.document);
+  });
 }
