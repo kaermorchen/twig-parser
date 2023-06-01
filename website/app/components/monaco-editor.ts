@@ -20,7 +20,7 @@ type IStandaloneEditorConstructionOptions =
 
 interface MonacoEditorSignature {
   Args: IStandaloneEditorConstructionOptions & {
-    onDidChangeModelContent: (
+    onDidChangeModelContent?: (
       value: string,
       editor: IStandaloneCodeEditor
     ) => void;
@@ -31,7 +31,7 @@ interface MonacoEditorSignature {
   Element: HTMLElement;
 }
 
-export default class MonacoEditorComponent extends Component<MonacoEditorSignature> {
+export default class MonacoEditor extends Component<MonacoEditorSignature> {
   declare editor: IStandaloneCodeEditor;
 
   @action
@@ -58,7 +58,7 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
     if (this.args.onDidChangeModelContent) {
       const onDidChangeModelContent = this.editor.onDidChangeModelContent(
         () => {
-          this.args.onDidChangeModelContent(
+          this.args.onDidChangeModelContent?.(
             this.editor.getValue(),
             this.editor
           );
@@ -82,5 +82,11 @@ export default class MonacoEditorComponent extends Component<MonacoEditorSignatu
     this.editor.dispose();
 
     super.willDestroy();
+  }
+}
+
+declare module '@glint/environment-ember-loose/registry' {
+  export default interface Registry {
+    MonacoEditor: typeof MonacoEditor;
   }
 }
